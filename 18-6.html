@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>流程图与 ER 图 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .diagram {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+    padding: 14px;
+    overflow-x: auto;
+  }
+
+  .diagram svg { display: block; width: 100%; height: auto; min-width: 640px; }
+
+  .node rect { fill: #fff; stroke: #dfe5ee; stroke-width: 1; }
+  .node.start rect { fill: #14161a; stroke: #14161a; }
+  .node.start text { fill: #fff; }
+  .node.decision rect { fill: #fff8e9; stroke: #f0c98a; }
+  .node.end rect { fill: #f7f9fc; stroke: #b9c4d4; }
+
+  .node text { font: 500 12.5px -apple-system, "Segoe UI", "PingFang SC", sans-serif; fill: #1b2330; }
+  .node.decision text { font-size: 12px; }
+  .node:hover rect { stroke: #2f6fed; }
+
+  .edge { fill: none; stroke: #b9c4d4; stroke-width: 1.2; }
+  .edge-label { font: 400 11px ui-monospace, Consolas, monospace; fill: #9aa4b2; }
+
+  /* ER 图 */
+  .entity rect.head { fill: #eef4ff; stroke: #c9dcfb; }
+  .entity rect.body { fill: #fff; stroke: #dfe5ee; }
+  .entity text.tname { font: 600 12.5px -apple-system, "Segoe UI", sans-serif; fill: #1b3a66; }
+  .entity text.field { font: 400 11.5px ui-monospace, Consolas, monospace; fill: #4b525c; }
+  .entity text.pk { fill: #b45309; }
+  .rel { fill: none; stroke: #b9c4d4; stroke-width: 1.2; }
+  .cardinal { font: 500 11px ui-monospace, Consolas, monospace; fill: #8b95a5; }
+
+  .tabbar { display: flex; gap: 6px; margin-bottom: 12px; }
+  .tabbar button {
+    padding: 6px 14px;
+    border: 1px solid #d9dee7;
+    border-radius: 7px;
+    background: #fff;
+    color: #4b525c;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .tabbar button.on { background: #14161a; border-color: #14161a; color: #fff; }
+  .pane { display: none; }
+  .pane.on { display: block; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>流程图与 ER 图</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>流程图与 ER 图</h1>
+    <div class="meta">
+      <span>第 18 讲</span>
+      <span class="mono">18-6.html</span>
+      <span>手写 SVG · 可导出</span>
+    </div>
+    <p class="lead">
+      这两张图平时用 Mermaid 一行代码就能生成，但生成出来的图你改不动样式。
+      这里是手写 SVG：<b>判断用菱形、起点用实心、主键用橙色、关系标了 1:N</b>，完全按画图规范来，而且能直接导出。
+    </p>
+
+    <section class="demo">
+      <div class="tabbar" id="tabs">
+        <button data-k="flow" class="on">业务流程图</button>
+        <button data-k="er">ER 图</button>
+        <button id="btn-svg" style="margin-left:auto">下载当前图 SVG</button>
+      </div>
+
+      <div class="diagram">
+        <!-- 流程图 -->
+        <div class="pane on" id="flow">
+          <svg id="svg-flow" viewBox="0 0 720 470" role="img" aria-label="订单处理流程图">
+            <defs>
+              <marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M1 1L8 5L1 9" fill="none" stroke="#b9c4d4" stroke-width="1.3" stroke-linecap="round"/>
+              </marker>
+            </defs>
+
+            <g class="node start">
+              <rect x="290" y="24" width="140" height="40" rx="20"/>
+              <text x="360" y="49" text-anchor="middle">用户提交订单</text>
+            </g>
+
+            <g class="node">
+              <rect x="290" y="98" width="140" height="42" rx="8"/>
+              <text x="360" y="124" text-anchor="middle">校验库存</text>
+            </g>
+
+            <g class="node decision">
+              <path d="M360 172 L452 224 L360 276 L268 224 Z"/>
+              <text x="360" y="220" text-anchor="middle">库存充足？</text>
+            </g>
+
+            <g class="node">
+              <rect x="480" y="203" width="150" height="42" rx="8"/>
+              <text x="555" y="229" text-anchor="middle">锁定库存</text>
+            </g>
+
+            <g class="node decision">
+              <path d="M555 286 L637 326 L555 366 L473 326 Z"/>
+              <text x="555" y="322" text-anchor="middle">支付成功？</text>
+            </g>
+
+            <g class="node">
+              <rect x="290" y="304" width="140" height="42" rx="8"/>
+              <text x="360" y="330" text-anchor="middle">释放库存</text>
+            </g>
+
+            <g class="node">
+              <rect x="480" y="396" width="150" height="42" rx="8"/>
+              <text x="555" y="422" text-anchor="middle">生成发货单</text>
+            </g>
+
+            <g class="node end">
+              <rect x="290" y="396" width="140" height="40" rx="20"/>
+              <text x="360" y="421" text-anchor="middle">订单关闭</text>
+            </g>
+
+            <!-- 连线 -->
+            <path class="edge" d="M360 64 V94" marker-end="url(#a1)"/>
+            <path class="edge" d="M360 140 V168" marker-end="url(#a1)"/>
+            <path class="edge" d="M452 224 H476" marker-end="url(#a1)"/>
+            <text class="edge-label" x="456" y="218">是</text>
+            <path class="edge" d="M360 276 V300" marker-end="url(#a1)"/>
+            <text class="edge-label" x="366" y="294">否</text>
+            <path class="edge" d="M555 245 V282" marker-end="url(#a1)"/>
+            <path class="edge" d="M555 366 V392" marker-end="url(#a1)"/>
+            <text class="edge-label" x="561" y="384">是</text>
+            <path class="edge" d="M473 326 H400 V346" marker-end="url(#a1)"/>
+            <text class="edge-label" x="410" y="320">否</text>
+            <path class="edge" d="M360 346 V392" marker-end="url(#a1)"/>
+          </svg>
+        </div>
+
+        <!-- ER 图 -->
+        <div class="pane" id="er">
+          <svg id="svg-er" viewBox="0 0 720 440" role="img" aria-label="订单系统 ER 图">
+            <!-- 用户 -->
+            <g class="entity">
+              <rect class="head" x="40" y="40" width="180" height="34" rx="8"/>
+              <rect class="body" x="40" y="74" width="180" height="118" rx="8" style="border-top-left-radius:0"/>
+              <text class="tname" x="130" y="62" text-anchor="middle">users</text>
+              <text class="field pk" x="54" y="96">id  PK</text>
+              <text class="field" x="54" y="116">nickname</text>
+              <text class="field" x="54" y="136">phone</text>
+              <text class="field" x="54" y="156">created_at</text>
+              <text class="field" x="54" y="176">level</text>
+            </g>
+
+            <!-- 订单 -->
+            <g class="entity">
+              <rect class="head" x="490" y="40" width="190" height="34" rx="8"/>
+              <rect class="body" x="490" y="74" width="190" height="138" rx="8"/>
+              <text class="tname" x="585" y="62" text-anchor="middle">orders</text>
+              <text class="field pk" x="504" y="96">id  PK</text>
+              <text class="field" x="504" y="116">user_id  FK</text>
+              <text class="field" x="504" y="136">status</text>
+              <text class="field" x="504" y="156">total_amount</text>
+              <text class="field" x="504" y="176">paid_at</text>
+              <text class="field" x="504" y="196">created_at</text>
+            </g>
+
+            <!-- 订单项 -->
+            <g class="entity">
+              <rect class="head" x="490" y="286" width="190" height="34" rx="8"/>
+              <rect class="body" x="490" y="320" width="190" height="100" rx="8"/>
+              <text class="tname" x="585" y="308" text-anchor="middle">order_items</text>
+              <text class="field pk" x="504" y="342">id  PK</text>
+              <text class="field" x="504" y="362">order_id  FK</text>
+              <text class="field" x="504" y="382">sku_id  FK</text>
+              <text class="field" x="504" y="402">qty / price</text>
+            </g>
+
+            <!-- 商品 -->
+            <g class="entity">
+              <rect class="head" x="40" y="286" width="180" height="34" rx="8"/>
+              <rect class="body" x="40" y="320" width="180" height="100" rx="8"/>
+              <text class="tname" x="130" y="308" text-anchor="middle">skus</text>
+              <text class="field pk" x="54" y="342">id  PK</text>
+              <text class="field" x="54" y="362">product_id  FK</text>
+              <text class="field" x="54" y="382">spec</text>
+              <text class="field" x="54" y="402">price / stock</text>
+            </g>
+
+            <!-- 关系线 -->
+            <path class="rel" d="M220 128 H486"/>
+            <text class="cardinal" x="228" y="122">1</text>
+            <text class="cardinal" x="466" y="122">N</text>
+
+            <path class="rel" d="M585 212 V282"/>
+            <text class="cardinal" x="592" y="232">1</text>
+            <text class="cardinal" x="592" y="276">N</text>
+
+            <path class="rel" d="M490 372 H224 V216"/>
+            <text class="cardinal" x="470" y="366">N</text>
+            <text class="cardinal" x="232" y="240">1</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>图形</th><th>含义</th><th>这里的实现</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>圆角长条（实心）</td><td>流程起点 / 终点</td><td><code>rect rx="20"</code> + 深色填充</td></tr>
+        <tr><td>矩形</td><td>处理步骤</td><td><code>rect rx="8"</code></td></tr>
+        <tr><td>菱形</td><td>判断分支</td><td>四段 <code>path</code> 拼成，不用图片</td></tr>
+        <tr><td>箭头</td><td>流向</td><td><code>marker-end</code> 复用同一个箭头定义</td></tr>
+        <tr><td>表箱</td><td>ER 实体</td><td>表头矩形 + 字段矩形上下拼接，同一圆角半径</td></tr>
+        <tr><td>1 / N</td><td>基数</td><td>文字直接标在连线端点旁</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>手写 SVG 与 Mermaid 的分工：</b>需求会变、要反复改的图用 Mermaid（改一行文字就重排）；
+      交付给别人看的定稿图用手写 SVG（样式、字号、留白完全可控）。这张图如果改成 Mermaid，
+      菱形和配色都会被框架锁死，反而不好看。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var current = "flow";
+
+  document.getElementById("tabs").addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-k]");
+    if (!btn) return;
+
+    Array.prototype.forEach.call(this.querySelectorAll("button[data-k]"), function (b) {
+      b.classList.toggle("on", b === btn);
+    });
+
+    current = btn.dataset.k;
+    document.getElementById("flow").classList.toggle("on", current === "flow");
+    document.getElementById("er").classList.toggle("on", current === "er");
+  });
+
+  document.getElementById("btn-svg").addEventListener("click", function () {
+    var svg = document.getElementById("svg-" + current);
+    var clone = svg.cloneNode(true);
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    var vb = (svg.getAttribute("viewBox") || "0 0 720 470").split(" ");
+    clone.setAttribute("width", vb[2]);
+    clone.setAttribute("height", vb[3]);
+
+    // 把 CSS 里定义的样式内联进去，否则导出的文件会丢样式
+    var css = [
+      ".node rect{fill:#fff;stroke:#dfe5ee;stroke-width:1}",
+      ".node.start rect{fill:#14161a;stroke:#14161a}",
+      ".node.start text{fill:#fff}",
+      ".node.decision rect{fill:#fff8e9;stroke:#f0c98a}",
+      ".node.end rect{fill:#f7f9fc;stroke:#b9c4d4}",
+      ".node text{font:500 12.5px sans-serif;fill:#1b2330}",
+      ".edge{fill:none;stroke:#b9c4d4;stroke-width:1.2}",
+      ".edge-label{font:400 11px monospace;fill:#9aa4b2}",
+      ".entity rect.head{fill:#eef4ff;stroke:#c9dcfb}",
+      ".entity rect.body{fill:#fff;stroke:#dfe5ee}",
+      ".entity text.tname{font:600 12.5px sans-serif;fill:#1b3a66}",
+      ".entity text.field{font:400 11.5px monospace;fill:#4b525c}",
+      ".entity text.pk{fill:#b45309}",
+      ".rel{fill:none;stroke:#b9c4d4;stroke-width:1.2}",
+      ".cardinal{font:500 11px monospace;fill:#8b95a5}"
+    ].join("\n");
+
+    var style = document.createElementNS("http://www.w3.org/2000/svg", "style");
+    style.textContent = css;
+    clone.insertBefore(style, clone.firstChild);
+
+    var text = new XMLSerializer().serializeToString(clone);
+    var blob = new Blob([text], { type: "image/svg+xml;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = current === "flow" ? "订单流程图.svg" : "订单系统ER图.svg";
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  });
+})();
+</script>
+
+</body>
+</html>

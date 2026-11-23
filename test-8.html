@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>音乐手机频道 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .ch-top {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e6e8ec;
+    margin-bottom: 4px;
+  }
+  .ch-top h2 { margin: 0; font-size: 20px; font-weight: 600; color: #185fa5; }
+  .ch-top .sub { color: #9aa4b2; font-size: 12px; padding-bottom: 3px; }
+  .ch-top .rss { margin-left: auto; font-size: 12px; color: #8b929d; }
+
+  .tabs {
+    display: flex;
+    gap: 22px;
+    border-bottom: 2px solid #eef1f6;
+    margin-bottom: 6px;
+  }
+
+  .tabs button {
+    position: relative;
+    padding: 12px 0 10px;
+    border: 0;
+    background: none;
+    color: #6b7280;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .tabs button:hover { color: #185fa5; }
+
+  .tabs button.on { color: #185fa5; font-weight: 600; }
+  .tabs button.on::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 2px;
+    background: #185fa5;
+  }
+
+  .list { display: grid; gap: 2px; }
+
+  .item {
+    display: grid;
+    grid-template-columns: 74px 1fr;
+    gap: 14px;
+    padding: 14px 4px;
+    border-bottom: 1px solid #f1f3f7;
+    transition: background .12s;
+  }
+  .item:hover { background: #fafbfd; }
+
+  .thumb {
+    height: 74px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 10.5px;
+    text-align: center;
+    line-height: 1.3;
+    padding: 6px;
+    letter-spacing: .02em;
+  }
+
+  .item h4 {
+    margin: 0 0 5px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  .item h4 a { color: #185fa5; }
+  .item h4 a:hover { color: #b23b3b; text-decoration: none; }
+
+  .item p {
+    margin: 0 0 8px;
+    color: #6b7280;
+    font-size: 12.5px;
+    line-height: 1.65;
+  }
+
+  .item .meta {
+    display: flex;
+    gap: 14px;
+    color: #b0b8c4;
+    font-size: 11.5px;
+    font-family: var(--mono);
+    flex-wrap: wrap;
+  }
+  .item .meta .src { color: #8b929d; font-family: inherit; }
+  .item .meta .hot { color: #b23b3b; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>音乐手机频道</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>音乐手机频道</h1>
+    <div class="meta">
+      <span>课堂测试 7</span>
+      <span class="mono">test-8.html</span>
+      <span>四标签 + 图文列表</span>
+    </div>
+    <p class="lead">
+      科技频道的典型排版：<b>蓝色标题、缩略图左对齐、摘要两行、元信息一行</b>。
+      标题用蓝色而不是黑色，是为了在列表里能快速扫读——整页只有标题有颜色，其余全是灰阶。
+    </p>
+
+    <section class="demo">
+      <div class="ch-top">
+        <h2>音乐手机频道</h2>
+        <span class="sub">行情 · 导购 · 新品 · 评测</span>
+        <a class="rss" href="#">订阅 ›</a>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button data-k="quote" class="on">行情</button>
+        <button data-k="guide">导购</button>
+        <button data-k="new">新品</button>
+        <button data-k="review">评测</button>
+      </div>
+
+      <div class="list" id="list"></div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>细节</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>标题蓝色、正文灰色</td><td>整页只有链接色有彩度，扫读时视线自动落在标题上</td></tr>
+        <tr><td>摘要两行截断</td><td><code>-webkit-line-clamp: 2</code>，长摘要不会把列表撑得参差不齐</td></tr>
+        <tr><td>缩略图固定尺寸</td><td>74×74 圆角，图片缺失时用文字色块兜底，不会塌</td></tr>
+        <tr><td>元信息同一行</td><td>来源、时间、评论数用 <code>display: flex</code> + <code>gap</code>，窄屏自动换行</td></tr>
+        <tr><td>标签下划线</td><td>用 <code>::after</code> 定位到底边，比 border-bottom 更容易控制粗细和位置</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>为什么摘要要截断而不是全部显示：</b>列表页的目标是"让人点进去"，不是"让人读完"。
+      摘要长度不一会让每行高度参差，二十条下来页面就失去节奏；
+      统一两行截断后，每行高度一致，滚动时视线有稳定的落点。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var DATA = {
+    quote: [
+      { t: "旗舰机型价格松动，12GB+512GB 版本降价 800 元", d: "本周主流电商平台的音乐手机价格普遍下调，其中主打独立音频芯片的三款机型降幅最大，库存周转明显加快。", src: "行情中心", time: "11-23 10:20", cm: 128, c1: "#185fa5", c2: "#4f86e8" },
+      { t: "二手市场回暖，Hi-Fi 机型保值率高于同价位", d: "过去三个月二手成交数据显示，带独立 DAC 的机型一年保值率约 62%，比同价位影像机型高出 7 个百分点。", src: "行情中心", time: "11-23 09:05", cm: 76, c1: "#1f3a2e", c2: "#35604c" },
+      { t: "千元档卷起来了：三款新机同时上 1 亿像素", d: "千元价位段本周集中发布，主摄规格集体上探，但音频配置出现分化，仅一款保留了 3.5mm 接口。", src: "行情中心", time: "11-22 18:40", cm: 214, c1: "#5a4a6b", c2: "#7d6b91" }
+    ],
+    guide: [
+      { t: "3000 元预算怎么选：要音质还是要续航", d: "把五款热门机型的音频参数、电池容量、重量做成一张表，结论其实很清楚——预算有限时优先选带独立 DAC 的。", src: "导购", time: "11-23 08:30", cm: 342, c1: "#b8442c", c2: "#d96a4a" },
+      { t: "蓝牙耳机搭配指南：LDAC 到底值不值得", d: "从编码码率、连接稳定性、延迟三个维度实测，给出不同价位段的搭配建议。", src: "导购", time: "11-21 16:10", cm: 187, c1: "#2b4a6b", c2: "#4a7499" },
+      { t: "学生党首选：这四款千元机音质超出预期", d: "千元档里也有认真做音频的机型，实测失真度和底噪都控制得不错。", src: "导购", time: "11-20 11:25", cm: 95, c1: "#8a6a3a", c2: "#b8915c" }
+    ],
+    new: [
+      { t: "星海 Note 13 发布：双扬声器 + 独立音频芯片", d: "6.7 英寸屏幕、5000mAh 电池，主打立体声外放，官方称响度提升 40%，定价 2499 元起。", src: "新品", time: "11-23 14:00", cm: 512, c1: "#1b3a66", c2: "#3f6fcd" },
+      { t: "青野 Audio 2 曝光：保留 3.5mm 接口", d: "渲染图显示机身顶部保留了耳机孔，同时在包装内附赠一条镀银音频线。", src: "新品", time: "11-22 20:15", cm: 268, c1: "#12603f", c2: "#2f8a63" },
+      { t: "云程 Buds Pro 3 通过认证，支持空间音频", d: "认证信息显示支持 LC3 编码与头部追踪，续航标称 8 小时。", src: "新品", time: "11-21 09:50", cm: 134, c1: "#6b3a5a", c2: "#94617f" }
+    ],
+    review: [
+      { t: "实测：五款音乐手机外放响度与失真对比", d: "在同一安静环境用分贝计与录音设备测量，最大音量下的失真差异比想象中大。", src: "评测", time: "11-23 11:40", cm: 421, c1: "#2b2b33", c2: "#4a4a55" },
+      { t: "用了一周：这款主打音质的手机值不值 2499", d: "优点在音频与手感，短板在影像与系统动画，长文列出十二个具体使用场景。", src: "评测", time: "11-22 15:20", cm: 305, c1: "#3d4a5a", c2: "#5c6b7d" },
+      { t: "拆解：独立 DAC 到底占了多少成本", d: "拆机后对比同价位机型，音频模块的物料成本约占整机的 6%。", src: "评测", time: "11-20 19:05", cm: 158, c1: "#7a3a3a", c2: "#a05a5a" }
+    ]
+  };
+
+  var list = document.getElementById("list");
+
+  function render(key) {
+    var items = DATA[key] || [];
+    list.innerHTML = "";
+
+    items.forEach(function (it) {
+      var d = document.createElement("div");
+      d.className = "item";
+
+      var thumb = document.createElement("div");
+      thumb.className = "thumb";
+      thumb.textContent = it.src;
+      thumb.style.background = "linear-gradient(145deg," + it.c1 + "," + it.c2 + ")";
+
+      var box = document.createElement("div");
+      var h = document.createElement("h4");
+      var a = document.createElement("a");
+      a.href = "#";
+      a.textContent = it.t;
+      h.appendChild(a);
+
+      var p = document.createElement("p");
+      p.textContent = it.d;
+
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      var s1 = document.createElement("span");
+      s1.className = "src";
+      s1.textContent = it.src;
+      var s2 = document.createElement("span");
+      s2.textContent = it.time;
+      var s3 = document.createElement("span");
+      s3.textContent = it.cm + " 评论";
+      if (it.cm > 300) s3.className = "hot";
+      meta.appendChild(s1);
+      meta.appendChild(s2);
+      meta.appendChild(s3);
+
+      box.appendChild(h);
+      box.appendChild(p);
+      box.appendChild(meta);
+      d.appendChild(thumb);
+      d.appendChild(box);
+      list.appendChild(d);
+    });
+  }
+
+  document.getElementById("tabs").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    Array.prototype.forEach.call(this.children, function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+    render(btn.dataset.k);
+  });
+
+  render("quote");
+})();
+</script>
+
+</body>
+</html>

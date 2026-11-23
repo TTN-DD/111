@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canvas 系统架构图 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .wrap-cv {
+    position: relative;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fbfcfe;
+  }
+
+  #cv {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: default;
+  }
+
+  .tip {
+    position: absolute;
+    pointer-events: none;
+    max-width: 240px;
+    padding: 8px 11px;
+    border-radius: 8px;
+    background: #14161a;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.6;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .12s, transform .12s;
+    z-index: 2;
+  }
+  .tip.on { opacity: 1; transform: translateY(0); }
+  .tip b { display: block; margin-bottom: 2px; font-size: 12.5px; }
+  .tip span { color: #9aa4b2; }
+
+  .bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: #8b929d;
+  }
+
+  .bar button {
+    padding: 7px 15px;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #fff;
+    color: #2c333d;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .bar button:hover { border-color: #2f6fed; color: #1c4fc0; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>Canvas 架构图</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>Canvas 绘制系统架构图</h1>
+    <div class="meta">
+      <span>第 18 讲</span>
+      <span class="mono">18-2.html</span>
+      <span>五层架构 · 可导出 PNG</span>
+    </div>
+    <p class="lead">
+      整张图没有一个 <code>div</code>：五层、十八个节点、所有连线都是 Canvas 画的。
+      鼠标悬停能看到节点说明（自己做命中检测），右下角可以导出 PNG——这两件事用图片做都做不到。
+    </p>
+
+    <section class="demo">
+      <div class="wrap-cv" id="stage">
+        <canvas id="cv" width="960" height="560"></canvas>
+        <div class="tip" id="tip"></div>
+      </div>
+
+      <div class="bar">
+        <button id="btn-png">导出 PNG</button>
+        <span>鼠标移到方块上查看说明</span>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>数据结构决定代码量</h2>
+      <p class="demo-hint">节点是数组，连线是"谁指向谁"的 id 对，画图就是两层循环。</p>
+<pre><code>const NODES = [
+  { id: "web", label: "Web 前端", x: 90,  y: 60,  desc: "…" },
+  { id: "cdn", label: "CDN",       x: 90,  y: 160, desc: "…" },
+  // …
+];
+const LINKS = [["web","cdn"], ["app","cdn"], ["cdn","gateway"]];
+
+NODES.forEach(drawBox);                     // 先画方块
+LINKS.forEach(([a, b]) =&gt; drawArrow(byId(a), byId(b)));  // 再画箭头</code></pre>
+      <p style="margin:0;color:#4b525c;font-size:13.5px;">
+        改架构图只需要改这两个数组，不用动绘制代码——这是"用代码画图"和"截图贴图"最大的区别。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>要点</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>圆角矩形</td><td>Canvas 没有现成 API，用 <code>arcTo</code> 或四段 <code>quadraticCurveTo</code> 自己封一个</td></tr>
+        <tr><td>命中检测</td><td>把鼠标坐标换算回画布坐标，逐个判断是否落在矩形内（倒序判断，上层优先）</td></tr>
+        <tr><td>文字居中</td><td><code>textAlign="center"</code> + <code>textBaseline="middle"</code>，位置用矩形中心点</td></tr>
+        <tr><td>高分屏清晰</td><td>canvas 的 <code>width</code> 属性乘 <code>devicePixelRatio</code>，CSS 尺寸保持不变</td></tr>
+        <tr><td>导出图片</td><td><code>canvas.toDataURL("image/png")</code> + <code>&lt;a download&gt;</code> 触发下载</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>什么该用 Canvas、什么该用 SVG：</b>节点数量固定、需要"图元级交互"（悬停、拖拽、导出图片）→ Canvas；
+      需要文字可选中、可被搜索引擎读、要加 <code>&lt;a&gt;</code> 链接 → SVG。
+      架构图如果只在页面里展示，其实 SVG 更合适；用 Canvas 是为了练习"自己画"。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var cv = document.getElementById("cv");
+  var ctx = cv.getContext("2d");
+  var tip = document.getElementById("tip");
+  var stage = document.getElementById("stage");
+
+  var W = 960, H = 560;
+
+  var LAYERS = [
+    { name: "用户层", color: "#2f6fed", y: 54 },
+    { name: "接入层", color: "#1d9e75", y: 152 },
+    { name: "业务层", color: "#b45309", y: 250 },
+    { name: "服务层", color: "#7c3aed", y: 348 },
+    { name: "数据层", color: "#0f766e", y: 446 }
+  ];
+
+  var NODES = [
+    { id: "web", l: 0, c: 0, t: "Web 前端", d: "PC 端页面，静态资源走 CDN 分发。" },
+    { id: "app", l: 0, c: 1, t: "移动 App", d: "iOS / Android 客户端，接口复用同一套网关。" },
+    { id: "mini", l: 0, c: 2, t: "小程序", d: "轻量入口，鉴权走微信的 code2session。" },
+
+    { id: "cdn", l: 1, c: 0, t: "CDN", d: "静态资源与图片分发，命中率约 92%。" },
+    { id: "gw", l: 1, c: 1, t: "API 网关", d: "统一入口，负责限流、路由、协议转换。" },
+    { id: "auth", l: 1, c: 2, t: "鉴权中心", d: "JWT 签发与校验，token 有效期 2 小时。" },
+
+    { id: "goods", l: 2, c: 0, t: "商品服务", d: "SPU / SKU 管理，读写分离。" },
+    { id: "order", l: 2, c: 1, t: "订单服务", d: "下单、拆单、状态机流转，核心链路。" },
+    { id: "pay", l: 2, c: 2, t: "支付服务", d: "对接微信与支付宝，幂等键防重复扣款。" },
+    { id: "stock", l: 2, c: 3, t: "库存服务", d: "预扣减 + 超时回滚，防止超卖。" },
+
+    { id: "search", l: 3, c: 0, t: "搜索服务", d: "ES 全文检索，支持拼音与同义词。" },
+    { id: "rec", l: 3, c: 1, t: "推荐服务", d: "召回 → 粗排 → 精排三段式。" },
+    { id: "msg", l: 3, c: 2, t: "消息服务", d: "站内信与推送，失败重试三次。" },
+
+    { id: "mysql", l: 4, c: 0, t: "MySQL", d: "主从架构，订单库独立实例。" },
+    { id: "redis", l: 4, c: 1, t: "Redis", d: "热点缓存与分布式锁，集群三主三从。" },
+    { id: "es", l: 4, c: 2, t: "Elasticsearch", d: "商品与订单的检索索引。" },
+    { id: "oss", l: 4, c: 3, t: "对象存储", d: "图片、视频、导出文件。" }
+  ];
+
+  var LINKS = [
+    ["web", "cdn"], ["app", "gw"], ["mini", "gw"], ["web", "gw"],
+    ["cdn", "gw"],
+    ["gw", "goods"], ["gw", "order"], ["gw", "auth"], ["auth", "order"],
+    ["order", "pay"], ["order", "stock"], ["goods", "stock"],
+    ["goods", "search"], ["order", "msg"], ["goods", "rec"],
+    ["search", "es"], ["rec", "redis"], ["goods", "mysql"], ["order", "mysql"],
+    ["stock", "redis"], ["pay", "mysql"], ["msg", "oss"], ["goods", "oss"]
+  ];
+
+  var BW = 148, BH = 58;
+  var PAD_LEFT = 84;
+  var GAP = 16;
+
+  function layout() {
+    var perLayer = {};
+    NODES.forEach(function (n) {
+      perLayer[n.l] = (perLayer[n.l] || 0) + 1;
+    });
+
+    NODES.forEach(function (n) {
+      var count = perLayer[n.l];
+      var totalW = count * BW + (count - 1) * GAP;
+      var startX = PAD_LEFT + (W - PAD_LEFT - 24 - totalW) / 2;
+      n.x = startX + n.c * (BW + GAP);
+      n.y = LAYERS[n.l].y;
+      n.w = BW;
+      n.h = BH;
+    });
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawArrow(a, b) {
+    var ax = a.x + a.w / 2, ay = a.y + a.h;
+    var bx = b.x + b.w / 2, by = b.y;
+    var my = (ay + by) / 2;
+
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.bezierCurveTo(ax, my, bx, my, bx, by);
+    ctx.strokeStyle = "rgba(120,135,160,.42)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(bx, by);
+    ctx.lineTo(bx - 4.5, by - 7);
+    ctx.lineTo(bx + 4.5, by - 7);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(120,135,160,.55)";
+    ctx.fill();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // 左侧层级标签
+    LAYERS.forEach(function (L) {
+      ctx.fillStyle = "#f2f5fa";
+      roundRect(16, L.y - 5, 56, BH + 10, 8);
+      ctx.fill();
+
+      ctx.save();
+      ctx.translate(44, L.y + BH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = L.color;
+      ctx.font = "600 12px ui-monospace, Consolas, monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(L.name, 0, 0);
+      ctx.restore();
+    });
+
+    // 连线
+    LINKS.forEach(function (pair) {
+      var a = find(pair[0]), b = find(pair[1]);
+      if (a && b) drawArrow(a, b);
+    });
+
+    // 节点
+    var hovered = hoveredId;
+    NODES.forEach(function (n) {
+      var L = LAYERS[n.l];
+      var on = n.id === hovered;
+
+      ctx.save();
+      ctx.shadowColor = on ? "rgba(47,111,237,.28)" : "rgba(20,22,26,.06)";
+      ctx.shadowBlur = on ? 16 : 6;
+      ctx.shadowOffsetY = on ? 4 : 2;
+
+      roundRect(n.x, n.y, n.w, n.h, 10);
+      ctx.fillStyle = on ? "#fff" : "#ffffff";
+      ctx.fill();
+      ctx.restore();
+
+      roundRect(n.x, n.y, n.w, n.h, 10);
+      ctx.strokeStyle = on ? L.color : "#e2e7ef";
+      ctx.lineWidth = on ? 1.6 : 1;
+      ctx.stroke();
+
+      // 左侧色条
+      ctx.save();
+      roundRect(n.x, n.y, n.w, n.h, 10);
+      ctx.clip();
+      ctx.fillStyle = L.color;
+      ctx.globalAlpha = on ? 1 : .85;
+      ctx.fillRect(n.x, n.y, 3, n.h);
+      ctx.restore();
+
+      ctx.fillStyle = on ? "#14161a" : "#2c333d";
+      ctx.font = "600 13px -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(n.t, n.x + n.w / 2, n.y + n.h / 2 + 1);
+    });
+  }
+
+  function find(id) {
+    for (var i = 0; i < NODES.length; i++) if (NODES[i].id === id) return NODES[i];
+    return null;
+  }
+
+  var hoveredId = null;
+
+  function hit(px, py) {
+    for (var i = NODES.length - 1; i >= 0; i--) {
+      var n = NODES[i];
+      if (px >= n.x && px <= n.x + n.w && py >= n.y && py <= n.y + n.h) return n;
+    }
+    return null;
+  }
+
+  cv.addEventListener("mousemove", function (e) {
+    var r = cv.getBoundingClientRect();
+    var px = (e.clientX - r.left) * (W / r.width);
+    var py = (e.clientY - r.top) * (H / r.height);
+    var n = hit(px, py);
+
+    if (n) {
+      cv.style.cursor = "pointer";
+      if (hoveredId !== n.id) { hoveredId = n.id; draw(); }
+      tip.innerHTML = "<b>" + n.t + "</b><span>" + n.d + "</span>";
+      tip.classList.add("on");
+      var tx = e.clientX - r.left + 14;
+      var ty = e.clientY - r.top + 14;
+      var maxX = r.width - tip.offsetWidth - 8;
+      var maxY = r.height - tip.offsetHeight - 8;
+      tip.style.left = Math.min(tx, maxX) + "px";
+      tip.style.top = Math.min(ty, maxY) + "px";
+    } else {
+      cv.style.cursor = "default";
+      tip.classList.remove("on");
+      if (hoveredId) { hoveredId = null; draw(); }
+    }
+  });
+
+  cv.addEventListener("mouseleave", function () {
+    tip.classList.remove("on");
+    if (hoveredId) { hoveredId = null; draw(); }
+  });
+
+  document.getElementById("btn-png").addEventListener("click", function () {
+    var a = document.createElement("a");
+    a.download = "电商系统架构图.png";
+    a.href = cv.toDataURL("image/png");
+    a.click();
+  });
+
+  layout();
+  draw();
+})();
+</script>
+
+</body>
+</html>

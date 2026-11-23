@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 3D 柱状图 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .chart-box {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fbfcfe;
+    padding: 22px 20px 40px;
+    overflow-x: auto;
+  }
+
+  .scene {
+    --depth: 14px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 26px;
+    height: 300px;
+    padding: 22px 18px 0 52px;
+    min-width: 620px;
+  }
+
+  /* 底座网格 */
+  .scene::after {
+    content: "";
+    position: absolute;
+    left: 52px;
+    right: 18px;
+    bottom: 0;
+    height: 1px;
+    background: #cfd7e6;
+  }
+
+  .gridline {
+    position: absolute;
+    left: 52px;
+    right: 18px;
+    border-top: 1px dashed #e7ebf2;
+  }
+  .gridline span {
+    position: absolute;
+    left: -8px;
+    top: -8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #b0b8c4;
+    transform: translateX(-100%);
+  }
+
+  .bar {
+    position: relative;
+    flex: 1 1 0;
+    max-width: 62px;
+    height: var(--h);
+    margin-right: var(--depth);
+    transition: height .5s cubic-bezier(.2,.8,.2,1);
+  }
+
+  .bar i { display: block; position: absolute; }
+
+  /* 正面 */
+  .bar .front {
+    inset: 0;
+    background: linear-gradient(180deg, #6f9bf0, #2f6fed);
+    border-radius: 3px 0 0 0;
+    box-shadow: inset 0 -12px 20px -14px rgba(0,0,0,.35);
+  }
+
+  /* 顶面：向右上倾斜的平行四边形 */
+  .bar .top {
+    left: 0;
+    top: calc(-1 * var(--depth));
+    width: 100%;
+    height: var(--depth);
+    background: #9dbcfa;
+    transform: skewX(-45deg);
+    transform-origin: left bottom;
+  }
+
+  /* 侧面 */
+  .bar .side {
+    right: calc(-1 * var(--depth));
+    top: 0;
+    width: var(--depth);
+    height: 100%;
+    background: linear-gradient(90deg, #2459c9, #1c4fc0);
+    transform: skewY(-45deg);
+    transform-origin: left top;
+  }
+
+  .bar .val {
+    position: absolute;
+    left: 50%;
+    top: calc(-1 * var(--depth) - 20px);
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: #1c4fc0;
+    white-space: nowrap;
+  }
+
+  .bar .label {
+    position: absolute;
+    left: 50%;
+    bottom: -24px;
+    transform: translateX(-50%);
+    font-size: 11.5px;
+    color: #8b929d;
+    white-space: nowrap;
+  }
+
+  .bar:hover .front { filter: brightness(1.08); }
+  .bar:hover .val { color: #b23b3b; }
+
+  .ctrl {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    background: #fafbfd;
+    font-size: 12.5px;
+    color: #4b525c;
+  }
+  .ctrl label { display: inline-flex; align-items: center; gap: 8px; }
+  .ctrl input[type="range"] { width: 120px; accent-color: #2f6fed; }
+  .ctrl output { font-family: var(--mono); color: #1c4fc0; min-width: 34px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>CSS 3D 柱状图</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>CSS 3D 柱状图</h1>
+    <div class="meta">
+      <span>第 18 讲</span>
+      <span class="mono">18-7.html</span>
+      <span>轴测投影 · 不引 Three.js</span>
+    </div>
+    <p class="lead">
+      每根柱子由三个面拼成：正面是矩形，顶面是把矩形 <code>skewX(-45°)</code> 压出的平行四边形，
+      侧面用 <code>skewY(-45°)</code>。三个面共用一个"厚度"变量，拖动滑块就能改变柱体的厚度，
+      看上去就像换了个观察角度。
+    </p>
+
+    <section class="demo">
+      <div class="chart-box">
+        <div class="scene" id="scene"></div>
+      </div>
+
+      <div class="ctrl">
+        <label>柱体厚度 <input type="range" id="depth" min="6" max="26" value="14"><output id="depth-v">14</output></label>
+        <label>数据缩放 <input type="range" id="scale" min="60" max="140" value="100"><output id="scale-v">100</output></label>
+        <span style="margin-left:auto;color:#8b929d">悬停柱子看数值</span>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>三个面怎么拼的</h2>
+      <p class="demo-hint">关键只有一个：<code>--depth</code> 这一个变量，三个面同时引用它。</p>
+<pre><code>.bar { --depth: 14px; position: relative; }
+
+/* 正面：普通矩形 */
+.bar .front { inset: 0; background: #2f6fed; }
+
+/* 顶面：压扁成平行四边形，原点设在左下角 */
+.bar .top {
+  top: calc(-1 * var(--depth)); height: var(--depth);
+  transform: skewX(-45deg); transform-origin: left bottom;
+}
+
+/* 侧面：同理，原点设在左上角 */
+.bar .side {
+  right: calc(-1 * var(--depth)); width: var(--depth);
+  transform: skewY(-45deg); transform-origin: left top;
+}</code></pre>
+      <p style="margin:14px 0 0;color:#4b525c;font-size:13.5px;">
+        <b><code>transform-origin</code> 是这三个面的命门。</b>顶面锚在左下角、侧面锚在左上角，
+        倾斜之后才能严丝合缝地贴住正面。锚点写错一个，柱子的角就会裂开一道缝。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>做法</th><th>体积</th><th>能改样式吗</th><th>适合</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>CSS 轴测投影（本页）</td><td>0 KB</td><td>完全可控</td><td>固定视角的静态图表</td></tr>
+        <tr><td>Three.js</td><td>约 600 KB</td><td>要写 WebGL 代码</td><td>需要真实光照、自由旋转</td></tr>
+        <tr><td>ECharts GL</td><td>约 1 MB</td><td>受配置项限制</td><td>大屏里成套的 3D 图表</td></tr>
+        <tr><td>预渲染图片</td><td>几十 KB</td><td>不能改</td><td>数据不变的一次性配图</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>别被"3D"骗了：</b>这里其实不是真 3D——它没有透视、没有光照、转不了视角。
+      它叫<b>轴测投影</b>（平行投影），只是"看起来有厚度"。
+      对于一张静态柱状图，这已经足够了，而且比 WebGL 轻一千倍。
+      真正需要"鼠标拖着转"的场景，才值得上 Three.js。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var DATA = [
+    { label: "HTML", v: 92 },
+    { label: "CSS", v: 86 },
+    { label: "Flex", v: 78 },
+    { label: "Grid", v: 71 },
+    { label: "JS 基础", v: 64 },
+    { label: "Canvas", v: 38 },
+    { label: "动画", v: 55 }
+  ];
+
+  var MAX = 100;
+  var scene = document.getElementById("scene");
+  var scale = 1;
+
+  function build() {
+    scene.innerHTML = "";
+
+    // 网格线（每 20 一条）
+    for (var g = 0; g <= MAX; g += 20) {
+      var line = document.createElement("div");
+      line.className = "gridline";
+      line.style.bottom = (g / MAX * 100) + "%";
+      var s = document.createElement("span");
+      s.textContent = g;
+      line.appendChild(s);
+      scene.appendChild(line);
+    }
+
+    DATA.forEach(function (d) {
+      var bar = document.createElement("div");
+      bar.className = "bar";
+      bar.style.setProperty("--h", (d.v / MAX * 100 * scale) + "%");
+
+      var front = document.createElement("i");
+      front.className = "front";
+
+      var top = document.createElement("i");
+      top.className = "top";
+
+      var side = document.createElement("i");
+      side.className = "side";
+
+      var val = document.createElement("span");
+      val.className = "val";
+      val.textContent = d.v;
+
+      var label = document.createElement("span");
+      label.className = "label";
+      label.textContent = d.label;
+
+      bar.appendChild(front);
+      bar.appendChild(top);
+      bar.appendChild(side);
+      bar.appendChild(val);
+      bar.appendChild(label);
+      scene.appendChild(bar);
+    });
+  }
+
+  document.getElementById("depth").addEventListener("input", function () {
+    document.getElementById("depth-v").textContent = this.value;
+    scene.style.setProperty("--depth", this.value + "px");
+    document.querySelector(".scene").style.setProperty("--depth", this.value + "px");
+  });
+
+  document.getElementById("scale").addEventListener("input", function () {
+    scale = this.value / 100;
+    document.getElementById("scale-v").textContent = this.value;
+    build();
+  });
+
+  build();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canvas 粒子网络动画 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .stage {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0d1117;
+    border: 1px solid #1f2733;
+  }
+
+  #cv { display: block; width: 100%; height: 380px; }
+
+  .hud {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #8b97a8;
+  }
+
+  .hud span {
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+
+  .ctrl {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    background: #fafbfd;
+    font-size: 12.5px;
+    color: #4b525c;
+  }
+
+  .ctrl label { display: inline-flex; align-items: center; gap: 8px; }
+  .ctrl input[type="range"] { width: 110px; accent-color: #2f6fed; }
+  .ctrl output { font-family: var(--mono); color: #1c4fc0; min-width: 34px; }
+
+  .ctrl button {
+    margin-left: auto;
+    padding: 6px 14px;
+    border: 1px solid #d9dee7;
+    border-radius: 7px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 12.5px;
+    color: #2c333d;
+    cursor: pointer;
+  }
+  .ctrl button:hover { border-color: #2f6fed; color: #1c4fc0; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>Canvas 粒子网络</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>Canvas 粒子网络动画</h1>
+    <div class="meta">
+      <span>第 18 讲</span>
+      <span class="mono">18-1.html</span>
+      <span>Canvas + requestAnimationFrame</span>
+    </div>
+    <p class="lead">
+      六十个粒子在画布上漂移，距离小于阈值就连一条线，鼠标靠近时被推开。
+      没有引入任何库，全部是 <code>canvas.getContext("2d")</code> 的直线和圆弧——这个效果几乎所有"科技感"页面都在用。
+    </p>
+
+    <section class="demo">
+      <div class="stage">
+        <canvas id="cv"></canvas>
+        <div class="hud">
+          <span id="fps">-- fps</span>
+          <span id="cnt">-- 粒子</span>
+          <span>移动鼠标试试</span>
+        </div>
+      </div>
+
+      <div class="ctrl">
+        <label>粒子数 <input type="range" id="num" min="20" max="140" value="64"><output id="num-v">64</output></label>
+        <label>连线距离 <input type="range" id="dist" min="60" max="220" value="128"><output id="dist-v">128</output></label>
+        <label>速度 <input type="range" id="speed" min="1" max="20" value="7"><output id="speed-v">7</output></label>
+        <button id="toggle">暂停</button>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>核心循环只有三步</h2>
+      <p class="demo-hint">清空画布 → 计算新位置 → 画出来，每秒重复 60 次。</p>
+<pre><code>function frame(now) {
+  ctx.clearRect(0, 0, W, H);      // 1. 擦掉上一帧
+  for (const p of dots) {         // 2. 更新位置 + 画圆
+    p.x += p.vx; p.y += p.vy;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  drawLines();                    // 3. 画连线
+  requestAnimationFrame(frame);   // 下一帧再叫我
+}
+requestAnimationFrame(frame);</code></pre>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>关键点</th><th>为什么这么做</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>requestAnimationFrame</code> 而不是 <code>setInterval</code></td><td>跟着屏幕刷新率走，页面切到后台会自动暂停，省电；<code>setInterval</code> 会一直跑</td></tr>
+        <tr><td>连线距离用平方比较</td><td><code>dx*dx + dy*dy &lt; d*d</code> 避免每次开根号，60 个粒子每帧要算 1770 对</td></tr>
+        <tr><td>透明度按距离衰减</td><td>近的线深、远的线浅，视觉上才有"网络"的层次感</td></tr>
+        <tr><td>监听 <code>resize</code> 并乘 <code>devicePixelRatio</code></td><td>否则高分屏上会糊，图元坐标要跟着缩放</td></tr>
+        <tr><td>尊重 <code>prefers-reduced-motion</code></td><td>系统开了"减少动态效果"就只画静态一帧</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>性能红线：</b>连线是 O(n²)，60 个粒子是 1770 次比较，140 个就是 9730 次——还能跑。
+      如果粒子数是几百上千，就必须改用空间网格分桶（把画布切成格子，只比较相邻格子里的粒子），
+      否则帧率会掉到个位数。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var cv = document.getElementById("cv");
+  var ctx = cv.getContext("2d");
+  var fpsEl = document.getElementById("fps");
+  var cntEl = document.getElementById("cnt");
+  var btn = document.getElementById("toggle");
+
+  var conf = { num: 64, dist: 128, speed: 7 };
+  var dots = [];
+  var W = 0, H = 0, dpr = 1;
+  var mouse = { x: -999, y: -999 };
+  var running = true;
+  var raf = null;
+  var lastFps = performance.now(), frames = 0;
+
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var rect = cv.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function seed() {
+    dots = [];
+    for (var i = 0; i < conf.num; i++) {
+      var a = Math.random() * Math.PI * 2;
+      var s = (0.3 + Math.random() * 0.7) * (conf.speed / 7);
+      dots.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: Math.cos(a) * s,
+        vy: Math.sin(a) * s,
+        r: 1.2 + Math.random() * 1.2
+      });
+    }
+    cntEl.textContent = conf.num + " 粒子";
+  }
+
+  function step() {
+    for (var i = 0; i < dots.length; i++) {
+      var p = dots[i];
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      p.x = Math.max(0, Math.min(W, p.x));
+      p.y = Math.max(0, Math.min(H, p.y));
+
+      var mdx = p.x - mouse.x, mdy = p.y - mouse.y;
+      var md2 = mdx * mdx + mdy * mdy;
+      if (md2 < 8100) {
+        var md = Math.sqrt(md2) || 1;
+        p.x += (mdx / md) * 1.4;
+        p.y += (mdy / md) * 1.4;
+      }
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    var d = conf.dist;
+    var d2 = d * d;
+
+    for (var i = 0; i < dots.length; i++) {
+      var a = dots[i];
+      for (var j = i + 1; j < dots.length; j++) {
+        var b = dots[j];
+        var dx = a.x - b.x, dy = a.y - b.y;
+        var dsq = dx * dx + dy * dy;
+        if (dsq < d2) {
+          var alpha = (1 - dsq / d2) * 0.55;
+          ctx.strokeStyle = "rgba(120,170,255," + alpha.toFixed(3) + ")";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    for (var k = 0; k < dots.length; k++) {
+      var p = dots[k];
+      ctx.fillStyle = "rgba(150,190,255,.95)";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function frame(now) {
+    step();
+    draw();
+
+    frames++;
+    if (now - lastFps > 700) {
+      fpsEl.textContent = Math.round((frames * 1000) / (now - lastFps)) + " fps";
+      frames = 0;
+      lastFps = now;
+    }
+
+    if (running) raf = requestAnimationFrame(frame);
+  }
+
+  function start() {
+    running = true;
+    btn.textContent = "暂停";
+    lastFps = performance.now();
+    frames = 0;
+    raf = requestAnimationFrame(frame);
+  }
+
+  function stop() {
+    running = false;
+    btn.textContent = "继续";
+    if (raf) cancelAnimationFrame(raf);
+  }
+
+  cv.addEventListener("mousemove", function (e) {
+    var r = cv.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+  });
+  cv.addEventListener("mouseleave", function () { mouse.x = mouse.y = -999; });
+
+  btn.addEventListener("click", function () { running ? stop() : start(); });
+
+  document.getElementById("num").addEventListener("input", function () {
+    conf.num = +this.value;
+    document.getElementById("num-v").textContent = conf.num;
+    seed();
+  });
+
+  document.getElementById("dist").addEventListener("input", function () {
+    conf.dist = +this.value;
+    document.getElementById("dist-v").textContent = conf.dist;
+  });
+
+  document.getElementById("speed").addEventListener("input", function () {
+    conf.speed = +this.value;
+    document.getElementById("speed-v").textContent = conf.speed;
+    seed();
+  });
+
+  window.addEventListener("resize", function () {
+    resize();
+    seed();
+  });
+
+  resize();
+  seed();
+
+  if (reduce) {
+    draw();
+    btn.disabled = true;
+    btn.textContent = "已按系统设置停用";
+    fpsEl.textContent = "静态";
+  } else {
+    start();
+  }
+})();
+</script>
+
+</body>
+</html>

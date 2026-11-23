@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>运营数据大屏 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .screen-outer {
+    border: 1px solid #1f2733;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #070b12;
+    position: relative;
+  }
+
+  #viewport { position: relative; width: 100%; overflow: hidden; }
+
+  .dash {
+    width: 1920px;
+    height: 1080px;
+    padding: 26px 30px;
+    box-sizing: border-box;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(47,111,237,.18), transparent 70%),
+      #070b12;
+    color: #dfe7f5;
+    font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    transform-origin: top left;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .dash-head {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(120,170,255,.18);
+  }
+
+  .dash-head h1 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    background: linear-gradient(90deg, #9dbcfa, #6f9bf0 60%, #9dbcfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .dash-head .clock {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 20px;
+    color: #7f93b0;
+    letter-spacing: .06em;
+  }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  .kpi {
+    padding: 18px 20px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(47,111,237,.14), rgba(47,111,237,.04));
+    border: 1px solid rgba(120,170,255,.22);
+  }
+
+  .kpi span { display: block; font-size: 15px; color: #8296b4; margin-bottom: 8px; }
+  .kpi b {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 600;
+    color: #cfe0ff;
+    letter-spacing: -.01em;
+  }
+  .kpi i { font-style: normal; font-size: 15px; color: #5fd0a8; margin-left: 10px; }
+  .kpi i.down { color: #f08a8a; }
+
+  .row2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; flex: 1; min-height: 0; }
+
+  .panel {
+    position: relative;
+    padding: 16px 20px 14px;
+    border-radius: 10px;
+    background: rgba(14,22,36,.72);
+    border: 1px solid rgba(120,170,255,.16);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .panel h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #a9bcd8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel h3::before {
+    content: "";
+    width: 3px; height: 14px;
+    border-radius: 2px;
+    background: #4f86e8;
+  }
+  .panel h3 em { font-style: normal; margin-left: auto; font-size: 12.5px; color: #64758f; font-family: var(--mono); }
+
+  .line-area { flex: 1; position: relative; min-height: 0; }
+  .line-area svg { display: block; width: 100%; height: 100%; }
+
+  .axes text { font: 11px var(--mono); fill: #52627c; }
+
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 18px; flex: 1; min-height: 0; }
+
+  .donut-wrap { display: flex; align-items: center; gap: 22px; flex: 1; }
+
+  .donut {
+    width: 190px; height: 190px;
+    flex: 0 0 190px;
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(#4f86e8 0 46%, #35c08f 46% 74%, #e0a83f 74% 90%, #a56fd6 90% 100%);
+  }
+  .donut::after {
+    content: "";
+    position: absolute;
+    inset: 44px;
+    border-radius: 50%;
+    background: #0b1220;
+  }
+  .donut-legend { display: grid; gap: 10px; font-size: 14px; color: #9fb0c9; }
+  .donut-legend div { display: flex; align-items: center; gap: 8px; }
+  .donut-legend i { width: 9px; height: 9px; border-radius: 2px; display: block; }
+  .donut-legend b { margin-left: auto; font-family: var(--mono); color: #d6e3fa; }
+
+  .hbars { display: grid; gap: 14px; align-content: start; }
+  .hbar { font-size: 13.5px; color: #9fb0c9; }
+  .hbar .t { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .hbar .t b { font-family: var(--mono); color: #d6e3fa; font-weight: 500; }
+  .hbar .track { height: 8px; border-radius: 4px; background: rgba(120,170,255,.12); overflow: hidden; }
+  .hbar .track i {
+    display: block; height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #2f6fed, #6f9bf0);
+    width: 0;
+    transition: width .8s cubic-bezier(.2,.8,.2,1);
+  }
+
+  .loglist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.9;
+    color: #8698b3;
+    overflow: hidden;
+    flex: 1;
+  }
+  .loglist li { display: flex; gap: 12px; white-space: nowrap; }
+  .loglist .t { color: #4f6280; flex: 0 0 74px; }
+  .loglist .ok { color: #5fd0a8; }
+  .loglist .warn { color: #e0a83f; }
+
+  .note-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: #8b929d;
+  }
+  .note-bar button {
+    padding: 7px 15px;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #fff;
+    color: #2c333d;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .note-bar button:hover { border-color: #2f6fed; color: #1c4fc0; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>运营大屏</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>客服运营数据大屏</h1>
+    <div class="meta">
+      <span>第 18 讲</span>
+      <span class="mono">18-8.html</span>
+      <span>1920×1080 等比缩放</span>
+    </div>
+    <p class="lead">
+      大屏的标准做法：<b>内部按 1920×1080 的绝对尺寸写死，外层按容器宽度整体缩放</b>。
+      这样不管投到 1080p 的会议室屏幕上、还是塞进笔记本的半个窗口里，比例都不会乱。
+      数据用假数据每 2 秒刷新一次。
+    </p>
+
+    <section class="demo">
+      <div class="screen-outer">
+        <div id="viewport">
+          <div class="dash" id="dash">
+            <div class="dash-head">
+              <h1>客服运营实时看板</h1>
+              <span class="clock" id="clock">--:--:--</span>
+            </div>
+
+            <div class="kpis">
+              <div class="kpi"><span>今日会话总量</span><b id="k1">0</b><i id="k1d">+0%</i></div>
+              <div class="kpi"><span>平均响应时长</span><b id="k2">0</b><i>秒</i></div>
+              <div class="kpi"><span>一次解决率</span><b id="k3">0</b><i id="k3d">+0%</i></div>
+              <div class="kpi"><span>转人工占比</span><b id="k4">0</b><i class="down" id="k4d">-0%</i></div>
+            </div>
+
+            <div class="row2">
+              <div class="panel">
+                <h3>近 12 小时会话趋势 <em>单位：次</em></h3>
+                <div class="line-area">
+                  <svg id="line" viewBox="0 0 900 300" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(79,134,232,.42)"/>
+                        <stop offset="100%" stop-color="rgba(79,134,232,0)"/>
+                      </linearGradient>
+                    </defs>
+                    <g class="axes" id="axes"></g>
+                    <path id="area" fill="url(#fill)" stroke="none"/>
+                    <polyline id="poly" fill="none" stroke="#6f9bf0" stroke-width="2.5" stroke-linejoin="round"/>
+                    <g id="dots"></g>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="panel">
+                <h3>渠道占比 <em>实时</em></h3>
+                <div class="donut-wrap">
+                  <div class="donut"></div>
+                  <div class="donut-legend">
+                    <div><i style="background:#4f86e8"></i>App 内 <b>46%</b></div>
+                    <div><i style="background:#35c08f"></i>小程序 <b>28%</b></div>
+                    <div><i style="background:#e0a83f"></i>官网 <b>16%</b></div>
+                    <div><i style="background:#a56fd6"></i>外部接入 <b>10%</b></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row3">
+              <div class="panel">
+                <h3>问题类型 TOP5</h3>
+                <div class="hbars" id="hbars"></div>
+              </div>
+
+              <div class="panel">
+                <h3>坐席状态 <em>共 42 人</em></h3>
+                <div class="hbars" id="agents"></div>
+              </div>
+
+              <div class="panel">
+                <h3>实时事件流 <em>LIVE</em></h3>
+                <ul class="loglist" id="logs"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-bar">
+        <button id="btn-fit">重新贴合容器</button>
+        <span>窗口缩放时会自动重新计算比例；也可以点这个按钮手动触发</span>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>等比缩放的三行代码</h2>
+<pre><code>const DASH_W = 1920, DASH_H = 1080;
+const scale = viewport.clientWidth / DASH_W;
+
+dash.style.transform = `scale(${scale})`;        // 内部尺寸不变，整体缩小
+viewport.style.height = DASH_H * scale + "px";    // 外层高度跟着缩，避免留白</code></pre>
+      <p style="margin:14px 0 0;color:#4b525c;font-size:13.5px;">
+        关键是 <code>transform-origin: top left</code>。默认原点是中心，缩放后左上角会跑到容器外面去，
+        怎么调都对不齐。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>要点</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1920×1080 写死</td><td>所有字号、间距用固定 px，不写 <code>rem</code> 也不写百分比——大屏只有一个分辨率基准</td></tr>
+        <tr><td>整体缩放</td><td><code>transform: scale()</code>，比媒体查询一档档改尺寸稳得多</td></tr>
+        <tr><td>折线图</td><td>把数据点映射成 SVG <code>polyline</code> 的 points，不需要图表库</td></tr>
+        <tr><td>环形图</td><td>一个 <code>conic-gradient</code> 加一个挖空的内圆，两行 CSS</td></tr>
+        <tr><td>数字跳动</td><td>用等宽字体，否则每次刷新宽度变化会带着整行单元格一起抖</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>大屏的两个真实约束：</b>① 观众距离远，字号要大、对比度要高，正常网页那套 14px 灰字直接不可读；
+      ② 投屏常见 1080p，但也可能是 4K 或超宽屏，所以"整体缩放"比"响应式重排"更靠谱——
+      大屏不需要在手机上好看。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var DASH_W = 1920, DASH_H = 1080;
+  var dash = document.getElementById("dash");
+  var viewport = document.getElementById("viewport");
+
+  function fit() {
+    var s = viewport.clientWidth / DASH_W;
+    dash.style.transform = "scale(" + s + ")";
+    viewport.style.height = (DASH_H * s) + "px";
+  }
+
+  /* ---------- 折线图 ---------- */
+  var W = 900, H = 300, PAD_L = 44, PAD_B = 26, PAD_T = 12;
+  var series = [];
+  var HOURS = ["09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"];
+
+  function seedSeries() {
+    series = HOURS.map(function (_, i) {
+      var base = 320 + i * 42;
+      return Math.round(base + (Math.random() - 0.5) * 220);
+    });
+  }
+
+  function drawLine() {
+    var max = Math.max.apply(null, series) * 1.15;
+    var stepX = (W - PAD_L - 20) / (series.length - 1);
+    var innerH = H - PAD_T - PAD_B;
+
+    var pts = series.map(function (v, i) {
+      var x = PAD_L + i * stepX;
+      var y = PAD_T + innerH - (v / max) * innerH;
+      return [x, y];
+    });
+
+    document.getElementById("poly").setAttribute(
+      "points", pts.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ")
+    );
+
+    var d = "M" + pts[0][0].toFixed(1) + "," + (H - PAD_B) + " ";
+    pts.forEach(function (p) { d += "L" + p[0].toFixed(1) + "," + p[1].toFixed(1) + " "; });
+    d += "L" + pts[pts.length - 1][0].toFixed(1) + "," + (H - PAD_B) + " Z";
+    document.getElementById("area").setAttribute("d", d);
+
+    var dots = document.getElementById("dots");
+    dots.innerHTML = "";
+    pts.forEach(function (p, i) {
+      if (i % 2 !== 0) return;
+      var c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      c.setAttribute("cx", p[0]);
+      c.setAttribute("cy", p[1]);
+      c.setAttribute("r", 3.2);
+      c.setAttribute("fill", "#0b1220");
+      c.setAttribute("stroke", "#6f9bf0");
+      c.setAttribute("stroke-width", "2");
+      dots.appendChild(c);
+    });
+
+    var axes = document.getElementById("axes");
+    axes.innerHTML = "";
+    for (var g = 0; g <= 3; g++) {
+      var y = PAD_T + innerH - (innerH / 3) * g;
+      var ln = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      ln.setAttribute("x1", PAD_L); ln.setAttribute("x2", W - 20);
+      ln.setAttribute("y1", y); ln.setAttribute("y2", y);
+      ln.setAttribute("stroke", "rgba(120,170,255,.12)");
+      axes.appendChild(ln);
+
+      var tx = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tx.setAttribute("x", 6);
+      tx.setAttribute("y", y + 4);
+      tx.textContent = Math.round((max / 3) * g);
+      axes.appendChild(tx);
+    }
+
+    HOURS.forEach(function (h, i) {
+      if (i % 2 !== 0) return;
+      var tx = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tx.setAttribute("x", PAD_L + i * stepX);
+      tx.setAttribute("y", H - 6);
+      tx.setAttribute("text-anchor", "middle");
+      tx.textContent = h + ":00";
+      axes.appendChild(tx);
+    });
+  }
+
+  /* ---------- 条形 ---------- */
+  var TOPICS = [
+    { t: "订单与物流", v: 1284 },
+    { t: "退款退货", v: 967 },
+    { t: "账号与登录", v: 743 },
+    { t: "优惠券使用", v: 512 },
+    { t: "其他咨询", v: 386 }
+  ];
+
+  var AGENTS = [
+    { t: "在线接待", v: 26, max: 42, c: "#35c08f" },
+    { t: "小休 / 培训", v: 9, max: 42, c: "#e0a83f" },
+    { t: "离线", v: 7, max: 42, c: "#5a6a82" }
+  ];
+
+  function drawBars(host, list, unit) {
+    host.innerHTML = "";
+    var max = Math.max.apply(null, list.map(function (x) { return x.v; }));
+    list.forEach(function (x) {
+      var d = document.createElement("div");
+      d.className = "hbar";
+      d.innerHTML = "<div class='t'><span></span><b></b></div><div class='track'><i></i></div>";
+      d.querySelector("span").textContent = x.t;
+      d.querySelector("b").textContent = x.v + (unit || "");
+      var fill = d.querySelector("i");
+      if (x.c) fill.style.background = x.c;
+      host.appendChild(d);
+      requestAnimationFrame(function () {
+        fill.style.width = (x.v / (x.max || max)) * 100 + "%";
+      });
+    });
+  }
+
+  /* ---------- 日志 ---------- */
+  var LOGS = [
+    ["app", "新会话接入 · 用户 #8***42", "ok"],
+    ["bot", "命中知识库「退货运费谁承担」", "ok"],
+    ["warn", "响应耗时 3.2s 超过阈值", "warn"],
+    ["app", "会话转人工 · 技能组：售后", "ok"],
+    ["bot", "自动生成工单 #2026112301", "ok"],
+    ["app", "满意度评价：满意", "ok"]
+  ];
+
+  function pushLog() {
+    var list = document.getElementById("logs");
+    var pick = LOGS[Math.floor(Math.random() * LOGS.length)];
+    var now = new Date();
+    var t = ("0" + now.getHours()).slice(-2) + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + ("0" + now.getSeconds()).slice(-2);
+
+    var li = document.createElement("li");
+    li.innerHTML = "<span class='t'></span><span class='" + pick[2] + "'></span>";
+    li.querySelector(".t").textContent = t;
+    li.lastChild.textContent = pick[1];
+    list.insertBefore(li, list.firstChild);
+
+    while (list.children.length > 9) list.removeChild(list.lastChild);
+  }
+
+  /* ---------- KPI ---------- */
+  function kpi() {
+    var total = 8420 + Math.round(Math.random() * 260);
+    document.getElementById("k1").textContent = total.toLocaleString("zh-CN");
+    document.getElementById("k1d").textContent = "+" + (3 + Math.random() * 6).toFixed(1) + "%";
+    document.getElementById("k2").textContent = (1.6 + Math.random() * 0.7).toFixed(1);
+    document.getElementById("k3").textContent = (86 + Math.random() * 4).toFixed(1);
+    document.getElementById("k3d").textContent = "+" + (1 + Math.random() * 3).toFixed(1) + "%";
+    document.getElementById("k4").textContent = (11 + Math.random() * 3).toFixed(1);
+    document.getElementById("k4d").textContent = "-" + (0.5 + Math.random() * 2).toFixed(1) + "%";
+  }
+
+  function clock() {
+    var d = new Date();
+    document.getElementById("clock").textContent =
+      d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) +
+      "  " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+  }
+
+  /* ---------- 启动 ---------- */
+  fit();
+  window.addEventListener("resize", fit);
+  document.getElementById("btn-fit").addEventListener("click", fit);
+
+  seedSeries();
+  drawLine();
+  drawBars(document.getElementById("hbars"), TOPICS, "");
+  drawBars(document.getElementById("agents"), AGENTS, " 人");
+  for (var i = 0; i < 5; i++) pushLog();
+  kpi();
+  clock();
+
+  setInterval(function () {
+    seedSeries();
+    drawLine();
+    kpi();
+    clock();
+    pushLog();
+  }, 2000);
+})();
+</script>
+
+</body>
+</html>

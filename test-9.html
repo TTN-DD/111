@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新闻标签页 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .tagbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 18px 0 16px;
+    border-bottom: 1px solid #eef1f6;
+  }
+
+  /* 红框标签：未选中白底红字红框，选中红底白字 */
+  .tagbar button {
+    padding: 7px 18px;
+    border: 1px solid #d64545;
+    border-radius: 4px;
+    background: #fff;
+    color: #b23b3b;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .tagbar button:hover { background: #fdf1f1; }
+  .tagbar button.on { background: #b23b3b; border-color: #b23b3b; color: #fff; }
+
+  .feed { display: grid; gap: 0; }
+
+  .news {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    padding: 16px 2px;
+    border-bottom: 1px solid #f1f3f7;
+    align-items: start;
+  }
+  .news:hover { background: #fafbfd; }
+
+  .news h4 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .news h4 a { color: #1b2330; }
+  .news h4 a:hover { color: #b23b3b; text-decoration: none; }
+
+  .news .tags { display: flex; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
+  .news .tags span {
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10.5px;
+    border: 1px solid currentColor;
+    line-height: 1.6;
+  }
+  .tags .red { color: #b23b3b; }
+  .tags .blue { color: #185fa5; }
+  .tags .green { color: #12603f; }
+  .tags .gray { color: #8b929d; }
+
+  .news p {
+    margin: 0 0 8px;
+    color: #6b7280;
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
+
+  .news .meta {
+    color: #b0b8c4;
+    font-size: 11.5px;
+    font-family: var(--mono);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .news .meta .src { font-family: inherit; color: #8b929d; }
+
+  .count {
+    flex: 0 0 auto;
+    padding: 3px 9px;
+    border-radius: 4px;
+    background: #f4f6fa;
+    color: #6b7280;
+    font-size: 11.5px;
+    font-family: var(--mono);
+    white-space: nowrap;
+  }
+
+  .empty { padding: 40px; text-align: center; color: #b0b8c4; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>新闻标签页</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>新闻标签页</h1>
+    <div class="meta">
+      <span>课堂测试 8</span>
+      <span class="mono">test-9.html</span>
+      <span>红框标签 + 分类列表</span>
+    </div>
+    <p class="lead">
+      这张图的重点全在标签上：<b>红框红字，选中后整块填红</b>。比起下划线式的标签，
+      方框标签的点击区域更明确，也更适合放在"投诉 / 回应 / 调查"这种严肃语境里。
+    </p>
+
+    <section class="demo">
+      <div class="tagbar" id="tags">
+        <button data-k="new" class="on">最新投诉</button>
+        <button data-k="reply">官方回应</button>
+        <button data-k="track">追踪调查</button>
+      </div>
+
+      <div class="feed" id="feed"></div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>细节</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>方框标签</td><td>1px 红边 + 红字，圆角只给 4px，显得利落而不圆润</td></tr>
+        <tr><td>选中态</td><td>背景和边框同时变红，文字转白；不要只改一个属性，否则边界会糊</td></tr>
+        <tr><td>标签用 currentColor</td><td>边框写 <code>border: 1px solid currentColor</code>，换主题色只改一处</td></tr>
+        <tr><td>复合标签</td><td>一条新闻可以同时挂"投诉"和"处理中"两个标签，用 flex + gap 自动排</td></tr>
+        <tr><td>右侧计数</td><td>"12 条跟进"固定在右侧，用 <code>white-space: nowrap</code> 防断行</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>语义上的取舍：</b>这类页面其实用 <code>&lt;nav&gt; + &lt;a&gt;</code> 更合适（标签是导航，不是按钮）。
+      这里用 <code>button</code> 是因为切换时不改 URL、纯前端替换内容；如果你希望每个标签都有独立链接
+      （能被分享、能被搜索引擎收录），就该换成 <code>&lt;a href="?tab=reply"&gt;</code>，
+      再从 URL 参数里读当前标签。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var DATA = {
+    new: [
+      { t: "某品牌净水器滤芯三月即失效，售后称属正常损耗", tags: [["投诉", "red"], ["处理中", "gray"]], src: "消费投诉", time: "11-23 13:20", cm: 12 },
+      { t: "直播带货宣称「全网最低价」，实际高于官方店", tags: [["投诉", "red"], ["价格", "blue"]], src: "消费投诉", time: "11-23 11:05", cm: 34 },
+      { t: "预付卡门店突然停业，三百余名会员余额未退", tags: [["投诉", "red"], ["预付卡", "blue"], ["群体", "green"]], src: "消费投诉", time: "11-22 19:40", cm: 87 },
+      { t: "快递保价后仍按运费三倍赔付，用户起诉", tags: [["投诉", "red"], ["物流", "gray"]], src: "消费投诉", time: "11-22 09:15", cm: 21 }
+    ],
+    reply: [
+      { t: "针对滤芯问题，品牌方回应：将免费更换并延长保修", tags: [["回应", "blue"], ["已处理", "green"]], src: "官方回应", time: "11-23 15:00", cm: 5 },
+      { t: "平台就对播间价格问题致歉，承诺三倍差价补偿", tags: [["回应", "blue"], ["退款", "green"]], src: "官方回应", time: "11-23 10:30", cm: 18 },
+      { t: "市场监管部门介入预付卡事件，要求七日内给出方案", tags: [["监管", "red"], ["回应", "blue"]], src: "官方回应", time: "11-22 17:20", cm: 62 }
+    ],
+    track: [
+      { t: "追踪：三家预付卡门店的登记主体竟是同一人", tags: [["调查", "red"], ["深度", "green"]], src: "追踪调查", time: "11-23 09:00", cm: 143 },
+      { t: "我们买了五款净水器送检，滤芯寿命差距达四倍", tags: [["调查", "red"], ["实测", "blue"]], src: "追踪调查", time: "11-21 14:45", cm: 208 },
+      { t: "保价条款里的这行小字，让赔付打了三折", tags: [["调查", "red"], ["条款", "gray"]], src: "追踪调查", time: "11-20 16:30", cm: 96 }
+    ]
+  };
+
+  var feed = document.getElementById("feed");
+
+  function render(key) {
+    var items = DATA[key] || [];
+    feed.innerHTML = "";
+
+    if (!items.length) {
+      var e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = "该分类暂无内容。";
+      feed.appendChild(e);
+      return;
+    }
+
+    items.forEach(function (it) {
+      var d = document.createElement("div");
+      d.className = "news";
+
+      var left = document.createElement("div");
+
+      var tagBox = document.createElement("div");
+      tagBox.className = "tags";
+      it.tags.forEach(function (tg) {
+        var s = document.createElement("span");
+        s.className = tg[1];
+        s.textContent = tg[0];
+        tagBox.appendChild(s);
+      });
+
+      var h = document.createElement("h4");
+      var a = document.createElement("a");
+      a.href = "#";
+      a.textContent = it.t;
+      h.appendChild(a);
+
+      var p = document.createElement("p");
+      p.textContent = it.src + " · 编号 " + key.toUpperCase() + "-" + Math.floor(Math.random() * 900 + 100) +
+        "　该条已进入处理流程，后续进展会在本页更新。";
+
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      var s1 = document.createElement("span");
+      s1.className = "src";
+      s1.textContent = it.src;
+      var s2 = document.createElement("span");
+      s2.textContent = it.time;
+      meta.appendChild(s1);
+      meta.appendChild(s2);
+
+      left.appendChild(tagBox);
+      left.appendChild(h);
+      left.appendChild(p);
+      left.appendChild(meta);
+
+      var cnt = document.createElement("span");
+      cnt.className = "count";
+      cnt.textContent = it.cm + " 条跟进";
+
+      d.appendChild(left);
+      d.appendChild(cnt);
+      feed.appendChild(d);
+    });
+  }
+
+  document.getElementById("tags").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    Array.prototype.forEach.call(this.children, function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+    render(btn.dataset.k);
+  });
+
+  render("new");
+})();
+</script>
+
+</body>
+</html>

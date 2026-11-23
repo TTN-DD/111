@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>极坐标玫瑰线 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .polar {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 18px;
+    align-items: start;
+  }
+  @media (max-width: 720px) { .polar { grid-template-columns: 1fr; } }
+
+  .board {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+    padding: 10px;
+  }
+  canvas#cv { display: block; width: 100%; height: auto; }
+
+  .panel { border: 1px solid #eef0f3; border-radius: 10px; padding: 14px; background: #fafbfd; }
+  .panel h4 { margin: 0 0 12px; font-size: 13px; color: #2c333d; }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: flex; justify-content: space-between; font-size: 12.5px; color: #4b525c; margin-bottom: 6px; }
+  .field output { font-family: var(--mono); color: #1c4fc0; }
+  .field input[type="range"] { width: 100%; accent-color: #2f6fed; }
+
+  .row2 { display: flex; gap: 8px; }
+  .row2 button {
+    flex: 1;
+    padding: 7px 0;
+    border: 1px solid #d9dee7;
+    border-radius: 7px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 12px;
+    color: #2c333d;
+    cursor: pointer;
+  }
+  .row2 button.on { background: #14161a; border-color: #14161a; color: #fff; }
+
+  .formula {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #1b1f24;
+    color: #dfe4ec;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre-line;
+  }
+  .formula .k { color: #8fb3f9; }
+  .formula .s { color: #a5d6a7; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>极坐标玫瑰线</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>极坐标玫瑰线</h1>
+    <div class="meta">
+      <span>第 18 讲</span>
+      <span class="mono">18-4.html</span>
+      <span>Canvas 极坐标 + 参数方程</span>
+    </div>
+    <p class="lead">
+      公式只有一行：<code>r = R · cos(kθ)</code>。把 θ 从 0 扫到 2π，每算一个半径就画一个点，
+      连起来就是一朵玫瑰花。<b>k 为奇数得 k 瓣，k 为偶数得 2k 瓣</b>——拖动滑块能直接看到这个规律。
+    </p>
+
+    <section class="demo">
+      <div class="polar">
+        <div class="board">
+          <canvas id="cv" width="560" height="560"></canvas>
+        </div>
+
+        <div class="panel">
+          <h4>参数</h4>
+
+          <div class="field">
+            <label>瓣数参数 k <output id="k-v">5</output></label>
+            <input type="range" id="k" min="2" max="9" step="1" value="5">
+          </div>
+
+          <div class="field">
+            <label>旋转角度 <output id="rot-v">0°</output></label>
+            <input type="range" id="rot" min="0" max="360" step="1" value="0">
+          </div>
+
+          <div class="field">
+            <div class="row2">
+              <button id="btn-play">自动旋转</button>
+              <button id="btn-theme">深色</button>
+            </div>
+          </div>
+
+          <div class="formula" id="formula"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>极坐标 → 直角坐标</h2>
+      <p class="demo-hint">Canvas 只认 x / y，所以每一步都要转一次。</p>
+<pre><code>for (let i = 0; i &lt;= steps; i++) {
+  const t = (i / steps) * Math.PI * 2;   // θ 从 0 扫到 2π
+  const r = R * Math.cos(k * t);         // 玫瑰线方程
+  const x = cx + r * Math.cos(t + rot);  // 转成直角坐标
+  const y = cy - r * Math.sin(t + rot);  // 减号：canvas 的 y 轴朝下
+  i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+}</code></pre>
+      <p style="margin:14px 0 0;color:#4b525c;font-size:13.5px;">
+        <b>y 用减号</b>是新手最容易错的一行：数学里 y 轴朝上，canvas 里 y 轴朝下，不取反整个图形会上下翻转。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>现象</th><th>原因</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>k 为奇数 → k 瓣</td><td>cos 在 [0, π] 区间走完一圈花瓣，π 到 2π 时 <code>r</code> 变负，画到反向重叠</td></tr>
+        <tr><td>k 为偶数 → 2k 瓣</td><td>正负半周不重叠，各画 k 瓣</td></tr>
+        <tr><td>曲线边缘有锯齿</td><td>采样点太少；把 <code>steps</code> 提到 720 以上就顺了</td></tr>
+        <tr><td>看起来不圆</td><td>canvas 宽高不等比，或没有按 <code>devicePixelRatio</code> 缩放</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>为什么不用 ECharts：</b>玫瑰图是 ECharts 的 <code>polar + bar</code> 组合，但要引 1MB 的库。
+      这朵线只需要一个 <code>for</code> 循环和 20 行绘制代码——能自己画的图就别引库，
+      尤其当项目只用到这一个图表的时候。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var cv = document.getElementById("cv");
+  var ctx = cv.getContext("2d");
+  var SIZE = 560, dpr = 1;
+  var R = 210, cx = SIZE / 2, cy = SIZE / 2;
+
+  var k = 5, rot = 0, dark = false, playing = false, raf = null;
+
+  function fit() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = SIZE * dpr;
+    cv.height = SIZE * dpr;
+    cv.style.aspectRatio = "1 / 1";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function grid() {
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    ctx.fillStyle = dark ? "#0d1117" : "#ffffff";
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    var line = dark ? "rgba(255,255,255,.10)" : "rgba(20,22,26,.08)";
+    var strong = dark ? "rgba(255,255,255,.20)" : "rgba(20,22,26,.16)";
+
+    [1, 2, 3].forEach(function (i) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, (R / 3) * i, 0, Math.PI * 2);
+      ctx.strokeStyle = line;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+
+    for (var a = 0; a < 12; a++) {
+      var t = (a / 12) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(t) * R, cy - Math.sin(t) * R);
+      ctx.strokeStyle = a % 3 === 0 ? strong : line;
+      ctx.stroke();
+    }
+  }
+
+  function rose() {
+    var steps = 1080;
+    var hue = dark ? 205 : 220;
+
+    ctx.beginPath();
+    for (var i = 0; i <= steps; i++) {
+      var t = (i / steps) * Math.PI * 2;
+      var r = R * Math.cos(k * t);
+      var ang = t + rot;
+      var x = cx + r * Math.cos(ang);
+      var y = cy - r * Math.sin(ang);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+
+    var g = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
+    g.addColorStop(0, "hsla(" + hue + ", 90%, 62%, .95)");
+    g.addColorStop(0.5, "hsla(" + (hue + 40) + ", 85%, 60%, .6)");
+    g.addColorStop(1, "hsla(" + (hue + 80) + ", 80%, 58%, .28)");
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    ctx.strokeStyle = dark ? "rgba(180,215,255,.9)" : "rgba(47,111,239,.75)";
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = dark ? "rgba(255,255,255,.7)" : "rgba(20,22,26,.5)";
+    ctx.fill();
+  }
+
+  function draw() {
+    grid();
+    rose();
+    document.getElementById("rot-v").textContent = Math.round((rot * 180 / Math.PI) % 360) + "°";
+  }
+
+  function info() {
+    var petals = (k % 2 === 0) ? k * 2 : k;
+    document.getElementById("formula").innerHTML =
+      '<span class="s">r</span> = R · cos(<span class="k">' + k + '</span>θ)\n' +
+      '<span class="s">k 为' + (k % 2 === 0 ? "偶数" : "奇数") + ' → 实际 </span>' +
+      '<span class="k">' + petals + '</span> 瓣';
+  }
+
+  function loop() {
+    rot += 0.012;
+    draw();
+    raf = requestAnimationFrame(loop);
+  }
+
+  document.getElementById("k").addEventListener("input", function () {
+    k = +this.value;
+    document.getElementById("k-v").textContent = k;
+    draw();
+    info();
+  });
+
+  document.getElementById("rot").addEventListener("input", function () {
+    rot = (+this.value) * Math.PI / 180;
+    draw();
+  });
+
+  document.getElementById("btn-play").addEventListener("click", function () {
+    playing = !playing;
+    this.classList.toggle("on", playing);
+    this.textContent = playing ? "停止旋转" : "自动旋转";
+    if (playing) loop(); else if (raf) cancelAnimationFrame(raf);
+  });
+
+  document.getElementById("btn-theme").addEventListener("click", function () {
+    dark = !dark;
+    this.classList.toggle("on", dark);
+    this.textContent = dark ? "浅色" : "深色";
+    draw();
+  });
+
+  window.addEventListener("resize", fit);
+
+  fit();
+  draw();
+  info();
+})();
+</script>
+
+</body>
+</html>

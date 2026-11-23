@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一百个盒子 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .box-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    color: #4b525c;
+  }
+
+  .box-toolbar label { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+  .box-toolbar input[type="checkbox"] { accent-color: #2f6fed; width: 14px; height: 14px; }
+  .box-toolbar .stat { margin-left: auto; color: #8b929d; font-family: var(--mono); }
+
+  .boxes {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    padding: 14px;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+  }
+  @media (max-width: 620px) { .boxes { grid-template-columns: repeat(5, 1fr); } }
+
+  .bx {
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    background: #f7f9fc;
+    color: #c3cad6;
+    font-family: var(--mono);
+    font-size: 11px;
+    transition: transform .12s, box-shadow .12s;
+    cursor: default;
+  }
+
+  .bx:hover { transform: translateY(-2px) scale(1.06); box-shadow: 0 8px 16px -10px rgba(20,22,26,.6); }
+
+  .bx.mul {
+    background: #eaf3de;
+    color: #3b6d11;
+    font-weight: 600;
+  }
+
+  .bx.has {
+    background: #e6f1fb;
+    color: #185fa5;
+    font-weight: 600;
+  }
+
+  .bx.both {
+    background: #2f6fed;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 12px; color: #8b929d; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 12px; height: 12px; border-radius: 3px; display: block; }
+
+  .code-note { margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>一百个盒子</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>一百个盒子：逢 7 规则</h1>
+    <div class="meta">
+      <span>第 15 讲</span>
+      <span class="mono">15-2.html</span>
+      <span>循环 + 取余 + 字符串查找</span>
+    </div>
+    <p class="lead">
+      1 到 100 个格子：<b>7 的倍数标绿、数字里含 7 的标蓝、两者都占的标深蓝</b>，其余留白。
+      看着是排版练习，其实考三个 JS 基本功：<code>%</code> 取余、<code>String.includes</code>、
+      以及用 <code>classList</code> 控制状态。
+    </p>
+
+    <section class="demo">
+      <div class="box-toolbar">
+        <label><input type="checkbox" id="c-mul" checked> 7 的倍数</label>
+        <label><input type="checkbox" id="c-has" checked> 含数字 7</label>
+        <label><input type="checkbox" id="c-plain"> 只显示命中项</label>
+        <span class="stat" id="stat"></span>
+      </div>
+
+      <div class="boxes" id="boxes"></div>
+
+      <div class="legend">
+        <span><i style="background:#f7f9fc;border:1px solid #eef0f3"></i>普通</span>
+        <span><i style="background:#eaf3de"></i>7 的倍数</span>
+        <span><i style="background:#e6f1fb"></i>含 7</span>
+        <span><i style="background:#2f6fed"></i>两者都是</span>
+      </div>
+    </section>
+
+    <section class="demo code-note">
+      <h2>判定只有两行</h2>
+<pre><code>for (let i = 1; i &lt;= 100; i++) {
+  const isMul = i % 7 === 0;              // 7 的倍数
+  const has   = String(i).includes("7");  // 数字里含 7
+
+  const cls = isMul &amp;&amp; has ? "both" : isMul ? "mul" : has ? "has" : "";
+  box.className = "bx " + cls;
+}</code></pre>
+      <p style="margin:14px 0 0;color:#4b525c;font-size:13.5px;">
+        <b>注意判断顺序：</b>必须先判"两者都是"，否则会被前一个条件拦下。
+        这也是嵌套三目运算符唯一值得用的场景——三个互斥状态，写出来比四个 <code>if</code> 短。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>要点</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>100 个格子怎么排</td><td><code>grid-template-columns: repeat(10, 1fr)</code>，一行 10 个自动换行，不用算坐标</td></tr>
+        <tr><td>正方形格子</td><td><code>aspect-ratio: 1/1</code>，宽度由栅格决定，高度自动跟上</td></tr>
+        <tr><td>数字含 7</td><td>先转字符串再 <code>includes("7")</code>，比对 100 取余简单得多</td></tr>
+        <tr><td>7 的倍数个数</td><td>100 / 7 取整 = 14 个；含 7 的共 19 个；交集 2 个（7、70）</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>顺手验证一下答案：</b>7 的倍数 14 个、含 7 的 19 个、两者都是的是 7 和 70 这 2 个。
+      勾选"只显示命中项"时，格子会重新排布（因为被隐藏的格子不再占据栅格位置），
+      你会发现行数变少了——这是 <code>display: none</code> 和 <code>visibility: hidden</code> 的区别。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var host = document.getElementById("boxes");
+  var stat = document.getElementById("stat");
+  var cMul = document.getElementById("c-mul");
+  var cHas = document.getElementById("c-has");
+  var cPlain = document.getElementById("c-plain");
+
+  var cells = [];
+
+  for (var i = 1; i <= 100; i++) {
+    var d = document.createElement("div");
+    d.className = "bx";
+    d.textContent = i;
+    d.dataset.i = i;
+    d.dataset.mul = i % 7 === 0 ? "1" : "0";
+    d.dataset.has = String(i).indexOf("7") > -1 ? "1" : "0";
+    host.appendChild(d);
+    cells.push(d);
+  }
+
+  function paint() {
+    var showMul = cMul.checked;
+    var showHas = cHas.checked;
+    var onlyHit = cPlain.checked;
+
+    var nMul = 0, nHas = 0, nBoth = 0;
+
+    cells.forEach(function (d) {
+      var isMul = d.dataset.mul === "1";
+      var has = d.dataset.has === "1";
+      var hit = (showMul && isMul) || (showHas && has);
+      var both = showMul && showHas && isMul && has;
+
+      d.className = "bx" + (both ? " both" : (showMul && isMul) ? " mul" : (showHas && has) ? " has" : "");
+      d.style.display = (onlyHit && !hit) ? "none" : "";
+
+      if (both) nBoth++;
+      if (isMul) nMul++;
+      if (has) nHas++;
+
+      d.title = d.dataset.i + (isMul ? " · 7 的倍数" : "") + (has ? " · 含 7" : "");
+    });
+
+    stat.textContent = "倍数 " + nMul + " · 含7 " + nHas + " · 交集 " + nBoth;
+  }
+
+  [cMul, cHas, cPlain].forEach(function (c) { c.addEventListener("change", paint); });
+
+  paint();
+})();
+</script>
+
+</body>
+</html>

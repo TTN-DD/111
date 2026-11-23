@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>矩阵坐标系 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .matrix-card {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  .matrix {
+    display: grid;
+    grid-template-columns: 56px repeat(5, minmax(64px, 1fr));
+    gap: 6px;
+    min-width: 470px;
+  }
+
+  .cell {
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    font-size: 11.5px;
+    font-family: var(--mono);
+    color: #4b525c;
+    background: #f4f6fa;
+    cursor: default;
+    transition: transform .12s, box-shadow .12s, outline-color .12s;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+  }
+
+  .cell.head {
+    background: none;
+    color: #8b929d;
+    font-family: inherit;
+    font-size: 12px;
+    height: 26px;
+  }
+
+  .cell.rowhead {
+    justify-items: end;
+    padding-right: 6px;
+    background: none;
+    color: #8b929d;
+    font-family: inherit;
+    font-size: 11.5px;
+    height: 46px;
+  }
+
+  /* 五档深浅：数值越大越深 */
+  .lv1 { background: #eef4ff; color: #4a6fa5; }
+  .lv2 { background: #d6e4fb; color: #2f5a94; }
+  .lv3 { background: #b3ccf6; color: #1c3f73; }
+  .lv4 { background: #7fa6ec; color: #fff; }
+  .lv5 { background: #3f6fcd; color: #fff; }
+
+  .cell.break {
+    background: repeating-linear-gradient(45deg, #f4f6fa, #f4f6fa 5px, #eceff5 5px, #eceff5 10px);
+    color: #b0b8c4;
+    font-family: inherit;
+    font-size: 11px;
+  }
+
+  .cell.hit { outline-color: #14161a; transform: translateY(-1px); }
+  .cell.dim { opacity: .28; }
+
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 11.5px;
+    color: #8b929d;
+  }
+  .legend i {
+    display: block;
+    width: 16px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .slider-box {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #eef0f3;
+  }
+  .slider-box label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: #4b525c;
+    margin-bottom: 8px;
+  }
+  .slider-box output { font-family: var(--mono); color: #1c4fc0; }
+  .slider-box input[type="range"] { width: 100%; accent-color: #3f6fcd; }
+
+  .detail {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    background: #fafbfd;
+    border: 1px solid #eef0f3;
+    font-size: 12.5px;
+    color: #4b525c;
+    min-height: 44px;
+  }
+  .detail b { color: #14161a; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>矩阵坐标系</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>矩阵坐标系：一周课时热力表</h1>
+    <div class="meta">
+      <span>第 18 讲</span>
+      <span class="mono">18-5.html</span>
+      <span>Grid 矩阵 + 深浅映射</span>
+    </div>
+    <p class="lead">
+      五行（星期）× 六列（时段）的二维数据，用 Grid 摆成矩阵，用颜色深浅表示数值大小。
+      午休时段横跨三列合并成一格，最底下的滑块能联动高亮某一列——这是"表格 + 热力图"最常见的两种交互。
+    </p>
+
+    <section class="demo">
+      <div class="matrix-card">
+        <div class="matrix" id="mx"></div>
+
+        <div class="legend">
+          <span>课时少</span>
+          <i style="background:#eef4ff"></i><i style="background:#d6e4fb"></i>
+          <i style="background:#b3ccf6"></i><i style="background:#7fa6ec"></i>
+          <i style="background:#3f6fcd"></i>
+          <span>课时多</span>
+          <span style="margin-left:auto">悬停格子看明细</span>
+        </div>
+
+        <div class="slider-box">
+          <label>按时段筛选 <output id="slot-v">第 1–2 节</output></label>
+          <input type="range" id="slot" min="0" max="4" step="1" value="0">
+        </div>
+
+        <div class="detail" id="detail">把鼠标移到任意格子上。</div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>合并单元格：Grid 的 span</h2>
+      <p class="demo-hint">"午休"横跨三列，只需要 <code>grid-column: span 3</code>，不用 table 的 colspan。</p>
+<pre><code>.matrix { display: grid; grid-template-columns: 56px repeat(5, 1fr); }
+.cell.break { grid-column: span 3; grid-row: span 1; }</code></pre>
+      <p style="margin:0;color:#4b525c;font-size:13.5px;">
+        顺便一个表格做不到的事：每个格子都能单独做 <code>transform</code> 和 <code>box-shadow</code>，
+        悬停时轻轻抬起，视觉上就像"活的"。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>要点</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>数值 → 颜色</td><td>把数值归一化到 1–5 档，映射到 <code>lv1…lv5</code> 五个类，不做渐变以保持可读</td></tr>
+        <tr><td>行列标签</td><td>第一列放星期，第一行放时段，用同一套 Grid 布局自然对齐</td></tr>
+        <tr><td>午休合并</td><td><code>grid-column: span 3</code>，斜纹背景表示"不排课"</td></tr>
+        <tr><td>行联动</td><td>滑块改变时，给目标行以外的格子加 <code>.dim</code>（透明度 28%），并实时汇总该行总课时</td></tr>
+        <tr><td>深色底不用纯色</td><td>第 4、5 档改成白字，保证对比度够（WCAG AA）</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>配色可读性：</b>热力图最怕"看不出差别"。五个档位的亮度差要均匀，
+      而且第 4 档开始就得换白字——深蓝底配深灰字是典型的不可读组合，肉眼看着有字，实际对比度只有 2:1 左右。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var DAYS = ["周一", "周二", "周三", "周四", "周五"];
+  var SLOTS = ["第 1–2 节", "第 3–4 节", "午休", "第 5–6 节", "第 7–8 节", "第 9–10 节"];
+
+  // 每行：周一到周五的课时数，null 表示午休（合并）
+  var DATA = [
+    [0, 2, 4, 6, 1],   // 1–2 节
+    [3, 5, 2, 4, 2],   // 3–4 节
+    null,              // 午休：合并三列
+    [5, 4, 3, 2, 1],   // 5–6 节
+    [2, 1, 0, 3, 4],   // 7–8 节
+    [1, 0, 2, 1, 0]    // 9–10 节
+  ];
+
+  var mx = document.getElementById("mx");
+  var detail = document.getElementById("detail");
+
+  function level(v) {
+    if (v <= 0) return "lv1";
+    if (v <= 1) return "lv1";
+    if (v <= 2) return "lv2";
+    if (v <= 3) return "lv3";
+    if (v <= 4) return "lv4";
+    return "lv5";
+  }
+
+  // 表头
+  var corner = document.createElement("div");
+  corner.className = "cell head";
+  mx.appendChild(corner);
+
+  SLOTS.forEach(function (s) {
+    var h = document.createElement("div");
+    h.className = "cell head";
+    h.textContent = s.replace("第 ", "").replace(" 节", "");
+    h.title = s;
+    mx.appendChild(h);
+  });
+
+  DATA.forEach(function (row, si) {
+    var rh = document.createElement("div");
+    rh.className = "cell rowhead";
+    rh.textContent = SLOTS[si];
+    mx.appendChild(rh);
+
+    if (row === null) {
+      var br = document.createElement("div");
+      br.className = "cell break";
+      br.style.gridColumn = "span 5";
+      br.textContent = "午休 · 不排课";
+      mx.appendChild(br);
+      return;
+    }
+
+    row.forEach(function (v, di) {
+      var c = document.createElement("div");
+      c.className = "cell " + level(v) + " col-" + di;
+      c.dataset.day = DAYS[di];
+      c.dataset.slot = SLOTS[si];
+      c.dataset.si = si;
+      c.dataset.v = v;
+      c.textContent = v === 0 ? "—" : v + " 节";
+      mx.appendChild(c);
+    });
+  });
+
+  mx.addEventListener("mousemove", function (e) {
+    var c = e.target.closest(".cell");
+    if (!c || c.classList.contains("head") || c.classList.contains("rowhead") || c.classList.contains("break")) {
+      if (!c) detail.innerHTML = "把鼠标移到任意格子上。";
+      return;
+    }
+    var v = +c.dataset.v;
+    detail.innerHTML =
+      "<b>" + c.dataset.day + " · " + c.dataset.slot + "</b><br>" +
+      "课时数 " + v + " 节" + (v === 0 ? "（当天没排课）" : "，深浅档位 lv" + (v === 0 ? 1 : Math.min(5, v))) +
+      "　·　该格背景色按数值映射，不是手工指定的";
+  });
+
+  var slot = document.getElementById("slot");
+  var ROW_OF_SLIDER = [0, 1, 3, 4, 5];   // 跳过 index 2 的午休行
+
+  slot.addEventListener("input", function () {
+    var rowIdx = ROW_OF_SLIDER[+this.value];
+    document.getElementById("slot-v").textContent = SLOTS[rowIdx];
+
+    var cells = mx.querySelectorAll(".cell[data-si]");
+    Array.prototype.forEach.call(cells, function (c) {
+      c.classList.toggle("dim", c.dataset.si !== String(rowIdx));
+    });
+
+    var total = 0;
+    Array.prototype.forEach.call(cells, function (c) {
+      if (c.dataset.si === String(rowIdx)) total += +c.dataset.v;
+    });
+
+    detail.innerHTML = "已高亮：<b>" + SLOTS[rowIdx] + "</b>" +
+      "　——　这一时段全周共 <b>" + total + "</b> 节课，其余行已淡化到 28% 透明度。";
+  });
+
+  slot.dispatchEvent(new Event("input"));
+})();
+</script>
+
+</body>
+</html>

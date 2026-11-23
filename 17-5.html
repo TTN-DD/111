@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>两种定时器 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+
+  .timer {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .timer .hd {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #eef0f3;
+    background: #fafbfd;
+  }
+  .timer .hd b { font-size: 13.5px; color: #14161a; }
+  .timer .hd code { font-size: 11.5px; }
+
+  .readout {
+    padding: 20px 16px;
+    text-align: center;
+  }
+  .readout .big {
+    font-family: var(--mono);
+    font-size: 40px;
+    font-weight: 600;
+    color: #1c4fc0;
+    line-height: 1.1;
+  }
+  .readout .sub { margin-top: 6px; color: #8b929d; font-size: 12.5px; }
+
+  .btns { display: flex; gap: 8px; padding: 0 16px 16px; }
+  .btns button {
+    flex: 1;
+    padding: 8px 0;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #fff;
+    color: #2c333d;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .btns button:hover { border-color: #2f6fed; color: #1c4fc0; }
+  .btns button.primary { background: #2f6fed; border-color: #2f6fed; color: #fff; }
+  .btns button.primary:hover { background: #2459c9; }
+  .btns button:disabled { opacity: .45; cursor: not-allowed; }
+
+  .log {
+    margin: 0;
+    padding: 12px 16px;
+    border-top: 1px solid #eef0f3;
+    background: #fbfcfd;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.9;
+    color: #6b7280;
+    height: 132px;
+    overflow: auto;
+    white-space: pre-wrap;
+  }
+  .log .on { color: #12603f; }
+  .log .off { color: #b23b3b; }
+  .log .dim { color: #b0b8c4; }
+
+  .prog { height: 4px; background: #f2f4f8; }
+  .prog i { display: block; height: 100%; width: 0; background: #2f6fed; transition: width .1s linear; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>两种定时器</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>两种定时器</h1>
+    <div class="meta">
+      <span>第 17 讲</span>
+      <span class="mono">17-5.html</span>
+      <span>setTimeout / setInterval</span>
+    </div>
+    <p class="lead">
+      <b>setTimeout 只执行一次</b>，<b>setInterval 每隔一段时间执行一次</b>。
+      两个都能取消，取消的方式不一样：前者靠 <code>clearTimeout</code> 提前拦住，
+      后者靠 <code>clearInterval</code> 停下。左边那个 3 秒倒计时，在归零前点"取消"就再也不会触发。
+    </p>
+
+    <section class="demo">
+      <div class="two">
+
+        <div class="timer">
+          <div class="hd"><b>setTimeout</b><code>3 秒后执行一次</code></div>
+          <div class="prog"><i id="p1"></i></div>
+          <div class="readout">
+            <div class="big" id="o1">3.0</div>
+            <div class="sub" id="s1">等待开始</div>
+          </div>
+          <div class="btns">
+            <button class="primary" id="start1">开始</button>
+            <button id="cancel1">取消</button>
+          </div>
+          <pre class="log" id="log1"></pre>
+        </div>
+
+        <div class="timer">
+          <div class="hd"><b>setInterval</b><code>每 1 秒累加</code></div>
+          <div class="prog"><i id="p2"></i></div>
+          <div class="readout">
+            <div class="big" id="o2">0</div>
+            <div class="sub" id="s2">未开始</div>
+          </div>
+          <div class="btns">
+            <button class="primary" id="start2">开始</button>
+            <button id="pause2">暂停</button>
+            <button id="reset2">重置</button>
+          </div>
+          <pre class="log" id="log2"></pre>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>用 setTimeout 模拟 setInterval</h2>
+      <p class="demo-hint">差别的本质：setInterval 不管上一次跑完没有，到点就发；递归 setTimeout 是"跑完再等下一次"。</p>
+<pre><code>// 写法一：setInterval —— 固定间隔，可能堆积
+const id = setInterval(tick, 1000);
+clearInterval(id);
+
+// 写法二：递归 setTimeout —— 上一次结束后才排下一次
+function loop() {
+  tick();
+  timer = setTimeout(loop, 1000);   // 注意用 setTimeout，不是 setInterval
+}
+loop();</code></pre>
+      <p style="margin:14px 0 0;color:#4b525c;font-size:13.5px;">
+        如果 <code>tick</code> 里有耗时操作（比如请求接口），<code>setInterval</code> 会把任务排成一队，
+        页面看起来"越跑越乱"；递归 <code>setTimeout</code> 永远等上一次结束，不会堆积。
+        所以轮询接口、做动画循环时，优先用后者。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>对比</th><th>setTimeout</th><th>setInterval</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>执行次数</td><td>一次</td><td>无数次，直到被清除</td></tr>
+        <tr><td>取消方法</td><td><code>clearTimeout(id)</code></td><td><code>clearInterval(id)</code></td></tr>
+        <tr><td>返回值</td><td>一个数字 id（浏览器里从 1 开始递增）</td><td>同左</td></tr>
+        <tr><td>会堆积吗</td><td>不会</td><td>回调耗时超过间隔时会堆积</td></tr>
+        <tr><td>典型用途</td><td>防抖、延迟提示、模拟请求</td><td>倒计时、轮播图、轮询</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>一定要清的两个场景：</b>① 组件/页面被移除时不清定时器，会继续改已经不存在的 DOM，报一堆错；
+      ② 标签页切到后台时浏览器会把间隔拉长到 1 秒以上（省电），所以不能用定时器计数来"精确计时"，
+      要算时间差请用 <code>Date.now()</code>。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- 左：setTimeout ---------------- */
+  var o1 = document.getElementById("o1");
+  var s1 = document.getElementById("s1");
+  var p1 = document.getElementById("p1");
+  var log1 = document.getElementById("log1");
+  var timeoutId = null, rafId = null, deadline = 0;
+  var DURATION = 3000;
+
+  function log(el, text, cls) {
+    var line = document.createElement("div");
+    line.className = cls || "";
+    line.textContent = text;
+    el.appendChild(line);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function tick1() {
+    var left = deadline - performance.now();
+    if (left < 0) left = 0;
+    o1.textContent = (left / 1000).toFixed(1);
+    p1.style.width = (100 - (left / DURATION) * 100) + "%";
+    if (left > 0) rafId = requestAnimationFrame(tick1);
+  }
+
+  document.getElementById("start1").addEventListener("click", function () {
+    if (timeoutId) clearTimeout(timeoutId);
+    if (rafId) cancelAnimationFrame(rafId);
+
+    log1.innerHTML = "";
+    log(log1, "setTimeout(fn, 3000) 已注册，id = " + (Math.floor(Math.random() * 900) + 100), "dim");
+    s1.textContent = "倒计时中…";
+
+    deadline = performance.now() + DURATION;
+    tick1();
+
+    timeoutId = setTimeout(function () {
+      o1.textContent = "0.0";
+      p1.style.width = "100%";
+      s1.textContent = "已执行（只执行这一次）";
+      log(log1, "▶ 回调触发", "on");
+      timeoutId = null;
+    }, DURATION);
+  });
+
+  document.getElementById("cancel1").addEventListener("click", function () {
+    if (!timeoutId) {
+      log(log1, "没有待执行的定时器，无需取消", "dim");
+      return;
+    }
+    clearTimeout(timeoutId);
+    timeoutId = null;
+    if (rafId) cancelAnimationFrame(rafId);
+    s1.textContent = "已取消，回调不会再触发";
+    log(log1, "✕ clearTimeout 调用，回调被丢弃", "off");
+  });
+
+  /* ---------------- 右：setInterval ---------------- */
+  var o2 = document.getElementById("o2");
+  var s2 = document.getElementById("s2");
+  var p2 = document.getElementById("p2");
+  var log2 = document.getElementById("log2");
+  var intervalId = null;
+  var count = 0;
+
+  function step() {
+    count++;
+    o2.textContent = count;
+    p2.style.width = ((count % 10) / 10 * 100) + "%";
+    log(log2, "tick #" + count, count % 5 === 0 ? "on" : "");
+    if (count >= 999) stopInterval("到 999 自动停止，避免无限增长");
+  }
+
+  function startInterval() {
+    if (intervalId) return;
+    intervalId = setInterval(step, 1000);
+    s2.textContent = "运行中（每 1000ms）";
+    log(log2, "setInterval 启动", "on");
+    document.getElementById("start2").textContent = "运行中";
+  }
+
+  function stopInterval(reason) {
+    if (!intervalId) return;
+    clearInterval(intervalId);
+    intervalId = null;
+    s2.textContent = reason || "已暂停";
+    log(log2, "⏸ clearInterval", "off");
+    document.getElementById("start2").textContent = "继续";
+  }
+
+  document.getElementById("start2").addEventListener("click", startInterval);
+  document.getElementById("pause2").addEventListener("click", function () { stopInterval(); });
+  document.getElementById("reset2").addEventListener("click", function () {
+    stopInterval("已重置");
+    count = 0;
+    o2.textContent = "0";
+    p2.style.width = "0";
+    log2.innerHTML = "";
+    document.getElementById("start2").textContent = "开始";
+  });
+})();
+</script>
+
+</body>
+</html>

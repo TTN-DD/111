@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>接口测试 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .req {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .req-line {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #eef0f3;
+  }
+
+  .methods { display: flex; flex: 0 0 auto; background: #fafbfd; border-right: 1px solid #eef0f3; }
+
+  .methods button {
+    padding: 11px 14px;
+    border: 0;
+    border-right: 1px solid #eef0f3;
+    background: none;
+    color: #6b7280;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .methods button:last-child { border-right: 0; }
+  .methods button.on { background: #fff; color: #1c4fc0; box-shadow: inset 0 -2px 0 #2f6fed; }
+
+  .req-line input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 14px;
+    border: 0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: #2c333d;
+  }
+  .req-line input:focus { outline: none; background: #fbfcfe; }
+
+  .req-line .send {
+    flex: 0 0 auto;
+    padding: 0 22px;
+    border: 0;
+    background: #2f6fed;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .req-line .send:hover { background: #2459c9; }
+  .req-line .send:disabled { opacity: .5; cursor: not-allowed; }
+
+  .body-edit {
+    display: none;
+    border-bottom: 1px solid #eef0f3;
+  }
+  .body-edit.on { display: block; }
+  .body-edit textarea {
+    display: block;
+    width: 100%;
+    min-height: 96px;
+    padding: 12px 14px;
+    border: 0;
+    background: #1b1f24;
+    color: #dfe4ec;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    resize: vertical;
+  }
+
+  .resp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #eef0f3;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: #6b7280;
+    align-items: center;
+  }
+  .badge {
+    padding: 2px 9px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 11.5px;
+  }
+  .badge.ok { background: #eaf3de; color: #3b6d11; }
+  .badge.err { background: #fdf1f1; color: #b23b3b; }
+  .badge.wait { background: #fdf6e3; color: #8a5a0b; }
+  .resp-meta .t { margin-left: auto; }
+
+  .resp-body {
+    margin: 0;
+    padding: 14px;
+    min-height: 220px;
+    max-height: 380px;
+    overflow: auto;
+    background: #1b1f24;
+    color: #dfe4ec;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.75;
+    white-space: pre-wrap;
+  }
+  .resp-body .k { color: #8fb3f9; }
+  .resp-body .s { color: #a5d6a7; }
+  .resp-body .n { color: #ffcc80; }
+  .resp-body .c { color: #7d8794; }
+  .resp-body .e { color: #f09595; }
+
+  .history { margin-top: 14px; display: grid; gap: 6px; }
+  .history div {
+    display: flex;
+    gap: 10px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    background: #fafbfd;
+    border: 1px solid #f1f3f7;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: #6b7280;
+  }
+  .history .m { color: #1c4fc0; font-weight: 600; flex: 0 0 46px; }
+  .history .u { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .history .s2 { flex: 0 0 auto; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>接口测试</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>接口测试面板</h1>
+    <div class="meta">
+      <span>第 17 讲</span>
+      <span class="mono">17-7.html</span>
+      <span>GET / POST / PUT / DELETE</span>
+    </div>
+    <p class="lead">
+      一个迷你版的 Postman：选方法、填地址、发请求，看状态码、耗时和响应体。
+      四种方法在 REST 里的语义各不相同，切到 POST 和 PUT 会多出一个请求体输入框——那是必须带 <code>body</code> 的方法。
+    </p>
+
+    <section class="demo">
+      <div class="req">
+        <div class="req-line">
+          <div class="methods" id="methods">
+            <button data-m="GET" class="on">GET</button>
+            <button data-m="POST">POST</button>
+            <button data-m="PUT">PUT</button>
+            <button data-m="DELETE">DELETE</button>
+          </div>
+          <input type="text" id="url" value="https://jsonplaceholder.typicode.com/posts/1" spellcheck="false">
+          <button class="send" id="send">发送</button>
+        </div>
+
+        <div class="body-edit" id="bodyEdit">
+          <textarea id="body" spellcheck="false"></textarea>
+        </div>
+
+        <div class="resp-meta">
+          <span class="badge wait" id="badge">待发送</span>
+          <span id="meta">—</span>
+          <span class="t" id="time"></span>
+        </div>
+
+        <pre class="resp-body" id="resp">选一个方法，然后点「发送」。</pre>
+      </div>
+
+      <div class="history" id="history"></div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>方法</th><th>语义</th><th>要不要 body</th><th>幂等吗</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>GET</code></td><td>获取资源</td><td>不要</td><td>是</td></tr>
+        <tr><td><code>POST</code></td><td>新建资源</td><td>要</td><td>否（重复提交会建多条）</td></tr>
+        <tr><td><code>PUT</code></td><td>整体替换资源</td><td>要</td><td>是（同一份数据替换多少次结果一样）</td></tr>
+        <tr><td><code>PATCH</code></td><td>局部更新</td><td>要</td><td>否</td></tr>
+        <tr><td><code>DELETE</code></td><td>删除资源</td><td>不要</td><td>是</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>三个必须检查的东西：</b>① <b>状态码</b>（2xx 成功、4xx 客户端错、5xx 服务端错）；
+      ② <b>响应体</b>是不是你预期的结构——200 也可能返回 <code>{"code":500,"msg":"..."}</code> 这种业务错误；
+      ③ <b>耗时</b>，超过 1 秒的接口要考虑加 loading 或缓存。
+      调试时按 F12 → Network，比任何第三方工具都快。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var BASE = "https://jsonplaceholder.typicode.com";
+  var method = "GET";
+  var busy = false;
+
+  var urlEl = document.getElementById("url");
+  var bodyEdit = document.getElementById("bodyEdit");
+  var bodyEl = document.getElementById("body");
+  var respEl = document.getElementById("resp");
+  var badge = document.getElementById("badge");
+  var meta = document.getElementById("meta");
+  var timeEl = document.getElementById("time");
+  var send = document.getElementById("send");
+  var history = document.getElementById("history");
+
+  var DEFAULTS = {
+    GET: BASE + "/posts/1",
+    POST: BASE + "/posts",
+    PUT: BASE + "/posts/1",
+    DELETE: BASE + "/posts/1"
+  };
+
+  var BODIES = {
+    POST: '{\n  "title": "高级网页设计",\n  "body": "课堂练习",\n  "userId": 1\n}',
+    PUT: '{\n  "id": 1,\n  "title": "改过的标题",\n  "body": "整条替换",\n  "userId": 1\n}'
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  }
+
+  /* 简单高亮 JSON */
+  function pretty(text) {
+    var out = esc(text);
+    out = out.replace(/"([^"\\]*)":/g, '<span class="k">"$1"</span>:');
+    out = out.replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>');
+    out = out.replace(/: (-?\d+\.?\d*)/g, ': <span class="n">$1</span>');
+    out = out.replace(/: (true|false|null)/g, ': <span class="n">$1</span>');
+    return out;
+  }
+
+  document.getElementById("methods").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    Array.prototype.forEach.call(this.children, function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+
+    method = btn.dataset.m;
+    urlEl.value = DEFAULTS[method] || BASE + "/posts/1";
+
+    var needsBody = method === "POST" || method === "PUT";
+    bodyEdit.classList.toggle("on", needsBody);
+    if (needsBody) bodyEl.value = BODIES[method] || "{}";
+  });
+
+  function addHistory(m, url, status, ms) {
+    var d = document.createElement("div");
+    d.innerHTML = "<span class='m'></span><span class='u'></span><span class='s2'></span>";
+    d.querySelector(".m").textContent = m;
+    d.querySelector(".u").textContent = url.replace(BASE, "");
+    d.querySelector(".s2").textContent = (status || "ERR") + " · " + ms + "ms";
+    history.insertBefore(d, history.firstChild);
+    while (history.children.length > 6) history.removeChild(history.lastChild);
+  }
+
+  async function send_() {
+    if (busy) return;
+    busy = true;
+    send.disabled = true;
+
+    badge.className = "badge wait";
+    badge.textContent = "请求中";
+    meta.textContent = method + " " + urlEl.value.replace(BASE, "");
+    timeEl.textContent = "";
+    respEl.innerHTML = '<span class="c">等待响应…</span>';
+
+    var t0 = performance.now();
+    var opts = { method: method, headers: {} };
+
+    if (method === "POST" || method === "PUT") {
+      opts.headers["Content-Type"] = "application/json; charset=utf-8";
+      opts.body = bodyEl.value;
+    }
+
+    try {
+      var res = await fetch(urlEl.value, opts);
+      var ms = Math.round(performance.now() - t0);
+      var text = await res.text();
+
+      badge.className = "badge " + (res.ok ? "ok" : "err");
+      badge.textContent = res.status + " " + (res.statusText || "");
+      meta.textContent = method + " " + urlEl.value.replace(BASE, "");
+      timeEl.textContent = ms + " ms · " + text.length + " 字节";
+
+      var shown = text;
+      try { shown = JSON.stringify(JSON.parse(text), null, 2); } catch (e) { /* 不是 JSON 就原样显示 */ }
+      respEl.innerHTML = pretty(shown);
+
+      addHistory(method, urlEl.value, res.status, ms);
+
+    } catch (err) {
+      var ms2 = Math.round(performance.now() - t0);
+      badge.className = "badge err";
+      badge.textContent = "网络错误";
+      timeEl.textContent = ms2 + " ms";
+      respEl.innerHTML =
+        '<span class="e">请求失败：' + esc(err.message) + '</span>\n\n' +
+        '<span class="c">常见原因：\n' +
+        '  · 跨域被拦截（对方没开 CORS）\n' +
+        '  · 断网或域名解析失败\n' +
+        '  · 地址写错（少个斜杠、多了空格）</span>';
+      addHistory(method, urlEl.value, 0, ms2);
+    } finally {
+      busy = false;
+      send.disabled = false;
+    }
+  }
+
+  send.addEventListener("click", send_);
+  urlEl.addEventListener("keydown", function (e) { if (e.key === "Enter") send_(); });
+})();
+</script>
+
+</body>
+</html>

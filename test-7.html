@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUV 频道导购 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .ch-head {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #b23b3b;
+    margin-bottom: 16px;
+  }
+
+  .ch-head h2 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 600;
+    color: #b23b3b;
+    letter-spacing: .02em;
+  }
+
+  .ch-head .date {
+    color: #9aa4b2;
+    font-size: 12px;
+    font-family: var(--mono);
+    padding-bottom: 3px;
+  }
+
+  .ch-head .nav { margin-left: auto; display: flex; gap: 14px; font-size: 12.5px; }
+  .ch-head .nav a { color: #6b7280; }
+
+  .price-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .price-tabs button {
+    padding: 7px 16px;
+    border: 1px solid #e0e5ee;
+    border-radius: 999px;
+    background: #fff;
+    color: #4b525c;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .price-tabs button:hover { border-color: #f0c4c4; color: #b23b3b; }
+  .price-tabs button.on { background: #b23b3b; border-color: #b23b3b; color: #fff; }
+
+  .cars { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+
+  .car {
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .car:hover { border-color: #f0c4c4; box-shadow: 0 10px 22px -18px rgba(20,22,26,.6); }
+
+  .car .pic {
+    height: 116px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .03em;
+  }
+
+  .car .info { padding: 12px 14px 14px; }
+  .car h4 { margin: 0 0 4px; font-size: 14.5px; color: #1b2330; }
+  .car .spec { color: #8b929d; font-size: 12px; }
+  .car .price {
+    margin-top: 8px;
+    color: #b23b3b;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .car .price em { font-style: normal; font-size: 11px; color: #9aa4b2; margin-left: 6px; font-weight: 400; }
+
+  .car .tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .car .tags span {
+    padding: 1px 7px;
+    border-radius: 4px;
+    background: #f4f6fa;
+    color: #6b7280;
+    font-size: 11px;
+  }
+  .car .tags span.hot { background: #fdf1f1; color: #b23b3b; }
+
+  .empty { padding: 36px; text-align: center; color: #b0b8c4; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>SUV 频道导购</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>SUV 频道导购</h1>
+    <div class="meta">
+      <span>课堂测试 6</span>
+      <span class="mono">test-7.html</span>
+      <span>价格区间切换</span>
+    </div>
+    <p class="lead">
+      频道页的常见结构：<b>红色主标题 + 日期 + 价格区间筛选 + 卡片列表</b>。
+      切区间时只换数据、不重排布局，卡片高度也用固定比例锁住，保证切换时不会跳一下。
+    </p>
+
+    <section class="demo">
+      <div class="ch-head">
+        <h2>SUV 频道 · 购车导购</h2>
+        <span class="date" id="today">2026-11-23</span>
+        <div class="nav">
+          <a href="#">轿车</a><a href="#">SUV</a><a href="#">MPV</a><a href="#">新能源</a>
+        </div>
+      </div>
+
+      <div class="price-tabs" id="tabs">
+        <button data-k="a" class="on">10 万以下</button>
+        <button data-k="b">10–15 万</button>
+        <button data-k="c">15–20 万</button>
+        <button data-k="d">20 万以上</button>
+      </div>
+
+      <div class="cars" id="cars"></div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>要点</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>主标题强调</td><td>红色文字 + 2px 红色下划线，比整块红底更克制</td></tr>
+        <tr><td>日期跟着标题走</td><td>与标题基线对齐（<code>align-items: flex-end</code>），不居中</td></tr>
+        <tr><td>筛选标签</td><td>胶囊按钮，选中态用主色填充，一眼看出当前区间</td></tr>
+        <tr><td>卡片图片占位</td><td>固定 116px 高 + 渐变底色，图片没加载也不跳版</td></tr>
+        <tr><td>切换不跳版</td><td>卡片高度由内容决定但价格/标签位置固定，切换时视觉稳定</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>频道的配色逻辑：</b>汽车频道用红色做主色（热情、动力），数码频道多用蓝色（科技、冷静），
+      财经频道常用深红配绿。这不是审美问题，是行业惯例——用户扫一眼标题颜色就知道自己在哪个频道。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var DATA = {
+    a: [
+      { n: "青野 EV3", s: "小型 SUV · 纯电 · 430km", p: "8.98", c1: "#2f6fed", c2: "#6f9bf0", tags: ["入门首选", "续航够用"], hot: true },
+      { n: "竞速 X3", s: "紧凑 SUV · 燃油 · 1.5T", p: "9.58", c1: "#2b4a6b", c2: "#4a7499", tags: ["保养便宜"] },
+      { n: "长川 mini", s: "微型 SUV · 纯电 · 301km", p: "7.28", c1: "#4a6b52", c2: "#6e9578", tags: ["城市代步"] }
+    ],
+    b: [
+      { n: "远山 L6", s: "中型 SUV · 插混 · 1200km", p: "15.98", c1: "#b8442c", c2: "#d96a4a", tags: ["销量冠军", "空间大"], hot: true },
+      { n: "致远 05", s: "紧凑 SUV · 燃油 · 2.0T", p: "13.58", c1: "#3d4a5a", c2: "#5c6b7d", tags: ["动力强"] },
+      { n: "青野 EV5", s: "紧凑 SUV · 纯电 · 510km", p: "12.98", c1: "#12603f", c2: "#2f8a63", tags: ["快充"] },
+      { n: "云程 X2", s: "紧凑 SUV · 插混 · 1100km", p: "14.28", c1: "#5a4a6b", c2: "#7d6b91", tags: ["油耗低"] }
+    ],
+    c: [
+      { n: "星海 S7", s: "中大型 SUV · 纯电 · 620km", p: "18.98", c1: "#1b3a66", c2: "#3f6fcd", tags: ["新上市", "智驾"], hot: true },
+      { n: "昊空 07", s: "中大型 SUV · 纯电 · 580km", p: "19.80", c1: "#8a6a3a", c2: "#b8915c", tags: ["七座"] },
+      { n: "远山 L7", s: "中大型 SUV · 插混 · 1300km", p: "17.58", c1: "#6b3a5a", c2: "#94617f", tags: ["增程"] }
+    ],
+    d: [
+      { n: "昊空 09", s: "大型 SUV · 纯电 · 700km", p: "31.80", c1: "#2b2b33", c2: "#4a4a55", tags: ["旗舰", "空气悬架"], hot: true },
+      { n: "云程 M9", s: "MPV/SUV · 插混 · 1400km", p: "45.80", c1: "#1f3a2e", c2: "#35604c", tags: ["商务"] },
+      { n: "竞速 GT-S", s: "中大型 SUV · 纯电 · 650km", p: "26.98", c1: "#7a3a3a", c2: "#a05a5a", tags: ["性能版"] }
+    ]
+  };
+
+  var cars = document.getElementById("cars");
+
+  function render(key) {
+    var list = DATA[key] || [];
+    cars.innerHTML = "";
+
+    if (!list.length) {
+      var e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = "该价格区间暂无车型。";
+      cars.appendChild(e);
+      return;
+    }
+
+    list.forEach(function (c) {
+      var d = document.createElement("div");
+      d.className = "car";
+
+      var pic = document.createElement("div");
+      pic.className = "pic";
+      pic.textContent = c.n;
+      pic.style.background = "linear-gradient(140deg," + c.c1 + "," + c.c2 + ")";
+
+      var info = document.createElement("div");
+      info.className = "info";
+
+      var h = document.createElement("h4");
+      h.textContent = c.n;
+
+      var sp = document.createElement("div");
+      sp.className = "spec";
+      sp.textContent = c.s;
+
+      var pr = document.createElement("div");
+      pr.className = "price";
+      pr.textContent = c.p + " 万起";
+      var em = document.createElement("em");
+      em.textContent = "指导价";
+      pr.appendChild(em);
+
+      var tags = document.createElement("div");
+      tags.className = "tags";
+      c.tags.forEach(function (t, i) {
+        var s = document.createElement("span");
+        s.textContent = t;
+        if (i === 0 && c.hot) s.className = "hot";
+        tags.appendChild(s);
+      });
+
+      info.appendChild(h);
+      info.appendChild(sp);
+      info.appendChild(pr);
+      info.appendChild(tags);
+      d.appendChild(pic);
+      d.appendChild(info);
+      cars.appendChild(d);
+    });
+  }
+
+  document.getElementById("tabs").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    Array.prototype.forEach.call(this.children, function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+    render(btn.dataset.k);
+  });
+
+  var now = new Date();
+  document.getElementById("today").textContent =
+    now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+
+  render("a");
+})();
+</script>
+
+</body>
+</html>

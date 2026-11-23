@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Promise 包饺子 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .kitchen {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .kitchen .hd {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #eef0f3;
+    background: #fafbfd;
+    font-size: 12.5px;
+    color: #8b929d;
+  }
+  .kitchen .hd b { color: #14161a; font-size: 13.5px; }
+  .kitchen .hd .clock { margin-left: auto; font-family: var(--mono); color: #1c4fc0; }
+
+  .stages { padding: 8px 16px 4px; }
+
+  .stage {
+    display: grid;
+    grid-template-columns: 96px 1fr 62px;
+    gap: 12px;
+    align-items: center;
+    padding: 9px 0;
+    font-size: 12.5px;
+    color: #4b525c;
+    border-bottom: 1px dashed #f1f3f7;
+  }
+  .stage:last-child { border-bottom: 0; }
+
+  .stage .name { display: flex; align-items: center; gap: 7px; }
+  .stage .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #d5dbe5; flex: 0 0 7px;
+  }
+  .stage.run .dot { background: #ef9f27; animation: blink 1s ease-in-out infinite; }
+  .stage.done .dot { background: #639922; }
+  .stage.fail .dot { background: #e24b4a; }
+  @keyframes blink { 50% { opacity: .3; } }
+
+  .stage .track { height: 6px; border-radius: 3px; background: #f2f4f8; overflow: hidden; }
+  .stage .track i {
+    display: block; height: 100%; width: 0; border-radius: 3px;
+    background: #2f6fed;
+    transition: width .1s linear;
+  }
+  .stage.done .track i { background: #639922; }
+  .stage.fail .track i { background: #e24b4a; }
+
+  .stage .ms { text-align: right; font-family: var(--mono); font-size: 11.5px; color: #b0b8c4; }
+  .stage.done .ms { color: #3b6d11; }
+
+  .parallel-note {
+    margin: 0 16px 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #f7faff;
+    border: 1px dashed #cdddf8;
+    color: #3a5170;
+    font-size: 12px;
+  }
+
+  .log {
+    margin: 0;
+    padding: 14px 16px;
+    border-top: 1px solid #eef0f3;
+    background: #1b1f24;
+    color: #dfe4ec;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.85;
+    height: 210px;
+    overflow: auto;
+    white-space: pre-wrap;
+  }
+  .log .k { color: #8fb3f9; }
+  .log .s { color: #a5d6a7; }
+  .log .n { color: #ffcc80; }
+  .log .e { color: #f09595; }
+  .log .c { color: #7d8794; }
+
+  .bar { display: flex; gap: 10px; align-items: center; padding: 14px 16px; border-top: 1px solid #eef0f3; flex-wrap: wrap; }
+  .bar button {
+    padding: 8px 18px;
+    border: 1px solid #2f6fed;
+    border-radius: 8px;
+    background: #2f6fed;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .bar button:hover { background: #2459c9; }
+  .bar button:disabled { opacity: .45; cursor: not-allowed; }
+  .bar label { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: #4b525c; cursor: pointer; }
+  .bar input[type="checkbox"] { accent-color: #2f6fed; }
+  .bar .sum { margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: #8b929d; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>Promise 包饺子</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>Promise 包饺子</h1>
+    <div class="meta">
+      <span>第 17 讲</span>
+      <span class="mono">17-6.html</span>
+      <span>串行 / 并行 / 报错</span>
+    </div>
+    <p class="lead">
+      包饺子的顺序是有讲究的：<b>和面和和馅可以同时进行</b>（<code>Promise.all</code>），
+      但"包"必须等这两样都好了，煮又必须等包完。
+      勾掉"并行"再看一遍，总耗时立刻从 4.6 秒变成 6.1 秒——这就是有依赖关系的任务该串行、没依赖的该并行。
+    </p>
+
+    <section class="demo">
+      <div class="kitchen">
+        <div class="hd">
+          <b>厨房进度</b>
+          <span id="total">总耗时：--</span>
+          <span class="clock" id="clock">0.0s</span>
+        </div>
+
+        <div class="stages" id="stages"></div>
+
+        <p class="parallel-note" id="pnote">
+          当前：<b>和面</b> 与 <b>和馅</b> 并行 —— 两件事互不依赖，可以同时开火。
+        </p>
+
+        <div class="bar">
+          <button id="btn-start">开始包饺子</button>
+          <button id="btn-fail" style="background:#fff;color:#b23b3b;border-color:#f0c4c4;">演示失败（面粉不够）</button>
+          <label><input type="checkbox" id="parallel" checked> 和面与和馅并行</label>
+          <span class="sum" id="sum"></span>
+        </div>
+
+        <pre class="log" id="log">点「开始包饺子」看 Promise 的执行顺序。</pre>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>代码长什么样</h2>
+<pre><code>// 每一步都是一个返回 Promise 的函数
+const buyFlour  = () =&gt; wait("买面粉", 900);
+const knead     = () =&gt; wait("和面",   1600);
+const mixFilling= () =&gt; wait("和馅",   1400);
+const wrap      = () =&gt; wait("包饺子", 2200);
+const boil      = () =&gt; wait("下锅煮", 1200);
+
+async function cook() {
+  await buyFlour();                       // 必须先买
+  await Promise.all([knead(), mixFilling()]);  // 这两件并行
+  await wrap();                           // 等两样都好了才包
+  await boil();
+}
+
+// wait 内部就是一个 Promise
+function wait(name, ms) {
+  return new Promise(resolve =&gt;
+    setTimeout(() =&gt; { log(name + " 完成"); resolve(name); }, ms)
+  );
+}</code></pre>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>写法</th><th>耗时</th><th>适用</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>全部串行 <code>await</code></td><td>900 + 1600 + 1400 + 2200 + 1200 = <b>7.3s</b></td><td>每一步都依赖上一步</td></tr>
+        <tr><td>和面/和馅并行（本页）</td><td><b>4.6s</b>（省 1.4s，等于较短的那个任务）</td><td>任务之间无依赖</td></tr>
+        <tr><td>全部并行</td><td>2.2s，但饺子会煮成一锅糊</td><td>只在真的没有先后要求时可用</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>失败怎么处理：</b>点"演示失败"看看——<code>buyFlour</code> 抛出错误后，
+      整个 <code>async</code> 函数会立刻跳到 <code>catch</code>，后面三步<b>一步都不会执行</b>。
+      这就是 <code>await</code> 链式调用的特性：中途任何一步 reject，剩下的全部短路。
+      如果某一步失败可以容忍（比如"和馅"失败改用现成肉馅），要单独 <code>try/catch</code> 那一小段。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var STAGES = [
+    { key: "buy",   name: "买面粉", ms: 900,  group: 0 },
+    { key: "knead", name: "和面",   ms: 1600, group: 1 },
+    { key: "mix",   name: "和馅",   ms: 1400, group: 1 },
+    { key: "wrap",  name: "包饺子", ms: 2200, group: 2 },
+    { key: "boil",  name: "下锅煮", ms: 1200, group: 3 }
+  ];
+
+  var host = document.getElementById("stages");
+  var logBox = document.getElementById("log");
+  var clockEl = document.getElementById("clock");
+  var totalEl = document.getElementById("total");
+  var sumEl = document.getElementById("sum");
+  var btnStart = document.getElementById("btn-start");
+  var btnFail = document.getElementById("btn-fail");
+  var cbParallel = document.getElementById("parallel");
+  var pnote = document.getElementById("pnote");
+
+  var t0 = 0, timer = null, busy = false, rows = {};
+
+  function build() {
+    host.innerHTML = "";
+    rows = {};
+    STAGES.forEach(function (s) {
+      var row = document.createElement("div");
+      row.className = "stage";
+      row.innerHTML =
+        "<div class='name'><span class='dot'></span><span></span></div>" +
+        "<div class='track'><i></i></div>" +
+        "<div class='ms'>等待</div>";
+      row.querySelector(".name span:last-child").textContent = s.name;
+      host.appendChild(row);
+      rows[s.key] = { el: row, fill: row.querySelector(".track i"), ms: row.querySelector(".ms") };
+    });
+  }
+
+  function stamp() {
+    return (Math.round(performance.now() - t0) / 1000).toFixed(1) + "s";
+  }
+
+  function log(text, cls) {
+    var span = document.createElement("span");
+    span.className = cls || "";
+    span.textContent = "[" + stamp().padStart(6, " ") + "] " + text + "\n";
+    logBox.appendChild(span);
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function wait(key, name, ms, shouldFail) {
+    return new Promise(function (resolve, reject) {
+      var r = rows[key];
+      r.el.classList.add("run");
+      r.ms.textContent = "进行中";
+      log("▶ " + name + " 开始", "k");
+
+      var start = performance.now();
+      var iv = setInterval(function () {
+        var p = Math.min(99, (performance.now() - start) / ms * 100);
+        r.fill.style.width = p + "%";
+      }, 40);
+
+      setTimeout(function () {
+        clearInterval(iv);
+        r.fill.style.width = "100%";
+
+        if (shouldFail) {
+          r.el.classList.remove("run");
+          r.el.classList.add("fail");
+          r.ms.textContent = "失败";
+          log("✕ " + name + " 失败：面粉不够了", "e");
+          reject(new Error(name + " 失败"));
+          return;
+        }
+
+        r.el.classList.remove("run");
+        r.el.classList.add("done");
+        r.ms.textContent = ms + "ms";
+        log("✔ " + name + " 完成", "s");
+        resolve(name);
+      }, ms);
+    });
+  }
+
+  function byKey(k) {
+    for (var i = 0; i < STAGES.length; i++) if (STAGES[i].key === k) return STAGES[i];
+  }
+
+  async function cook(failFirst) {
+    busy = true;
+    btnStart.disabled = btnFail.disabled = true;
+    build();
+    logBox.innerHTML = "";
+    t0 = performance.now();
+    if (timer) clearInterval(timer);
+    timer = setInterval(function () { clockEl.textContent = stamp(); }, 100);
+
+    var buy = byKey("buy"), knead = byKey("knead"), mix = byKey("mix"),
+        wrap = byKey("wrap"), boil = byKey("boil");
+
+    try {
+      await wait(buy.key, buy.name, buy.ms, failFirst);
+
+      if (cbParallel.checked) {
+        log("⇒ 和面 与 和馅 同时开始（Promise.all）", "n");
+        await Promise.all([
+          wait(knead.key, knead.name, knead.ms, false),
+          wait(mix.key, mix.name, mix.ms, false)
+        ]);
+      } else {
+        log("⇒ 先和面，再和馅（逐个 await）", "n");
+        await wait(knead.key, knead.name, knead.ms, false);
+        await wait(mix.key, mix.name, mix.ms, false);
+      }
+
+      await wait(wrap.key, wrap.name, wrap.ms, false);
+      await wait(boil.key, boil.name, boil.ms, false);
+
+      var total = (performance.now() - t0) / 1000;
+      log("");
+      log("🎉 全部完成，总耗时 " + total.toFixed(2) + "s", "s");
+      totalEl.textContent = "总耗时：" + total.toFixed(2) + "s";
+      sumEl.textContent = cbParallel.checked ? "并行版" : "串行版";
+    } catch (err) {
+      var total2 = (performance.now() - t0) / 1000;
+      log("");
+      log("⚠ 已中断：" + err.message + "，后面的步骤都没有执行", "e");
+      log("总耗时 " + total2.toFixed(2) + "s（提前结束）", "c");
+      totalEl.textContent = "已中断：" + total2.toFixed(2) + "s";
+    } finally {
+      clearInterval(timer);
+      clockEl.textContent = stamp();
+      busy = false;
+      btnStart.disabled = btnFail.disabled = false;
+    }
+  }
+
+  btnStart.addEventListener("click", function () { if (!busy) cook(false); });
+  btnFail.addEventListener("click", function () { if (!busy) cook(true); });
+
+  cbParallel.addEventListener("change", function () {
+    pnote.innerHTML = this.checked
+      ? "当前：<b>和面</b> 与 <b>和馅</b> 并行 —— 两件事互不依赖，可以同时开火。"
+      : "当前：<b>和面</b> 与 <b>和馅</b> 串行 —— 白白多等 1.4 秒。";
+  });
+
+  build();
+})();
+</script>
+
+</body>
+</html>
