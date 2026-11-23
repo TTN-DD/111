@@ -25,6 +25,7 @@
 | `7.html` | Flex 布局：主轴方向、justify-content、align-items、flex-wrap | 第 7 讲 |
 | `8.html` | Flex 进阶：等宽分栏、侧栏固定、圣杯布局、等高列、居中 | 第 8 讲 |
 | `10.html` | 过渡与动画：transition、transform、@keyframes | 第 10 讲 |
+| `wechat-read/index.html` | **课程大作业**：微信读书手机端界面还原，4 个一级页面 + 二级视图，纯 CSS 绘制封面，原生 JS 实现切换 | 综合 |
 
 ## 目录结构
 
@@ -36,6 +37,10 @@
 ├── assets/
 │   ├── site.css          全站公共样式（索引页 + 练习页外壳）
 │   └── demo-link.css     3-1.html 演示用的外部样式表
+├── wechat-read/          课程大作业：微信读书手机端还原
+│   ├── index.html
+│   ├── css/style.css
+│   └── js/app.js
 └── README.md
 ```
 

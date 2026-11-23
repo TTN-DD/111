@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<!-- 段栋 计算机24004 高级网页设计I 网页元素设计 -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>微信读书 - 网页元素设计</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="phone">
+
+    <!-- ==================== 阅读（书城首页） ==================== -->
+    <section class="page active" id="page-home">
+      <div class="content">
+        <!-- 搜索栏：左图右文元素 -->
+        <div class="search-bar" id="search-open">
+          <svg class="search-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span class="search-placeholder">你当像鸟飞往你的山</span>
+          <span class="search-divider"></span>
+          <span class="search-city">书城</span>
+        </div>
+
+        <!-- 快捷入口 -->
+        <div class="chip-row">
+          <div class="chip chip-red">限时免费 ›</div>
+          <div class="chip">分类 ›</div>
+          <div class="chip">榜单 ›</div>
+          <div class="chip">书单 ›</div>
+          <div class="chip">听书 ›</div>
+        </div>
+
+        <!-- 横滑卡片 -->
+        <div class="h-scroll">
+          <div class="promo-card white">
+            <div class="promo-title">本周阅读</div>
+            <div class="promo-big">6<span class="promo-unit">小时</span></div>
+            <div class="day-dots">
+              <span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span></span><span></span>
+            </div>
+            <div class="day-labels">一 二 三 四 五 六 日</div>
+          </div>
+          <div class="promo-card dark">
+            <div class="promo-title">读书挑战赛</div>
+            <div class="promo-gold">1 天付费会员</div>
+            <div class="promo-check">已读 5 天</div>
+            <div class="promo-btn">继续挑战</div>
+          </div>
+          <div class="promo-card book-promo" id="promo-book">
+            <div class="promo-book-cover">
+              <span>三体</span>
+              <em>限时免费</em>
+            </div>
+          </div>
+        </div>
+
+        <!-- 今日推荐：横滑小卡 -->
+        <h2 class="big-title">今日推荐</h2>
+        <div class="today-strip" id="today-strip"></div>
+
+        <!-- 为你推荐：上图下文列表元素 -->
+        <div class="title-row">
+          <h2 class="big-title">为你推荐</h2>
+          <span class="title-sub">根据你的阅读口味</span>
+        </div>
+        <div class="book-grid" id="home-grid"></div>
+        <div class="refresh-btn" id="btn-refresh">换一批</div>
+
+        <!-- 飙升榜：列表元素 -->
+        <div class="title-row">
+          <h2 class="big-title">飙升榜</h2>
+          <span class="title-link">完整榜单 ›</span>
+        </div>
+        <div class="rank-list" id="rank-list"></div>
+
+        <!-- 限时免费 -->
+        <div class="title-row">
+          <h2 class="big-title">限时免费</h2>
+          <span class="title-sub">10月26日 24:00 结束</span>
+        </div>
+        <div class="book-grid" id="free-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== 书架 ==================== -->
+    <section class="page" id="page-shelf">
+      <div class="content">
+        <div class="search-bar" id="search-open-2">
+          <svg class="search-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span class="search-placeholder">遥远的救世主</span>
+          <span class="search-divider"></span>
+          <span class="search-city">书城</span>
+        </div>
+
+        <div class="shelf-head">
+          <h1 class="shelf-title">书架</h1>
+          <div class="shelf-actions">
+            <span class="shelf-action">⊕ 导入</span>
+            <span class="shelf-action">⊙ 选择</span>
+          </div>
+        </div>
+
+        <!-- 继续阅读：左图右文元素 -->
+        <div class="shelf-hero" id="shelf-hero">
+          <div class="hero-cover" id="hero-cover"></div>
+          <div class="hero-info">
+            <div class="hero-label">继续阅读</div>
+            <div class="hero-title" id="hero-title">三体</div>
+            <div class="hero-sub" id="hero-sub">刘慈欣 · 读到第十二章「红岸之五」</div>
+            <div class="hero-progress">
+              <div class="track"><i id="hero-bar" style="width:38%"></i></div>
+              <span id="hero-pct">38%</span>
+            </div>
+          </div>
+          <button class="hero-btn" id="hero-btn">继续阅读</button>
+        </div>
+
+        <div class="sort-tabs" id="sort-tabs">
+          <span class="sort-tab active">默认</span>
+          <span class="sort-tab">更新(2)</span>
+          <span class="sort-tab">进度</span>
+          <span class="sort-tab">推荐值</span>
+          <span class="sort-tab">书名</span>
+          <span class="sort-tab">分类</span>
+        </div>
+
+        <div class="book-grid shelf-grid" id="shelf-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== 书友 ==================== -->
+    <section class="page" id="page-friends">
+      <div class="content">
+        <div class="friend-switch">
+          <span class="switch-item">有声书</span>
+          <span class="switch-item active">书友</span>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill active">推荐</span>
+          <span class="pill">关注</span>
+          <span class="pill">闲聊</span>
+          <span class="pill">话题</span>
+          <span class="pill">笔记</span>
+          <span class="pill pill-plus">+</span>
+        </div>
+
+        <div class="feed" id="feed"></div>
+      </div>
+    </section>
+
+    <!-- ==================== 我 ==================== -->
+    <section class="page" id="page-me">
+      <div class="content">
+        <div class="me-topbar">
+          <span class="mail">✉ <b>4</b></span>
+          <span class="settings">⚙</span>
+        </div>
+
+        <div class="me-profile">
+          <div class="me-avatar">段</div>
+          <div class="me-name">段栋</div>
+          <div class="medal">★ 勋章</div>
+          <span class="me-arrow">›</span>
+        </div>
+
+        <div class="me-card member-card">
+          <div class="card-icon yellow">∞</div>
+          <div class="card-main">
+            <div class="card-title">付费会员</div>
+            <div class="card-sub">全场书籍免费读 · 每月赠币</div>
+          </div>
+          <div class="card-right">
+            <div class="member-days">7<b>天</b></div>
+            <div class="member-expire">10月21日到期</div>
+          </div>
+        </div>
+
+        <div class="me-row">
+          <div class="me-card half">
+            <div class="card-icon gold">◈</div>
+            <div class="card-main">
+              <div class="card-title">充值币</div>
+              <div class="card-sub">余额 0.00</div>
+            </div>
+          </div>
+          <div class="me-card half">
+            <div class="card-icon orange">♦</div>
+            <div class="card-main">
+              <div class="card-title">福利</div>
+              <div class="card-sub">0 天｜赠币 0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="me-card">
+          <div class="stat-line">
+            <div class="card-icon red">▮▮▮</div>
+            <div class="card-title">读书排行榜</div>
+            <div class="stat-right">本周第 12 名 ›</div>
+          </div>
+          <div class="card-sep"></div>
+          <div class="stat-line">
+            <div class="card-icon salmon">L</div>
+            <div class="card-title">阅读时长</div>
+            <div class="stat-right big">22<b>小时</b>40<b>分钟</b>
+              <div class="stat-sub">本月 186 分钟</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 阅读时长图表：图表元素 -->
+        <div class="me-card chart-card">
+          <div class="chart-head">
+            <div class="card-title">最近 7 天阅读时长</div>
+            <div class="chart-unit">单位：分钟</div>
+          </div>
+          <div class="chart" id="chart">
+            <div class="chart-col"><span class="chart-val">45</span><i style="height:75%"></i></div>
+            <div class="chart-col"><span class="chart-val">32</span><i style="height:53%"></i></div>
+            <div class="chart-col"><span class="chart-val">58</span><i style="height:96%"></i></div>
+            <div class="chart-col"><span class="chart-val">21</span><i style="height:35%"></i></div>
+            <div class="chart-col"><span class="chart-val">40</span><i style="height:66%"></i></div>
+            <div class="chart-col"><span class="chart-val">12</span><i style="height:20%"></i></div>
+            <div class="chart-col"><span class="chart-val">36</span><i style="height:60%"></i></div>
+          </div>
+          <div class="chart-labels">
+            <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+          </div>
+        </div>
+
+        <div class="me-row">
+          <div class="me-card half">
+            <div class="card-icon green">→</div>
+            <div class="card-main">
+              <div class="card-title">在读</div>
+              <div class="card-sub">累计 6 本</div>
+            </div>
+          </div>
+          <div class="me-card half">
+            <div class="card-icon blue">✓</div>
+            <div class="card-main">
+              <div class="card-title">读完</div>
+              <div class="card-sub">今年读完 9 本</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="me-row">
+          <div class="me-card half">
+            <div class="card-icon cyan">✎</div>
+            <div class="card-main">
+              <div class="card-title">笔记</div>
+              <div class="card-sub">23 条笔记</div>
+            </div>
+          </div>
+          <div class="me-card half">
+            <div class="card-icon purple">♥</div>
+            <div class="card-main">
+              <div class="card-title">收藏</div>
+              <div class="card-sub">15 个书单</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="me-card">
+          <div class="card-icon blue">☆</div>
+          <div class="card-main">
+            <div class="card-title">关注的话题</div>
+            <div class="card-sub">科幻 · 历史 · 心理成长</div>
+          </div>
+          <span class="me-arrow">›</span>
+        </div>
+
+        <div class="me-list">
+          <div class="me-list-item"><span>🎧 听书设置</span><span class="me-arrow">›</span></div>
+          <div class="me-list-item"><span>🌙 夜间模式</span><span class="me-arrow">›</span></div>
+          <div class="me-list-item"><span>🔧 阅读偏好</span><span class="me-arrow">›</span></div>
+          <div class="me-list-item"><span>ℹ 关于微信读书</span><span class="me-arrow">›</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 底部 Tab（SVG 自适应宽度下导航） ==================== -->
+    <nav class="tab-bar">
+      <div class="tab-item active" data-page="page-home">
+        <svg class="tab-svg" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M883.8 925.1H140.2c-24.8 0-44.9-20.1-44.9-44.9V261c0-24.8 20.1-44.9 44.9-44.9H179c8.3 0 15 6.7 15 15s-6.7 15-15 15h-38.7c-8.3 0-15 6.7-15 15v619.2c0 8.3 6.7 15 15 15h743.6c8.3 0 15-6.7 15-15V261c0-8.3-6.7-15-15-15H512c-8.3 0-15-6.7-15-15s6.7-15 15-15h371.8c24.8 0 44.9 20.1 44.9 44.9v619.2c0 24.8-20.1 45-44.9 45z"/><path d="M512 925.1c-8.3 0-15-6.7-15-15v-679c0-8.3 6.7-15 15-15s15 6.7 15 15v679.1c0 8.2-6.7 14.9-15 14.9z"/><path d="M512 925.4c-1.7 0-3.5-0.3-5.2-0.9L202.7 811.6c-19.5-7.3-34.3-30.1-34.3-53.1V135.8c0-13.6 5.4-25.2 14.8-31.7 8.5-5.9 19.4-7 29.8-3.1l304.2 116.2c7.7 2.9 11.6 11.6 8.6 19.3-2.9 7.7-11.6 11.6-19.3 8.6L202.6 128.9c-1.3-0.5-2-0.4-2.2-0.3-0.5 0.4-2 2.4-2 7.2v622.7c0 11.2 7.8 22.4 14.7 25l304.1 112.8c7.8 2.9 11.7 11.5 8.8 19.2-2.2 6.1-7.9 9.9-14 9.9z"/></svg>
+        <span>阅读</span>
+      </div>
+      <div class="tab-item" data-page="page-shelf">
+        <svg class="tab-svg" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M938.666667 277.333333c0-38.4 12.8-76.8 29.866666-110.933333 17.066667-34.133333-4.266667-81.066667-42.666666-81.066667H192C85.333333 85.333333 0 170.666667 0 277.333333S85.333333 469.333333 192 469.333333h733.866667c38.4 0 59.733333-46.933333 42.666666-81.066666-17.066667-34.133333-29.866667-72.533333-29.866666-110.933334zM874.666667 384h-682.666667C132.266667 384 85.333333 337.066667 85.333333 277.333333S132.266667 170.666667 192 170.666667h682.666667c-12.8 29.866667-21.333333 68.266667-21.333334 106.666666 0 38.4 8.533333 76.8 21.333334 106.666667zM832 554.666667H98.133333c-38.4 0-59.733333 46.933333-42.666666 81.066666 17.066667 34.133333 29.866667 72.533333 29.866666 110.933334 0 38.4-12.8 76.8-29.866666 110.933333-17.066667 34.133333 4.266667 81.066667 42.666666 81.066667h733.866667c106.666667 0 192-85.333333 192-192S938.666667 554.666667 832 554.666667z m0 298.666666h-682.666667c12.8-29.866667 21.333333-68.266667 21.333334-106.666666 0-38.4-8.533333-76.8-21.333334-106.666667h682.666667c59.733333 0 106.666667 46.933333 106.666667 106.666667S891.733333 853.333333 832 853.333333z"/></svg>
+        <span>书架</span>
+      </div>
+      <div class="tab-item" data-page="page-friends">
+        <svg class="tab-svg" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M512 102.4c-226.304 0-409.6 183.296-409.6 409.6v409.6h409.6c226.304 0 409.6-183.296 409.6-409.6S738.304 102.4 512 102.4z m0 757.76H163.84V512c0-191.488 156.672-348.16 348.16-348.16s348.16 156.672 348.16 348.16-156.672 348.16-348.16 348.16z"/><path d="M686.08 368.64H337.92c-16.384 0-30.72 13.312-30.72 30.72 0 16.384 14.336 30.72 30.72 30.72h348.16c17.408 0 30.72-14.336 30.72-30.72 0-17.408-13.312-30.72-30.72-30.72zM481.28 501.76H337.92c-16.384 0-30.72 13.312-30.72 30.72 0 16.384 14.336 30.72 30.72 30.72h143.36c17.408 0 30.72-14.336 30.72-30.72 0-17.408-13.312-30.72-30.72-30.72z"/></svg>
+        <span>书友</span>
+      </div>
+      <div class="tab-item" data-page="page-me">
+        <div class="tab-badge-wrap">
+          <svg class="tab-svg" viewBox="0 0 1091 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M545.901727-6.34913734a300.183426 300.183426 0 0 0-185.834452 536.106341A552.015159 552.015159 0 0 0 0.625237 961.44889766a48.629576 48.629576 0 0 0 40.154136 55.576659 49.602168 49.602168 0 0 0 7.850203 0.625237 48.629576 48.629576 0 0 0 47.795926-40.779373 453.088707 453.088707 0 0 1 449.545696-382.089526A300.391839 300.391839 0 0 0 545.901727-6.34913734z m0 503.802409a203.41057 203.41057 0 1 1 203.41057-203.41057 203.618982 203.618982 0 0 1-203.41057 203.41057zM1091.178216 961.44889766A551.459393 551.459393 0 0 0 833.649876 578.24783866a48.629576 48.629576 0 1 0-50.57476 82.670279 454.686536 454.686536 0 0 1 212.441777 315.953303 48.629576 48.629576 0 0 0 47.795926 40.779373 49.602168 49.602168 0 0 0 7.780732-0.625237 48.629576 48.629576 0 0 0 40.084665-55.576659z"/></svg>
+          <span class="tab-badge">6</span>
+        </div>
+        <span>我</span>
+      </div>
+    </nav>
+
+    <!-- ==================== 搜索面板 ==================== -->
+    <div class="search-mask" id="search-mask">
+      <div class="search-panel">
+        <div class="search-panel-bar">
+          <svg class="search-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <input id="search-input" type="text" placeholder="搜索书名、作者" autocomplete="off">
+          <button id="search-close">取消</button>
+        </div>
+        <div class="search-body">
+          <div class="hot-block" id="hot-block">
+            <div class="hot-title">热搜榜</div>
+            <div class="hot-words" id="hot-words"></div>
+          </div>
+          <div class="search-results" id="search-results"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 阅读器 ==================== -->
+    <div class="reader-mask" id="reader-mask">
+      <div class="reader">
+        <div class="reader-toolbar">
+          <span class="reader-back" id="reader-close">‹ 返回</span>
+          <span id="reader-book-name"></span>
+          <span class="reader-tools">
+            <span id="reader-toc-btn">目录</span>
+            <span>···</span>
+          </span>
+        </div>
+        <div class="reader-body" id="reader-body"></div>
+        <div class="reader-footer">
+          <button id="chapter-prev">上一章</button>
+          <span id="chapter-label">第 1 章</span>
+          <button id="chapter-next">下一章</button>
+          <span class="footer-sep"></span>
+          <button id="font-minus">A-</button>
+          <span id="font-size-label">16px</span>
+          <button id="font-plus">A+</button>
+        </div>
+      </div>
+      <div class="reader-toc" id="reader-toc">
+        <div class="toc-title">目录</div>
+        <div class="toc-list" id="toc-list"></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

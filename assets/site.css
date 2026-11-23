@@ -182,6 +182,27 @@ a:hover { text-decoration: underline; }
   font-size: 11.5px;
 }
 
+/* 重型卡：占两格，用于课程大作业 */
+.card--wide {
+  grid-column: span 2;
+  padding: 22px;
+  border-color: #cfd9ea;
+  background: #fff;
+}
+
+.card--wide h3 { font-size: 17.5px; }
+
+.card--wide p { max-width: 60ch; font-size: 13.5px; }
+
+.card--wide .no {
+  background: #14161a;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .card--wide { grid-column: span 1; }
+}
+
 .site-foot {
   margin-top: 56px;
   padding: 26px 0 56px;
