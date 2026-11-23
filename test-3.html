@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新车上市表 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #4b525c;
+  }
+
+  .seg { display: inline-flex; border: 1px solid #d9dee7; border-radius: 8px; overflow: hidden; background: #fff; }
+
+  .seg button {
+    padding: 6px 14px;
+    border: 0;
+    border-right: 1px solid #eef0f3;
+    background: none;
+    color: #4b525c;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: #2f6fed; color: #fff; }
+
+  .toolbar .count { margin-left: auto; color: #8b929d; font-family: var(--mono); font-size: 12px; }
+
+  table.cars {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+
+  table.cars thead th {
+    padding: 11px 14px;
+    background: #fafbfd;
+    border-bottom: 1px solid #e6e8ec;
+    color: #8b929d;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  table.cars tbody td {
+    padding: 13px 14px;
+    border-bottom: 1px solid #f1f3f7;
+    color: #2c333d;
+    vertical-align: middle;
+  }
+
+  table.cars tbody tr:last-child td { border-bottom: 0; }
+  table.cars tbody tr:hover { background: #fafbfd; }
+
+  .model { display: flex; align-items: center; gap: 10px; }
+  .model .logo {
+    width: 30px; height: 30px;
+    flex: 0 0 30px;
+    display: grid; place-items: center;
+    border-radius: 8px;
+    background: #eef2f9;
+    color: #4a5f85;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .model b { display: block; font-size: 13.5px; }
+  .model small { color: #8b929d; font-size: 11.5px; }
+
+  .price { color: #b23b3b; font-family: var(--mono); font-size: 13px; white-space: nowrap; }
+  .date { color: #4b525c; font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+  .tag.ev { background: #eaf3de; color: #3b6d11; }
+  .tag.hev { background: #e6f1fb; color: #185fa5; }
+  .tag.ice { background: #f1f0ec; color: #5f5e5a; }
+  .tag.new { background: #fdf1f1; color: #b23b3b; }
+
+  .empty { padding: 40px; text-align: center; color: #b9c2d0; font-size: 13px; background: #fff; border: 1px solid #e6e8ec; border-radius: 12px; }
+
+  @media (max-width: 700px) {
+    table.cars { display: block; overflow-x: auto; white-space: nowrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>新车上市</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>新车上市表</h1>
+    <div class="meta">
+      <span>课堂测试 2</span>
+      <span class="mono">test-3.html</span>
+      <span>表格 + 筛选</span>
+    </div>
+    <p class="lead">
+      表格是最考验细节的排版：<b>车型名要能换行、价格不能换行、日期对齐、窄屏要能横向滚动</b>。
+      另外这里加了筛选，用来演示"表格内容是数据渲染出来的"——换一批数据只需要改数组。
+    </p>
+
+    <section class="demo">
+      <div class="toolbar">
+        <span>动力类型</span>
+        <div class="seg" id="seg">
+          <button data-k="all" class="on">全部</button>
+          <button data-k="ev">纯电</button>
+          <button data-k="hev">插混</button>
+          <button data-k="ice">燃油</button>
+        </div>
+        <span class="count" id="count"></span>
+      </div>
+
+      <table class="cars">
+        <thead>
+          <tr>
+            <th style="width:44%">车型</th>
+            <th>级别</th>
+            <th>上市时间</th>
+            <th>售价区间</th>
+            <th>动力</th>
+          </tr>
+        </thead>
+        <tbody id="body"></tbody>
+      </table>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>细节</th><th>处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>价格不能断行</td><td><code>white-space: nowrap</code>，否则 <code>15.98 万</code> 会被拆成两行</td></tr>
+        <tr><td>日期列对齐</td><td>用等宽字体，长短不一的日期也能左右对齐</td></tr>
+        <tr><td>表头与内容对齐</td><td>表头与单元格用同样的 <code>padding</code></td></tr>
+        <tr><td>窄屏</td><td>去掉表格的 <code>display:table</code>，外层包 <code>overflow-x:auto</code>，宁可横滑也不挤成竖排</td></tr>
+        <tr><td>品牌色块</td><td>取车型首字做色块，不需要加载任何 logo 图片</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>表格还是 Grid：</b>行列表格数据（有多列、需要列对齐、可能被复制到 Excel）用真正的 <code>&lt;table&gt;</code>；
+      只是"看起来像表格"的卡片列表用 Grid。前者读屏软件会念出"第 2 行第 3 列"，后者不会——这是语义差别，不是样式差别。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var CARS = [
+    { name: "星海 S7",    brand: "星海", level: "中大型轿车", date: "2026-11-08", price: "18.98 – 26.98 万", power: "ev",  isNew: true },
+    { name: "远山 L6",    brand: "远山", level: "中型 SUV",   date: "2026-11-05", price: "15.98 – 22.58 万", power: "hev", isNew: true },
+    { name: "昊空 07",    brand: "昊空", level: "中大型 SUV", date: "2026-10-28", price: "23.80 – 31.80 万", power: "ev",  isNew: false },
+    { name: "竞速者 GT",  brand: "竞速", level: "紧凑型轿车", date: "2026-10-22", price: "11.29 – 14.99 万", power: "ice", isNew: false },
+    { name: "云程 M9",    brand: "云程", level: "MPV",        date: "2026-10-18", price: "32.98 – 45.80 万", power: "hev", isNew: false },
+    { name: "青野 EV3",   brand: "青野", level: "小型 SUV",   date: "2026-10-11", price: "8.98 – 12.38 万",  power: "ev",  isNew: false },
+    { name: "致远 05",    brand: "致远", level: "中型轿车",   date: "2026-09-30", price: "16.58 – 21.98 万", power: "ice", isNew: false },
+    { name: "长川 T8",    brand: "长川", level: "皮卡",       date: "2026-09-25", price: "13.98 – 19.68 万", power: "ice", isNew: false }
+  ];
+
+  var POWER = {
+    ev:  { label: "纯电", cls: "ev" },
+    hev: { label: "插混", cls: "hev" },
+    ice: { label: "燃油", cls: "ice" }
+  };
+
+  var body = document.getElementById("body");
+  var count = document.getElementById("count");
+
+  function render(kind) {
+    var list = kind === "all" ? CARS : CARS.filter(function (c) { return c.power === kind; });
+    body.innerHTML = "";
+    count.textContent = list.length + " 款";
+
+    list.forEach(function (c) {
+      var tr = document.createElement("tr");
+
+      var tdName = document.createElement("td");
+      var model = document.createElement("div");
+      model.className = "model";
+      var logo = document.createElement("div");
+      logo.className = "logo";
+      logo.textContent = c.brand.charAt(0);
+      var info = document.createElement("div");
+      var b = document.createElement("b");
+      b.textContent = c.name;
+      var small = document.createElement("small");
+      small.textContent = c.brand;
+      info.appendChild(b);
+      info.appendChild(small);
+      model.appendChild(logo);
+      model.appendChild(info);
+      tdName.appendChild(model);
+
+      var tdLevel = document.createElement("td");
+      tdLevel.textContent = c.level;
+
+      var tdDate = document.createElement("td");
+      tdDate.className = "date";
+      tdDate.textContent = c.date;
+
+      var tdPrice = document.createElement("td");
+      tdPrice.className = "price";
+      tdPrice.textContent = c.price;
+
+      var tdPower = document.createElement("td");
+      var p = POWER[c.power];
+      var tag = document.createElement("span");
+      tag.className = "tag " + p.cls;
+      tag.textContent = p.label;
+      tdPower.appendChild(tag);
+      if (c.isNew) {
+        var n = document.createElement("span");
+        n.className = "tag new";
+        n.textContent = "新车";
+        n.style.marginLeft = "6px";
+        tdPower.appendChild(n);
+      }
+
+      tr.appendChild(tdName);
+      tr.appendChild(tdLevel);
+      tr.appendChild(tdDate);
+      tr.appendChild(tdPrice);
+      tr.appendChild(tdPower);
+      body.appendChild(tr);
+    });
+  }
+
+  document.getElementById("seg").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    Array.prototype.forEach.call(this.children, function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+    render(btn.dataset.k);
+  });
+
+  render("all");
+})();
+</script>
+
+</body>
+</html>

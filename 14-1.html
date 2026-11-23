@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>六种基本数据类型 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .jsx { border: 1px solid #eef0f3; border-radius: 10px; overflow: hidden; }
+
+  .jsx-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px;
+    background: #fafbfd;
+    border-bottom: 1px solid #eef0f3;
+  }
+
+  .jsx-btns button {
+    padding: 6px 13px;
+    border: 1px solid #d9dee7;
+    border-radius: 7px;
+    background: #fff;
+    color: #2c333d;
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .jsx-btns button:hover { border-color: #2f6fed; color: #1c4fc0; background: #f7faff; }
+  .jsx-btns button:active { transform: translateY(1px); }
+
+  .jsx-out {
+    margin: 0;
+    padding: 16px;
+    background: #1b1f24;
+    color: #dfe4ec;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.8;
+    min-height: 96px;
+    white-space: pre-wrap;
+  }
+  .jsx-out .k { color: #8fb3f9; }
+  .jsx-out .s { color: #a5d6a7; }
+  .jsx-out .n { color: #ffcc80; }
+  .jsx-out .c { color: #7d8794; }
+
+  .type-table td:first-child { font-family: var(--mono); font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>数据类型</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>六种基本数据类型</h1>
+    <div class="meta">
+      <span>第 14 讲</span>
+      <span class="mono">14-1.html</span>
+      <span>typeof 实测</span>
+    </div>
+    <p class="lead">
+      JavaScript 是弱类型语言，"弱"不等于"没有类型"。值本身是有类型的，
+      只是变量不绑定类型。判断类型最直接的办法是 <code>typeof</code>——它有两个著名的坑，
+      下面点按钮就能看到。
+    </p>
+
+    <section class="demo">
+      <h2>一、逐个点开看 typeof</h2>
+      <p class="demo-hint">点任意一个按钮，下面显示这个值本身和 <code>typeof</code> 的结果。</p>
+
+      <div class="jsx">
+        <div class="jsx-btns" id="btns">
+          <button data-k="num">42</button>
+          <button data-k="float">3.14</button>
+          <button data-k="nan">NaN</button>
+          <button data-k="str">"段栋"</button>
+          <button data-k="empty">""</button>
+          <button data-k="bool">true</button>
+          <button data-k="undef">undefined</button>
+          <button data-k="nul">null</button>
+          <button data-k="bigint">10n</button>
+          <button data-k="sym">Symbol()</button>
+          <button data-k="arr">[1, 2, 3]</button>
+          <button data-k="obj">{ name: "段栋" }</button>
+          <button data-k="fn">function(){}</button>
+        </div>
+        <pre class="jsx-out" id="out">点击上面的按钮开始。</pre>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>二、两个必须记住的坑</h2>
+
+      <table class="data type-table">
+        <thead>
+          <tr><th>值</th><th>typeof</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>null</td><td>"object"</td>
+            <td>历史遗留 bug，改不了。判断 null 要用 <code>v === null</code>，不能用 typeof</td>
+          </tr>
+          <tr>
+            <td>NaN</td><td>"number"</td>
+            <td>NaN 是"不是一个有效数字"，但它本身属于 number 类型；<code>NaN === NaN</code> 为 false</td>
+          </tr>
+          <tr>
+            <td>[1,2,3]</td><td>"object"</td>
+            <td>数组的本质是对象，区分数组要用 <code>Array.isArray()</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="jsx" style="margin-top:16px;">
+        <div class="jsx-btns">
+          <button id="btn-pitfall">跑一遍验证</button>
+        </div>
+        <pre class="jsx-out" id="out2">点按钮验证上面三条。</pre>
+      </div>
+    </section>
+
+    <div class="note">
+      <b>判断类型的三档写法：</b>
+      ① 普通类型用 <code>typeof</code>；
+      ② 区分数组用 <code>Array.isArray(x)</code>；
+      ③ 判断"是不是纯对象"用 <code>Object.prototype.toString.call(x) === '[object Object]'</code>。
+      不要用 <code>typeof</code> 去判断 null 和数组，那两个结果都会误导你。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var values = {
+    num:   { code: "42",                v: function () { return 42; } },
+    float: { code: "3.14",              v: function () { return 3.14; } },
+    nan:   { code: "NaN",               v: function () { return NaN; } },
+    str:   { code: '"段栋"',            v: function () { return "段栋"; } },
+    empty: { code: '""',                v: function () { return ""; } },
+    bool:  { code: "true",              v: function () { return true; } },
+    undef: { code: "undefined",         v: function () { return undefined; } },
+    nul:   { code: "null",              v: function () { return null; } },
+    bigint:{ code: "10n",               v: function () { return 10n; } },
+    sym:   { code: "Symbol()",          v: function () { return Symbol(); } },
+    arr:   { code: '[1, 2, 3]',         v: function () { return [1, 2, 3]; } },
+    obj:   { code: '{ name: "段栋" }',  v: function () { return { name: "段栋" }; } },
+    fn:    { code: "function(){}",      v: function () { return function () {}; } }
+  };
+
+  var out = document.getElementById("out");
+
+  function label(text, cls) {
+    return '<span class="' + (cls || "k") + '">' + text + "</span>";
+  }
+
+  document.getElementById("btns").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    var item = values[btn.dataset.k];
+    var v = item.v();
+    var t = typeof v;
+
+    var lines = [];
+    lines.push(label("值　　　", "c") + item.code);
+    lines.push(label("typeof　", "c") + label('"' + t + '"', "s"));
+
+    if (v === null) {
+      lines.push("");
+      lines.push(label("注意：", "n") + "null 的 typeof 是 \"object\"，这是语言本身的 bug，");
+      lines.push("　　　判断 null 只能写 v === null。");
+    } else if (typeof v === "number" && Number.isNaN(v)) {
+      lines.push("");
+      lines.push(label("注意：", "n") + "NaN 属于 number 类型，但 NaN === NaN 是 false；");
+      lines.push("　　　要判断它得用 Number.isNaN(v)。");
+    } else if (Array.isArray(v)) {
+      lines.push("");
+      lines.push(label("注意：", "n") + "数组的 typeof 也是 \"object\"，");
+      lines.push("　　　要区分数组得用 Array.isArray(v)，结果是 " + Array.isArray(v) + "。");
+    } else if (typeof v === "object") {
+      lines.push("");
+      lines.push(label("键的个数：", "c") + Object.keys(v).length);
+    }
+
+    out.innerHTML = lines.join("\n");
+  });
+
+  document.getElementById("btn-pitfall").addEventListener("click", function () {
+    var arr = [1, 2, 3];
+    var lines = [
+      label("typeof null　　　　", "c") + label('"' + typeof null + '"', "s"),
+      label("null === null　　　", "c") + String(null === null),
+      "",
+      label("typeof NaN　　　　 ", "c") + label('"' + typeof NaN + '"', "s"),
+      label("NaN === NaN　　　　", "c") + String(NaN === NaN),
+      label("Number.isNaN(NaN)　", "c") + String(Number.isNaN(NaN)),
+      "",
+      label("typeof [1,2,3]　　 ", "c") + label('"' + typeof arr + '"', "s"),
+      label("Array.isArray(arr) ", "c") + String(Array.isArray(arr)),
+      "",
+      label("Object.prototype.toString.call(arr)", "c"),
+      "  -> " + label(Object.prototype.toString.call(arr), "s")
+    ];
+    document.getElementById("out2").innerHTML = lines.join("\n");
+  });
+})();
+</script>
+
+</body>
+</html>

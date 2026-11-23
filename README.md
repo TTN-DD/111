@@ -25,6 +25,22 @@
 | `7.html` | Flex 布局：主轴方向、justify-content、align-items、flex-wrap | 第 7 讲 |
 | `8.html` | Flex 进阶：等宽分栏、侧栏固定、圣杯布局、等高列、居中 | 第 8 讲 |
 | `10.html` | 过渡与动画：transition、transform、@keyframes | 第 10 讲 |
+| `13-1.html` | 图标方案对比：字体图标 / 内联 SVG / 纯 CSS | 第 13 讲 |
+| `13-2.html` | 内联 SVG 图标库：16 个图标、currentColor 着色 | 第 13 讲 |
+| `13-3.html` | 纯 CSS 图标：十个几何图标，伪元素绘制 | 第 13 讲 |
+| `14-1.html` | 六种基本数据类型与 typeof 的坑 | 第 14 讲 |
+| `15-1.html` | 程序结构：if 条件、for 循环、while 循环 | 第 15 讲 |
+| `16-1.html` | 数组方法：map / filter / reduce / sort / find | 第 16 讲 |
+| `17-1.html` | JSON 与对象互转、异常处理 | 第 17 讲 |
+| `17-2.html` | fetch 调用接口、res.ok 判断、失败降级 | 第 17 讲 |
+| `17-3.html` | 商品列表与详情的数据渲染 | 第 17 讲 |
+| `17-4.html` | Promise / async，串行与并行耗时对比 | 第 17 讲 |
+| `test-1.html` | 课堂测试：四标签排行榜 | 版面练习 |
+| `test-2.html` | 课堂测试：24 小时点击排行 | 版面练习 |
+| `test-3.html` | 课堂测试：新车上市表 + 筛选 | 版面练习 |
+| `test-4.html` | 课堂测试：文学社科书城三栏 | 版面练习 |
+| `test-5.html` | 课堂测试：影视排行双列 | 版面练习 |
+| `test-6.html` | 课堂测试：股票涨跌榜（红涨绿跌） | 版面练习 |
 | `wechat-read/index.html` | **课程大作业**：微信读书手机端界面还原，4 个一级页面 + 二级视图，纯 CSS 绘制封面，原生 JS 实现切换 | 综合 |
 
 ## 目录结构

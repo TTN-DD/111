@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数组与对象方法 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .jsx { border: 1px solid #eef0f3; border-radius: 10px; overflow: hidden; }
+
+  .jsx-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px;
+    background: #fafbfd;
+    border-bottom: 1px solid #eef0f3;
+  }
+
+  .jsx-btns button {
+    padding: 6px 13px;
+    border: 1px solid #d9dee7;
+    border-radius: 7px;
+    background: #fff;
+    color: #2c333d;
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .jsx-btns button:hover { border-color: #2f6fed; color: #1c4fc0; background: #f7faff; }
+  .jsx-btns button.on { background: #2f6fed; border-color: #2f6fed; color: #fff; }
+
+  .out {
+    padding: 16px;
+    background: #1b1f24;
+    color: #dfe4ec;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.85;
+    min-height: 150px;
+    white-space: pre-wrap;
+  }
+  .out .k { color: #8fb3f9; }
+  .out .s { color: #a5d6a7; }
+  .out .n { color: #ffcc80; }
+  .out .c { color: #7d8794; }
+
+  .raw {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    padding: 14px;
+    background: #fff;
+  }
+  .raw div {
+    padding: 9px 11px;
+    border: 1px solid #eef0f3;
+    border-radius: 8px;
+    background: #fafbfc;
+    font-size: 12px;
+    color: #4b525c;
+  }
+  .raw b { display: block; color: #2c333d; font-size: 12.5px; margin-bottom: 2px; font-weight: 600; }
+  .raw em { font-style: normal; color: #8b929d; font-family: var(--mono); font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>数组方法</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>数组与对象方法</h1>
+    <div class="meta">
+      <span>第 16 讲</span>
+      <span class="mono">16-1.html</span>
+      <span>map / filter / reduce / sort</span>
+    </div>
+    <p class="lead">
+      下面这份数据是同一份数组，七个按钮分别用不同的方法处理它。
+      重点不是记住语法，而是记住<b>每个方法返回什么</b>：map 改形状、filter 减数量、
+      reduce 塌缩成一个值、sort 原地改顺序。
+    </p>
+
+    <section class="demo">
+      <h2>一、原始数据</h2>
+      <p class="demo-hint">一个对象数组，四个字段：书名、作者、评分、价格。</p>
+
+      <div class="raw" id="raw"></div>
+    </section>
+
+    <section class="demo">
+      <h2>二、挑一个方法看结果</h2>
+      <p class="demo-hint">每次点击都会打印"原数组有没有被改"——这条比结果本身更重要。</p>
+
+      <div class="jsx">
+        <div class="jsx-btns" id="btns">
+          <button data-m="map">map</button>
+          <button data-m="filter">filter</button>
+          <button data-m="reduce">reduce</button>
+          <button data-m="sort">sort</button>
+          <button data-m="find">find</button>
+          <button data-m="some">some / every</button>
+          <button data-m="chain">链式组合</button>
+        </div>
+        <pre class="out" id="out">选一个方法。</pre>
+      </div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>方法</th><th>返回什么</th><th>会不会改原数组</th><th>典型用途</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>map</code></td><td>长度相同的新数组</td><td>不会</td><td>取字段、算派生值</td></tr>
+        <tr><td><code>filter</code></td><td>长度 ≤ 原数组的新数组</td><td>不会</td><td>按条件筛</td></tr>
+        <tr><td><code>reduce</code></td><td>任意类型的单个值</td><td>不会</td><td>求和、分组、去重</td></tr>
+        <tr><td><code>sort</code></td><td>原数组（同一个引用）</td><td><b>会</b></td><td>排序，注意要传比较函数</td></tr>
+        <tr><td><code>find</code></td><td>第一个匹配的元素或 undefined</td><td>不会</td><td>按 id 找一条</td></tr>
+        <tr><td><code>some / every</code></td><td>布尔值</td><td>不会</td><td>存在性 / 全称判断</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>最常踩的坑：</b><code>sort()</code> 不传比较函数时，会把元素转成字符串按字典序排，
+      所以 <code>[10, 9, 100].sort()</code> 得到的是 <code>[10, 100, 9]</code>。
+      数字排序必须写 <code>(a, b) =&gt; a - b</code>。
+      另外 <code>sort</code> 是原地排序，想保留原数组要先 <code>[...arr]</code> 复制一份。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var BOOKS = [
+    { name: "活着",       author: "余华",       score: 9.4, price: 28 },
+    { name: "三体",       author: "刘慈欣",     score: 9.3, price: 46 },
+    { name: "人类简史",   author: "尤瓦尔",     score: 9.1, price: 68 },
+    { name: "被讨厌的勇气", author: "岸见一郎", score: 8.6, price: 39 },
+    { name: "长安的荔枝", author: "马伯庸",     score: 8.9, price: 45 },
+    { name: "置身事内",   author: "兰小欢",     score: 8.7, price: 59 }
+  ];
+
+  function K(t) { return '<span class="k">' + t + "</span>"; }
+  function S(t) { return '<span class="s">' + t + "</span>"; }
+  function N(t) { return '<span class="n">' + t + "</span>"; }
+  function C(t) { return '<span class="c">' + t + "</span>"; }
+
+  var out = document.getElementById("out");
+
+  /* 渲染原始数据 */
+  var raw = document.getElementById("raw");
+  BOOKS.forEach(function (b) {
+    var d = document.createElement("div");
+    d.innerHTML = "<b></b><em></em>";
+    d.querySelector("b").textContent = b.name;
+    d.querySelector("em").textContent = b.author + " · " + b.score + " 分 · ¥" + b.price;
+    raw.appendChild(d);
+  });
+
+  function snapshot() {
+    return BOOKS.map(function (b) { return b.score; }).join(", ");
+  }
+
+  var before = snapshot();
+
+  function report(code, result, note) {
+    var lines = [];
+    lines.push(C("代码："));
+    lines.push("  " + code);
+    lines.push("");
+    lines.push(C("结果："));
+    lines.push("  " + result);
+    lines.push("");
+    lines.push(C("原数组保护检查："));
+    lines.push("  调用前评分：" + before);
+    lines.push("  调用后评分：" + snapshot());
+    lines.push("  → " + (before === snapshot() ? S("原数组未被修改") : N("原数组已被修改！")));
+    if (note) { lines.push(""); lines.push(C("说明：")); lines.push("  " + note); }
+    out.innerHTML = lines.join("\n");
+  }
+
+  document.getElementById("btns").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    Array.prototype.forEach.call(this.children, function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+
+    var m = btn.dataset.m;
+
+    if (m === "map") {
+      var names = BOOKS.map(function (b) { return b.name; });
+      report(
+        "BOOKS.map(b => b.name)",
+        S('["' + names.join('", "') + '"]'),
+        "map 不改变长度，只是把每个元素换成另一个值。这里把对象换成了字符串。"
+      );
+
+    } else if (m === "filter") {
+      var cheap = BOOKS.filter(function (b) { return b.price < 50; });
+      report(
+        "BOOKS.filter(b => b.price < 50)",
+        S('["' + cheap.map(function (b) { return b.name; }).join('", "') + '"]'),
+        "从 6 条筛到 " + cheap.length + " 条，长度变短了，元素本身没变。"
+      );
+
+    } else if (m === "reduce") {
+      var total = BOOKS.reduce(function (sum, b) { return sum + b.price; }, 0);
+      var avg = (BOOKS.reduce(function (s, b) { return s + b.score; }, 0) / BOOKS.length).toFixed(2);
+      report(
+        "BOOKS.reduce((sum, b) => sum + b.price, 0)",
+        N(total) + C("　（总价）") + "　" + N(avg) + C("（平均分）"),
+        "reduce 把整个数组压成一个值。第二个参数 0 是初始值，不写的话空数组会直接报错。"
+      );
+
+    } else if (m === "sort") {
+      var sorted = BOOKS.slice().sort(function (a, b) { return b.score - a.score; });
+      report(
+        "BOOKS.slice().sort((a, b) => b.score - a.score)",
+        S('["' + sorted.map(function (b) { return b.name + " " + b.score; }).join('", "') + '"]'),
+        "先 slice() 复制再 sort，所以原数组顺序没变。如果直接 BOOKS.sort() 就会原地打乱原数据。"
+      );
+
+    } else if (m === "find") {
+      var hit = BOOKS.find(function (b) { return b.score > 9.2; });
+      report(
+        "BOOKS.find(b => b.score > 9.2)",
+        hit ? S(JSON.stringify(hit)) : N("undefined"),
+        "find 只返回第一个满足条件的元素，找不到返回 undefined——所以调用后要先判空。"
+      );
+
+    } else if (m === "some") {
+      var any = BOOKS.some(function (b) { return b.price > 60; });
+      var all = BOOKS.every(function (b) { return b.score > 8; });
+      report(
+        "some(b => b.price > 60) / every(b => b.score > 8)",
+        N(any) + C("　/　") + N(all),
+        "some：只要有一个满足就是 true；every：必须全部满足才是 true。两者都会短路，找到答案就停。"
+      );
+
+    } else if (m === "chain") {
+      var res = BOOKS
+        .filter(function (b) { return b.price < 50; })
+        .sort(function (a, b) { return b.score - a.score; })
+        .map(function (b) { return b.name + "（" + b.score + "）"; });
+      report(
+        "filter(价格<50) → sort(评分降序) → map(只留书名)",
+        S('["' + res.join('", "') + '"]'),
+        "链式调用的顺序会直接影响结果：先筛再排比先排再筛少做很多无用功。"
+      );
+    }
+  });
+
+  document.querySelector('#btns button[data-m="map"]').click();
+})();
+</script>
+
+</body>
+</html>

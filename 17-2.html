@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>调用接口展示数据 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #f7f9fc;
+    border: 1px solid #e6e8ec;
+    font-size: 13px;
+    color: #4b525c;
+    margin-bottom: 14px;
+  }
+  .status .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #b4b2a9; flex: 0 0 8px;
+  }
+  .status.loading .dot { background: #ef9f27; animation: pulse 1s ease-in-out infinite; }
+  .status.ok .dot { background: #639922; }
+  .status.warn .dot { background: #ba7517; }
+  .status.err .dot { background: #e24b4a; }
+  @keyframes pulse { 50% { opacity: .35; } }
+
+  .status .time { margin-left: auto; color: #8b929d; font-family: var(--mono); font-size: 11.5px; }
+
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .bar button {
+    padding: 7px 15px;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #fff;
+    color: #2c333d;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .bar button:hover { border-color: #2f6fed; color: #1c4fc0; }
+  .bar button.primary { background: #2f6fed; border-color: #2f6fed; color: #fff; }
+  .bar button.primary:hover { background: #2459c9; }
+  .bar button:disabled { opacity: .5; cursor: not-allowed; }
+
+  .users { display: grid; gap: 8px; }
+
+  .user {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 11px 14px;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .user .av {
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: #eaf1fe;
+    color: #1c4fc0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .user b { display: block; font-size: 13.5px; }
+  .user small { color: #8b929d; font-size: 12px; font-family: var(--mono); }
+  .user em { font-style: normal; color: #4b525c; font-size: 12.5px; }
+
+  .code { margin-top: 16px; }
+
+  .empty { padding: 24px; text-align: center; color: #8b929d; font-size: 13px; border: 1px dashed #dfe3ea; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>fetch 接口</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>调用接口并展示数据</h1>
+    <div class="meta">
+      <span>第 17 讲</span>
+      <span class="mono">17-2.html</span>
+      <span>fetch / async / 异常处理</span>
+    </div>
+    <p class="lead">
+      一次真实的接口请求有三种结局：成功、HTTP 报错、网络断掉。<b>fetch 只有后两种才会走 catch</b>——
+      404 和 500 不会抛异常，必须自己检查 <code>res.ok</code>。这是最容易漏的一步。
+    </p>
+
+    <section class="demo">
+      <h2>一、请求一份用户列表</h2>
+      <p class="demo-hint">数据源是公开的 JSONPlaceholder。如果外网不通，会自动降级到内置演示数据，并在状态栏标注。</p>
+
+      <div class="status" id="status">
+        <span class="dot"></span>
+        <span id="status-text">尚未请求</span>
+        <span class="time" id="status-time"></span>
+      </div>
+
+      <div class="bar">
+        <button class="primary" id="btn-load">加载数据</button>
+        <button id="btn-404">请求一个 404 地址</button>
+      </div>
+
+      <div class="users" id="users">
+        <div class="empty">点"加载数据"开始。</div>
+      </div>
+
+      <div class="code">
+<pre><code>async function load() {
+  try {
+    const res = await fetch("https://jsonplaceholder.typicode.com/users");
+    if (!res.ok) throw new Error("HTTP " + res.status);   // 关键：4xx/5xx 不会自动抛错
+    const data = await res.json();
+    render(data);
+  } catch (err) {
+    showError(err.message);   // 网络断掉才会走到这里
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>情况</th><th>res.ok</th><th>会不会进 catch</th><th>怎么处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>200 正常</td><td>true</td><td>不会</td><td>直接 <code>res.json()</code></td></tr>
+        <tr><td>404 地址错了</td><td>false</td><td><b>不会</b></td><td>手动判断 <code>res.ok</code> 后抛错</td></tr>
+        <tr><td>500 服务端挂了</td><td>false</td><td><b>不会</b></td><td>同上</td></tr>
+        <tr><td>断网 / DNS 失败</td><td>—</td><td>会</td><td>catch 里提示"网络异常"</td></tr>
+        <tr><td>响应不是 JSON</td><td>true</td><td>会（<code>res.json()</code> 抛）</td><td>catch 里提示"数据格式错误"</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>三个必备细节：</b>
+      ① <code>if (!res.ok) throw ...</code> 一定要写，否则 404 会当成成功数据往下传；
+      ② 请求期间把按钮 <code>disabled = true</code>，避免用户连点发出重复请求；
+      ③ 无论如何都要给"空状态"和"错误状态"设计好界面，不能只在成功时才有东西可看。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var FALLBACK = [
+    { name: "段栋", username: "duandong", email: "duandong@example.com", city: "淄博" },
+    { name: "罗亚博", username: "luoyabo", email: "luoyabo@example.com", city: "济南" },
+    { name: "李思远", username: "lisiyuan", email: "lisiyuan@example.com", city: "青岛" },
+    { name: "王一诺", username: "wangyinuo", email: "wangyinuo@example.com", city: "烟台" }
+  ];
+
+  var statusBox = document.getElementById("status");
+  var statusText = document.getElementById("status-text");
+  var statusTime = document.getElementById("status-time");
+  var users = document.getElementById("users");
+  var btnLoad = document.getElementById("btn-load");
+  var btn404 = document.getElementById("btn-404");
+
+  function setStatus(kind, text, ms) {
+    statusBox.className = "status " + kind;
+    statusText.textContent = text;
+    statusTime.textContent = ms == null ? "" : ms + " ms";
+  }
+
+  function render(list, note) {
+    users.innerHTML = "";
+    list.forEach(function (u) {
+      var row = document.createElement("div");
+      row.className = "user";
+      row.innerHTML = "<div class='av'></div><div><b></b><small></small></div><em></em>";
+      row.querySelector(".av").textContent = u.name.charAt(0);
+      row.querySelector("b").textContent = u.name;
+      row.querySelector("small").textContent = "@" + u.username;
+      row.querySelector("em").textContent = u.email + " · " + u.city;
+      users.appendChild(row);
+    });
+    if (note) {
+      var p = document.createElement("div");
+      p.className = "empty";
+      p.textContent = note;
+      users.appendChild(p);
+    }
+  }
+
+  async function load(url, label) {
+    btnLoad.disabled = btn404.disabled = true;
+    setStatus("loading", "正在请求 " + label + " …");
+    users.innerHTML = "<div class='empty'>加载中…</div>";
+    var t0 = performance.now();
+
+    try {
+      var res = await fetch(url, { cache: "no-store" });
+      var ms = Math.round(performance.now() - t0);
+
+      if (!res.ok) {
+        setStatus("err", "请求失败：HTTP " + res.status + "（注意：这一条没有进 catch）", ms);
+        users.innerHTML = "";
+        var box = document.createElement("div");
+        box.className = "empty";
+        box.textContent = "服务端返回 " + res.status + "，" +
+          (res.status === 404 ? "地址写错了。" : "服务端出问题了。") +
+          "因为 fetch 不会自动把 4xx/5xx 当成异常，所以必须自己判断 res.ok。";
+        users.appendChild(box);
+        return;
+      }
+
+      var data = await res.json();
+      setStatus("ok", "请求成功，拿到 " + data.length + " 条数据", ms);
+      render(data.slice(0, 6).map(function (u) {
+        return { name: u.name, username: u.username, email: u.email, city: u.address ? u.address.city : "—" };
+      }), "");
+
+    } catch (err) {
+      var ms2 = Math.round(performance.now() - t0);
+      setStatus("warn", "网络请求失败（" + err.message + "），已降级为内置演示数据", ms2);
+      render(FALLBACK, "以上是内置演示数据。真实环境里这里应该显示「网络异常，请稍后重试」和一个重试按钮。");
+    } finally {
+      btnLoad.disabled = btn404.disabled = false;
+    }
+  }
+
+  btnLoad.addEventListener("click", function () {
+    load("https://jsonplaceholder.typicode.com/users", "用户列表");
+  });
+
+  btn404.addEventListener("click", function () {
+    load("https://jsonplaceholder.typicode.com/users/9999/posts", "一个不存在的地址");
+  });
+})();
+</script>
+
+</body>
+</html>

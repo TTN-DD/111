@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图标方案对比 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .cmp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+
+  .cmp > div {
+    padding: 18px;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .cmp h4 { margin: 0 0 4px; font-size: 14px; }
+  .cmp .tagline { margin: 0 0 14px; color: #8b929d; font-size: 12px; }
+
+  .glyph-row { display: flex; gap: 14px; align-items: center; font-size: 26px; color: #2f6fed; line-height: 1; }
+  .glyph-row span { display: inline-block; }
+
+  .svg-row { display: flex; gap: 14px; align-items: center; color: #2f6fed; }
+  .svg-row svg { width: 26px; height: 26px; }
+
+  .css-row { display: flex; gap: 18px; align-items: center; }
+
+  /* 纯 CSS：汉堡 */
+  .i-menu { width: 22px; height: 16px; position: relative; }
+  .i-menu::before, .i-menu::after, .i-menu i {
+    content: ""; position: absolute; left: 0; width: 22px; height: 2px;
+    background: #2f6fed; border-radius: 2px;
+  }
+  .i-menu::before { top: 0; }
+  .i-menu i { top: 7px; display: block; }
+  .i-menu::after { top: 14px; }
+
+  /* 纯 CSS：加号 */
+  .i-plus { width: 22px; height: 22px; position: relative; }
+  .i-plus::before, .i-plus::after {
+    content: ""; position: absolute; background: #2f6fed; border-radius: 2px;
+  }
+  .i-plus::before { left: 10px; top: 0; width: 2px; height: 22px; }
+  .i-plus::after { top: 10px; left: 0; height: 2px; width: 22px; }
+
+  /* 纯 CSS：勾 */
+  .i-check { width: 20px; height: 20px; position: relative; }
+  .i-check::before {
+    content: ""; position: absolute; left: 3px; top: 7px;
+    width: 14px; height: 7px;
+    border-left: 2px solid #12603f;
+    border-bottom: 2px solid #12603f;
+    transform: rotate(-45deg);
+    transform-origin: left center;
+  }
+
+  /* 纯 CSS：箭头 */
+  .i-arrow { width: 22px; height: 22px; position: relative; }
+  .i-arrow::before {
+    content: ""; position: absolute; left: 2px; top: 10px;
+    width: 18px; height: 2px; background: #2f6fed; border-radius: 2px;
+  }
+  .i-arrow::after {
+    content: ""; position: absolute; right: 2px; top: 5px;
+    width: 9px; height: 9px;
+    border-top: 2px solid #2f6fed;
+    border-right: 2px solid #2f6fed;
+    transform: rotate(45deg);
+  }
+
+  .cmp pre { margin-top: 14px; font-size: 11px; padding: 12px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>图标方案</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>图标的三种实现方案</h1>
+    <div class="meta">
+      <span>第 13 讲</span>
+      <span class="mono">13-1.html</span>
+      <span>字体 / SVG / CSS</span>
+    </div>
+    <p class="lead">
+      页面上一个 24px 的图标，可以是字体、可以是 SVG、也可以纯用 CSS 画出来。
+      三种方式在<b>体积、着色、缩放、可访问性</b>上各有取舍，选错的代价不是"不好看"，而是后期每改一次颜色都要重新导一次图。
+    </p>
+
+    <section class="demo">
+      <h2>方案一：字体图标</h2>
+      <p class="demo-hint">下面的符号本质是"看起来像图标的字符"，和文字同源，所以能直接改 <code>color</code>、<code>font-size</code>。</p>
+
+      <div class="glyph-row">
+        <span>⌂</span><span>✎</span><span>⚙</span><span>✉</span><span>☰</span><span>⌕</span>
+      </div>
+<pre><code>&lt;!-- 实际项目里用 Font Awesome 这类字体库 --&gt;
+&lt;!-- 优点：能当文字用；缺点：要加载字体文件，描边风格难调 --&gt;</code></pre>
+      <p style="margin:0;color:#4b525c;font-size:13.5px;">
+        真正的字体图标（如 Font Awesome、iconfont）把每个图标做成字体里的一个字，
+        用 <code>::before</code> 塞一个私有区字符来显示。好处是颜色、大小随文字继承，
+        坏处是多一个字体文件请求、且不同字体的字形风格很难统一。
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>方案二：内联 SVG</h2>
+      <p class="demo-hint">直接写在 HTML 里，用 <code>currentColor</code> 跟随文字颜色。</p>
+
+      <div class="svg-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg>
+      </div>
+<pre><code>&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;
+  &lt;path d="M3 10.5 12 3l9 7.5"/&gt;
+&lt;/svg&gt;</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>方案三：纯 CSS 绘制</h2>
+      <p class="demo-hint">用伪元素 + 边框 + 变换画几何图形，一个字节的图片资源都不需要。</p>
+
+      <div class="css-row">
+        <div class="i-menu"><i></i></div>
+        <div class="i-plus"></div>
+        <div class="i-check"></div>
+        <div class="i-arrow"></div>
+      </div>
+<pre><code>.i-plus::before { left: 10px; width: 2px; height: 22px; background: #2f6fed; }
+.i-plus::after  { top: 10px; height: 2px; width: 22px; background: #2f6fed; }</code></pre>
+      <p style="margin:0;color:#4b525c;font-size:13.5px;">
+        只适合几何图形（加号、箭头、勾、汉堡菜单）。一旦要画"一本书"或"一个相机"，
+        CSS 会膨胀成几十行而且难维护，那时候就该用 SVG 了。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>维度</th><th>字体图标</th><th>内联 SVG</th><th>纯 CSS</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>请求数</td><td>1 个字体文件（可能 100KB+）</td><td>0（写在 HTML 里）</td><td>0</td></tr>
+        <tr><td>改颜色</td><td>继承 color</td><td>继承 color（currentColor）</td><td>改 border/background</td></tr>
+        <tr><td>无限缩放</td><td>是（矢量）</td><td>是（矢量）</td><td>是（几何计算）</td></tr>
+        <tr><td>多色图标</td><td>不支持</td><td>支持</td><td>勉强</td></tr>
+        <tr><td>可访问性</td><td>要加 aria-hidden</td><td>可加 role + title</td><td>需 aria-label</td></tr>
+        <tr><td>适合场景</td><td>大量同风格图标</td><td><b>首选</b>，绝大多数情况</td><td>简单几何符号</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>结论：</b>默认用内联 SVG。只有在已经有成熟的字体图标体系（比如整个项目都在用 Font Awesome）时才用字体图标；
+      CSS 图标只用来处理那些"画三条线就能解决"的符号，别拿它画复杂图形。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

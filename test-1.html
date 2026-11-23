@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>四标签排行榜 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .panel {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    max-width: 620px;
+  }
+
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #eef0f3;
+    background: #fafbfd;
+  }
+
+  .tabs button {
+    flex: 1;
+    padding: 13px 0;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: #6b7280;
+    font-family: inherit;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+
+  .tabs button:hover { color: #2c333d; background: #f4f6fa; }
+
+  .tabs button.on {
+    color: #b23b3b;
+    border-bottom-color: #b23b3b;
+    background: #fff;
+    font-weight: 600;
+  }
+
+  .rank { margin: 0; padding: 6px 0 10px; list-style: none; }
+
+  .rank li {
+    display: grid;
+    grid-template-columns: 26px 1fr auto;
+    gap: 10px;
+    align-items: baseline;
+    padding: 9px 18px;
+    font-size: 13.5px;
+  }
+
+  .rank li:hover { background: #fafbfd; }
+
+  .rank .no {
+    color: #b9c2d0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    text-align: right;
+  }
+
+  .rank li:nth-child(-n+3) .no { color: #b23b3b; font-weight: 600; }
+
+  .rank a {
+    color: #2c333d;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .rank a:hover { color: #1c4fc0; text-decoration: none; }
+
+  .rank .meta { color: #b9c2d0; font-size: 11.5px; font-family: var(--mono); }
+
+  .rank .hot { color: #b23b3b; }
+
+  .empty-hint { padding: 40px 18px; text-align: center; color: #b9c2d0; font-size: 13px; }
+
+  .board-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 18px 4px;
+    font-size: 13px;
+    color: #8b929d;
+  }
+  .board-title b { color: #2c333d; font-size: 14px; }
+  .board-title .more { margin-left: auto; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>排行榜</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>四标签排行榜</h1>
+    <div class="meta">
+      <span>课堂测试 0</span>
+      <span class="mono">test-1.html</span>
+      <span>标签切换 + 列表排版</span>
+    </div>
+    <p class="lead">
+      新闻门户最常见的模块：一个盒子、四个标签、每个标签下十条。考验的是
+      <b>序号对齐、标题截断、右侧数字不换行</b>——三条只要有一条没处理，长标题就会把布局撑破。
+    </p>
+
+    <section class="demo">
+      <div class="panel">
+        <div class="tabs" id="tabs">
+          <button data-k="news" class="on">新闻</button>
+          <button data-k="stock">证券</button>
+          <button data-k="money">理财</button>
+          <button data-k="blog">博客</button>
+        </div>
+        <div class="board-title"><b id="board-name">新闻</b><span>· 今日热榜</span><a class="more" href="#">更多 ›</a></div>
+        <ol class="rank" id="rank"></ol>
+      </div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>难点</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>序号右对齐、数字等宽</td><td><code>font-family: 等宽字体</code> + <code>text-align: right</code></td></tr>
+        <tr><td>长标题不撑破</td><td>父级 <code>min-width: 0</code>，标题 <code>overflow:hidden</code> + <code>text-overflow:ellipsis</code> + <code>white-space:nowrap</code></td></tr>
+        <tr><td>右侧数字被挤走</td><td>网格第三列 <code>auto</code>，标题列 <code>1fr</code></td></tr>
+        <tr><td>前三名突出</td><td><code>:nth-child(-n+3)</code> 改颜色，不用手写类名</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>这里用 Grid 而不是 Flex 的原因：</b>三列的宽度关系是"固定序号 + 弹性标题 + 自适应数字"，
+      <code>grid-template-columns: 26px 1fr auto</code> 一句话就表达清楚了；
+      用 Flex 要写三次 <code>flex</code> 值，而且中间那列还是得单独加 <code>min-width: 0</code> 才不溢出。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var DATA = {
+    news: [
+      ["国产大模型开源生态再添一员，参数规模 320 亿", "12.4 万"],
+      ["多地公布中考改革方案，体育分值继续上调", "9.8 万"],
+      ["新一批高铁线路开通运营，最快 3 小时直达", "8.6 万"],
+      ["新能源汽车下乡活动启动，覆盖 200 个县", "7.2 万"],
+      ["秋冬季流感疫苗接种指南发布，重点人群优先", "6.5 万"],
+      ["多所高校公布 2027 届推免政策调整", "5.9 万"],
+      ["城市更新试点扩围，老旧小区改造提速", "5.1 万"],
+      ["电影市场回暖，国庆档票房超预期", "4.7 万"],
+      ["新版食品安全国家标准实施，涉及 50 项指标", "4.2 万"],
+      ["冷空气南下，北方多地气温创入秋新低", "3.8 万"]
+    ],
+    stock: [
+      ["三大指数集体收涨，成交额重回 1.2 万亿", "沪指 +1.24%"],
+      ["半导体板块午后拉升，龙头封涨停", "涨 9.98%"],
+      ["北向资金净买入 86 亿元，连续三日加仓", "净流入"],
+      ["光伏产业链价格企稳，组件排产环比回升", "+3.6%"],
+      ["券商板块异动，两融余额创年内新高", "+2.8%"],
+      ["消费电子旺季来临，机构上调全年出货预期", "+2.1%"],
+      ["医药生物估值修复，创新药主线活跃", "+1.9%"],
+      ["地产板块分化，头部企业销售数据改善", "+1.2%"],
+      ["银行股护盘，高股息策略受资金青睐", "+0.8%"],
+      ["煤炭板块回调，短期获利盘兑现", "−1.4%"]
+    ],
+    money: [
+      ["货币基金七日年化普遍回落至 1.6% 附近", "1.62%"],
+      ["短债基金年内平均收益 3.1%，回撤可控", "3.10%"],
+      ["大额存单利率下调，三年期跌破 2.5%", "2.45%"],
+      ["增额终身寿险预定利率切换，投保高峰出现", "2.50%"],
+      ["公募 REITs 扩容，仓储物流项目受关注", "+4.2%"],
+      ["黄金 ETF 份额创新高，避险需求升温", "+6.8%"],
+      ["可转债市场活跃度提升，低价券修复", "+2.4%"],
+      ["个人养老金账户开户数突破 7000 万", "7000 万+"],
+      ["银行理财规模回升，固收类占比超八成", "82%"],
+      ["保险资金权益配置比例小幅上调", "+0.5pct"]
+    ],
+    blog: [
+      ["为什么我用 Grid 而不是 Flex 做后台布局", "3.2 万"],
+      ["从 0 写一个 CSS 图标库：三个伪元素够用了", "2.8 万"],
+      ["把 100 个页面的样式收敛成 12 个变量", "2.1 万"],
+      ["我踩过的 7 个 z-index 坑", "1.9 万"],
+      ["表单可访问性清单：label 只是第一步", "1.6 万"],
+      ["为什么你的动画会掉帧：重排与重绘", "1.4 万"],
+      ["移动端 1px 边框的三种解法", "1.1 万"],
+      ["用 prefers-reduced-motion 做无障碍", "9600"],
+      ["CSS 变量在主题切换里的正确用法", "8200"],
+      ["写文档比写代码更花时间，但值得", "6700"]
+    ]
+  };
+
+  var NAMES = { news: "新闻", stock: "证券", money: "理财", blog: "博客" };
+
+  var rank = document.getElementById("rank");
+  var boardName = document.getElementById("board-name");
+
+  function render(key) {
+    var list = DATA[key];
+    rank.innerHTML = "";
+
+    list.forEach(function (item, i) {
+      var li = document.createElement("li");
+
+      var no = document.createElement("span");
+      no.className = "no";
+      no.textContent = i + 1;
+
+      var a = document.createElement("a");
+      a.href = "#";
+      a.textContent = item[0];
+      a.title = item[0];
+
+      var meta = document.createElement("span");
+      meta.className = "meta" + (key === "stock" || key === "money" ? " hot" : "");
+      meta.textContent = item[1];
+
+      li.appendChild(no);
+      li.appendChild(a);
+      li.appendChild(meta);
+      rank.appendChild(li);
+    });
+
+    boardName.textContent = NAMES[key];
+  }
+
+  document.getElementById("tabs").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    Array.prototype.forEach.call(this.children, function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+    render(btn.dataset.k);
+  });
+
+  render("news");
+})();
+</script>
+
+</body>
+</html>

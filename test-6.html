@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>股票涨跌榜 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .quote {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .quote div { font-size: 12.5px; color: #8b929d; }
+  .quote b {
+    display: block;
+    margin-top: 3px;
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c333d;
+  }
+  .quote .up b { color: #d64545; }
+  .quote .down b { color: #1a7f4b; }
+
+  .boards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 760px) { .boards { grid-template-columns: 1fr; } }
+
+  .board {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .board head, .board .bh {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #eef0f3;
+    background: #fafbfd;
+  }
+
+  .board .bh b { font-size: 13.5px; color: #14161a; }
+  .board .bh span { margin-left: auto; color: #8b929d; font-size: 11.5px; font-family: var(--mono); }
+
+  table.stk { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+
+  table.stk th {
+    padding: 8px 12px;
+    color: #8b929d;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: left;
+    border-bottom: 1px solid #f1f3f7;
+  }
+
+  table.stk th:last-child, table.stk td:last-child { text-align: right; }
+
+  table.stk td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #f6f7f9;
+    color: #2c333d;
+  }
+  table.stk tr:last-child td { border-bottom: 0; }
+  table.stk tbody tr:hover { background: #fafbfd; }
+
+  .code { color: #8b929d; font-family: var(--mono); font-size: 11.5px; }
+  .name { color: #2c333d; }
+
+  .chg { font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+  .chg.up { color: #d64545; }
+  .chg.down { color: #1a7f4b; }
+  .chg.flat { color: #8b929d; }
+
+  .chg::before { content: ""; display: inline-block; width: 0; height: 0; margin-right: 4px; vertical-align: middle; }
+  .chg.up::before { border-left: 3.5px solid transparent; border-right: 3.5px solid transparent; border-bottom: 5px solid #d64545; }
+  .chg.down::before { border-left: 3.5px solid transparent; border-right: 3.5px solid transparent; border-top: 5px solid #1a7f4b; }
+
+  .legend { margin-top: 14px; color: #8b929d; font-size: 12px; }
+  .legend b.up { color: #d64545; }
+  .legend b.down { color: #1a7f4b; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>股票涨跌榜</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>股票涨跌榜</h1>
+    <div class="meta">
+      <span>课堂测试 5</span>
+      <span class="mono">test-6.html</span>
+      <span>四组行情表</span>
+    </div>
+    <p class="lead">
+      这一页唯一的值钱知识是配色：<b>在中国市场，红涨绿跌</b>，和国际市场正好相反。
+      写海外项目时要反过来，否则用户会看错方向。另外涨跌幅要带箭头、用等宽字体，小数点才能对齐。
+    </p>
+
+    <section class="demo">
+      <div class="quote">
+        <div class="up">上证指数<b>3 486.21　+1.24%</b></div>
+        <div class="up">深证成指<b>11 042.87　+1.68%</b></div>
+        <div class="down">创业板指<b>2 287.55　−0.36%</b></div>
+        <div>两市成交额<b>12 480 亿</b></div>
+      </div>
+
+      <div class="boards">
+        <div class="board">
+          <div class="bh"><b>沪市主板</b><span id="sh-time"></span></div>
+          <table class="stk">
+            <thead><tr><th>代码</th><th>名称</th><th>现价</th><th>涨跌幅</th></tr></thead>
+            <tbody id="sh"></tbody>
+          </table>
+        </div>
+
+        <div class="board">
+          <div class="bh"><b>深市主板</b><span id="sz-time"></span></div>
+          <table class="stk">
+            <thead><tr><th>代码</th><th>名称</th><th>现价</th><th>涨跌幅</th></tr></thead>
+            <tbody id="sz"></tbody>
+          </table>
+        </div>
+
+        <div class="board">
+          <div class="bh"><b>涨幅榜</b><span>今日前五</span></div>
+          <table class="stk">
+            <thead><tr><th>代码</th><th>名称</th><th>现价</th><th>涨跌幅</th></tr></thead>
+            <tbody id="gain"></tbody>
+          </table>
+        </div>
+
+        <div class="board">
+          <div class="bh"><b>跌幅榜</b><span>今日前五</span></div>
+          <table class="stk">
+            <thead><tr><th>代码</th><th>名称</th><th>现价</th><th>涨跌幅</th></tr></thead>
+            <tbody id="loss"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="legend">
+        配色约定：<b class="up">红色 = 上涨</b>，<b class="down">绿色 = 下跌</b>。
+        这是 A 股市场的习惯（红为喜），与欧美市场相反，做跨境项目时必须按目标市场切换。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>细节</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>不能只靠颜色区分涨跌</td><td>加 ▲ / ▼ 箭头，色盲用户也能分辨</td></tr>
+        <tr><td>小数点对不齐</td><td>价格与涨跌幅都用等宽字体（<code>--mono</code>）</td></tr>
+        <tr><td>数字宽度跳动</td><td>同理，等宽字体让刷新时不会左右抖</td></tr>
+        <tr><td>表格密度</td><td>行高 <code>9px</code> 上下留白 + 极细分隔线，比卡片更适合看数字</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>顺带说一句可访问性：</b>红绿是最典型的色盲混淆组合（约占男性 8%）。
+      只靠颜色表达涨跌，这部分用户看到的就是一片灰。加箭头、加正负号、加 <code>aria-label</code>，
+      成本很低但差别很大。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var SH = [
+    ["600519", "贵州茅台", 1786.00, 2.14],
+    ["601318", "中国平安", 52.36, 1.08],
+    ["600036", "招商银行", 38.72, 0.86],
+    ["601899", "紫金矿业", 17.84, -0.62],
+    ["600030", "中信证券", 26.18, 1.42],
+    ["601088", "中国神华", 41.25, -1.16],
+    ["600276", "恒瑞医药", 48.90, 0.00]
+  ];
+
+  var SZ = [
+    ["000001", "平安银行", 11.42, 0.53],
+    ["000858", "五粮液", 148.60, 1.92],
+    ["002594", "比亚迪", 268.40, 2.86],
+    ["300750", "宁德时代", 218.70, -0.94],
+    ["002415", "海康威视", 31.28, -1.42],
+    ["000333", "美的集团", 68.14, 0.72],
+    ["300059", "东方财富", 15.86, 3.04]
+  ];
+
+  var ALL = SH.concat(SZ);
+  var byGain = ALL.slice().sort(function (a, b) { return b[3] - a[3]; }).slice(0, 5);
+  var byLoss = ALL.slice().sort(function (a, b) { return a[3] - b[3]; }).slice(0, 5);
+
+  function cls(v) { return v > 0 ? "up" : (v < 0 ? "down" : "flat"); }
+
+  function sign(v) {
+    if (v > 0) return "+" + v.toFixed(2) + "%";
+    if (v < 0) return "−" + Math.abs(v).toFixed(2) + "%";
+    return "0.00%";
+  }
+
+  function fill(id, rows) {
+    var body = document.getElementById(id);
+    body.innerHTML = "";
+    rows.forEach(function (r) {
+      var tr = document.createElement("tr");
+      var c = cls(r[3]);
+
+      var tdCode = document.createElement("td");
+      tdCode.className = "code";
+      tdCode.textContent = r[0];
+
+      var tdName = document.createElement("td");
+      tdName.className = "name";
+      tdName.textContent = r[1];
+
+      var tdPrice = document.createElement("td");
+      tdPrice.style.fontFamily = "var(--mono)";
+      tdPrice.textContent = r[2].toFixed(2);
+
+      var tdChg = document.createElement("td");
+      var span = document.createElement("span");
+      span.className = "chg " + c;
+      span.textContent = sign(r[3]);
+      tdChg.appendChild(span);
+
+      tr.appendChild(tdCode);
+      tr.appendChild(tdName);
+      tr.appendChild(tdPrice);
+      tr.appendChild(tdChg);
+      body.appendChild(tr);
+    });
+  }
+
+  var now = new Date();
+  var clock = ("0" + now.getHours()).slice(-2) + ":" + ("0" + now.getMinutes()).slice(-2) + " 快照";
+  document.getElementById("sh-time").textContent = clock;
+  document.getElementById("sz-time").textContent = clock;
+
+  fill("sh", SH);
+  fill("sz", SZ);
+  fill("gain", byGain);
+  fill("loss", byLoss);
+})();
+</script>
+
+</body>
+</html>

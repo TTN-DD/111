@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>24 小时点击排行 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .board {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 720px) { .board { grid-template-columns: 1fr; } }
+
+  .col {
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .col-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef0f3;
+    background: #fafbfd;
+  }
+
+  .col-head b { font-size: 14px; color: #14161a; }
+  .col-head span { color: #8b929d; font-size: 12px; }
+  .col-head .live {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #b23b3b;
+    font-size: 11.5px;
+  }
+  .col-head .live::before {
+    content: "";
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #e24b4a;
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink { 50% { opacity: .2; } }
+
+  .top3 { padding: 12px 14px; display: grid; gap: 8px; }
+
+  .top3-item {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .top3-item:hover { border-color: #f0c4c4; background: #fffafa; }
+
+  .top3-item .badge {
+    display: grid;
+    place-items: center;
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: #fdf1f1;
+    color: #b23b3b;
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .top3-item.n1 .badge { background: #b23b3b; color: #fff; }
+  .top3-item.n2 .badge { background: #d98a8a; color: #fff; }
+  .top3-item.n3 .badge { background: #f0c4c4; color: #8a2b2b; }
+
+  .top3-item b { display: block; font-size: 13.5px; color: #2c333d; }
+  .top3-item small { color: #8b929d; font-size: 11.5px; font-family: var(--mono); }
+  .top3-item .cnt { color: #b23b3b; font-family: var(--mono); font-size: 13px; }
+
+  .rest { padding: 0 14px 14px; display: grid; gap: 2px; }
+
+  .rest-item {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    gap: 10px;
+    align-items: baseline;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .rest-item:hover { background: #fafbfd; }
+  .rest-item .no { color: #b9c2d0; font-family: var(--mono); font-size: 12px; text-align: right; }
+  .rest-item .t { color: #2c333d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rest-item .cnt { color: #8b929d; font-family: var(--mono); font-size: 11.5px; }
+
+  /* 右侧实时 */
+  .live-list { padding: 12px 14px; display: grid; gap: 10px; }
+
+  .live-item { font-size: 12.5px; min-width: 0; }
+  .live-item .row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+  .live-item .row span:first-child {
+    color: #2c333d;
+    min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .live-item .row span:last-child { color: #b23b3b; font-family: var(--mono); flex: 0 0 auto; }
+  .live-item .track { height: 4px; border-radius: 2px; background: #f2f4f8; overflow: hidden; }
+  .live-item .track i {
+    display: block; height: 100%; width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #f0c4c4, #b23b3b);
+    transition: width .4s ease;
+  }
+
+  .tip { margin-top: 12px; color: #8b929d; font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>点击排行</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>24 小时点击排行</h1>
+    <div class="meta">
+      <span>课堂测试 1</span>
+      <span class="mono">test-2.html</span>
+      <span>前三名 + 实时计数</span>
+    </div>
+    <p class="lead">
+      和普通排行榜的区别只有两点：<b>前三名单独放大</b>（带边框序号块），<b>数字是活的</b>。
+      点任意一条，它的点击数会加一，排名跟着重排——这就能看出"排序不能写死"。
+    </p>
+
+    <section class="demo">
+      <div class="board">
+        <div class="col">
+          <div class="col-head">
+            <b>24 小时点击排行</b>
+            <span>· 每小时更新</span>
+          </div>
+          <div class="top3" id="top3"></div>
+          <div class="rest" id="rest"></div>
+        </div>
+
+        <div class="col">
+          <div class="col-head">
+            <b>实时点击</b>
+            <span class="live">LIVE</span>
+          </div>
+          <div class="live-list" id="live"></div>
+          <p class="tip" style="padding:0 14px 14px;">每 1.2 秒随机一条 +1，观察左侧排名是否会变。</p>
+        </div>
+      </div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>点</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>前三名要"重"</td><td>前三渲染进 <code>.top3</code>，带 <code>.n1/.n2/.n3</code> 三种序号底色；第四名往后用紧凑行</td></tr>
+        <tr><td>排名会变</td><td>每次点击后 <code>sort((a,b) =&gt; b.cnt - a.cnt)</code> 再整体重渲染，不维护 DOM 顺序</td></tr>
+        <tr><td>数字要等宽</td><td>计数用 <code>font-family: var(--mono)</code>，否则数字跳动时宽度抖</td></tr>
+        <tr><td>进度条</td><td>宽度 = <code>该条 / 最高值 × 100%</code>，让"热度差"看得见</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>为什么整块重渲染而不是只改一行：</b>数据只有 10 条，重渲染的成本可以忽略；
+      而"只改 DOM 里某一个数字"需要在数据和节点之间维护映射，一旦排序变化，映射就对不上了。
+      小列表优先选"重新渲染"，代码短、不容易出错。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var ITEMS = [
+    { t: "三大指数集体收涨，成交额重回 1.2 万亿", cnt: 128400 },
+    { t: "国产大模型开源生态再添一员", cnt: 96300 },
+    { t: "多地公布中考改革方案，体育分值上调", cnt: 87200 },
+    { t: "北向资金净买入 86 亿元，连续三日加仓", cnt: 71500 },
+    { t: "新一批高铁线路开通运营，最快 3 小时直达", cnt: 64800 },
+    { t: "电影市场回暖，国庆档票房超预期", cnt: 52300 },
+    { t: "半导体板块午后拉升，龙头封涨停", cnt: 48900 },
+    { t: "秋冬季流感疫苗接种指南发布", cnt: 41200 },
+    { t: "城市更新试点扩围，老旧小区改造提速", cnt: 33600 },
+    { t: "冷空气南下，北方多地气温创新低", cnt: 27400 }
+  ];
+
+  var top3 = document.getElementById("top3");
+  var rest = document.getElementById("rest");
+  var live = document.getElementById("live");
+
+  function fmt(n) { return n.toLocaleString("zh-CN"); }
+
+  function sorted() {
+    return ITEMS.slice().sort(function (a, b) { return b.cnt - a.cnt; });
+  }
+
+  function renderBoard() {
+    var list = sorted();
+    top3.innerHTML = "";
+    rest.innerHTML = "";
+
+    list.slice(0, 3).forEach(function (it, i) {
+      var d = document.createElement("div");
+      d.className = "top3-item n" + (i + 1);
+      d.dataset.t = it.t;
+      d.innerHTML = "<div class='badge'></div><div><b></b><small>点击量</small></div><span class='cnt'></span>";
+      d.querySelector(".badge").textContent = i + 1;
+      d.querySelector("b").textContent = it.t;
+      d.querySelector(".cnt").textContent = fmt(it.cnt);
+      top3.appendChild(d);
+    });
+
+    list.slice(3).forEach(function (it, i) {
+      var d = document.createElement("div");
+      d.className = "rest-item";
+      d.dataset.t = it.t;
+      d.innerHTML = "<span class='no'></span><span class='t'></span><span class='cnt'></span>";
+      d.querySelector(".no").textContent = i + 4;
+      d.querySelector(".t").textContent = it.t;
+      d.querySelector(".cnt").textContent = fmt(it.cnt);
+      rest.appendChild(d);
+    });
+
+    renderLive();
+  }
+
+  function renderLive() {
+    var list = sorted();
+    var max = list[0].cnt;
+    live.innerHTML = "";
+
+    list.slice(0, 5).forEach(function (it) {
+      var d = document.createElement("div");
+      d.className = "live-item";
+      d.innerHTML =
+        "<div class='row'><span></span><span></span></div>" +
+        "<div class='track'><i></i></div>";
+      d.querySelector(".row span:first-child").textContent = it.t;
+      d.querySelector(".row span:last-child").textContent = fmt(it.cnt);
+      d.querySelector(".track i").style.width = Math.max(8, (it.cnt / max) * 100) + "%";
+      live.appendChild(d);
+    });
+  }
+
+  function bump(title) {
+    var it = ITEMS.find(function (x) { return x.t === title; });
+    if (!it) return;
+    it.cnt += Math.round(300 + Math.random() * 900);
+    renderBoard();
+  }
+
+  top3.addEventListener("click", function (e) {
+    var el = e.target.closest(".top3-item");
+    if (el) bump(el.dataset.t);
+  });
+
+  rest.addEventListener("click", function (e) {
+    var el = e.target.closest(".rest-item");
+    if (el) bump(el.dataset.t);
+  });
+
+  setInterval(function () {
+    var it = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+    it.cnt += Math.round(120 + Math.random() * 480);
+    renderBoard();
+  }, 1200);
+
+  renderBoard();
+})();
+</script>
+
+</body>
+</html>

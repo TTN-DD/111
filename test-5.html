@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>影视排行 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .seg { display: inline-flex; border: 1px solid #d9dee7; border-radius: 8px; overflow: hidden; background: #fff; }
+  .seg button {
+    padding: 6px 16px;
+    border: 0;
+    border-right: 1px solid #eef0f3;
+    background: none;
+    color: #4b525c;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: #1b2b45; color: #fff; }
+
+  .head .range { margin-left: auto; color: #8b929d; font-size: 12px; font-family: var(--mono); }
+
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 22px;
+  }
+  @media (max-width: 700px) { .cols { grid-template-columns: 1fr; } }
+
+  .row {
+    display: grid;
+    grid-template-columns: 22px 44px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 10px;
+    border-radius: 9px;
+    transition: background .15s;
+  }
+  .row:hover { background: #fafbfd; }
+
+  .row .no {
+    color: #b9c2d0;
+    font-family: var(--mono);
+    font-size: 12px;
+    text-align: right;
+  }
+  .row.hot .no { color: #b23b3b; font-weight: 600; }
+
+  .poster {
+    height: 56px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    padding: 4px;
+    color: #fff;
+    font-size: 9.5px;
+    line-height: 1.25;
+    text-align: center;
+    letter-spacing: .02em;
+  }
+
+  .row b {
+    display: block;
+    font-size: 13px;
+    color: #2c333d;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .row small { color: #8b929d; font-size: 11.5px; }
+
+  .score {
+    color: #b45309;
+    font-family: var(--mono);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .score em { font-style: normal; color: #b9c2d0; font-size: 10.5px; margin-left: 3px; }
+
+  .note-line {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #eef0f3;
+    color: #8b929d;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>影视排行</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>影视排行</h1>
+    <div class="meta">
+      <span>课堂测试 4</span>
+      <span class="mono">test-5.html</span>
+      <span>双列前十 + 时间维度切换</span>
+    </div>
+    <p class="lead">
+      榜单类页面的标准结构：<b>上方筛选、下方两列、每行固定四段</b>（序号 / 海报 / 片名信息 / 分数）。
+      两列用 Grid 均分，行内再用 Grid —— 嵌套 Grid 比一堆 float 好维护得多。
+    </p>
+
+    <section class="demo">
+      <div class="head">
+        <div class="seg" id="seg">
+          <button data-k="day" class="on">每日</button>
+          <button data-k="week">每周</button>
+          <button data-k="month">每月</button>
+        </div>
+        <span class="range" id="range"></span>
+      </div>
+
+      <div class="cols" id="cols"></div>
+
+      <p class="note-line">海报为占位色块：真实项目里应给 <code>&lt;img&gt;</code> 设置固定宽高比，避免图片加载完成后把列表撑开。</p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>要点</th><th>做法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>两列高度不齐</td><td>不追求两列等高，只保证每行高度固定（<code>align-items: center</code>）</td></tr>
+        <tr><td>片名过长</td><td>单行截断 + <code>title</code> 属性，鼠标悬停能看全名</td></tr>
+        <tr><td>分数不换行</td><td><code>white-space: nowrap</code>，并用等宽字体让小数点对齐</td></tr>
+        <tr><td>切换维度</td><td>只替换数据数组，DOM 结构不变，避免写三套 HTML</td></tr>
+        <tr><td>前十名分成两列</td><td>数据按 5 条一组渲染到两列，读起来符合"竖着读"的习惯</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>为什么竖着分而不是横着分：</b>横着排（第 1–5 名一行、第 6–10 名一行）会让视线左右跳，
+      竖着排（左列 1–5、右列 6–10）视线只往下走，扫读更快。这是排版习惯问题，不是技术问题。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var DATA = {
+    day: {
+      range: "2026-11-23 更新",
+      list: [
+        ["长安三万里", "动画 / 历史", 9.2, "#4a6b8a"],
+        ["深海回声", "剧情 / 悬疑", 9.0, "#2b4a6b"],
+        ["第七号仓库", "犯罪 / 剧情", 8.8, "#5a4a6b"],
+        ["春天不回来", "爱情 / 文艺", 8.6, "#8a5a4a"],
+        ["山海之间", "纪录片", 8.5, "#4a6b52"],
+        ["最后一班地铁", "剧情", 8.3, "#3d4a5a"],
+        ["午夜诊所", "惊悚", 8.1, "#5a3a3a"],
+        ["小镇来信", "家庭", 8.0, "#6b6a4a"],
+        ["逆风而行", "运动", 7.8, "#3a5a6b"],
+        ["南方以南", "文艺", 7.6, "#5a5a6b"]
+      ]
+    },
+    week: {
+      range: "第 47 周 · 11/16 – 11/22",
+      list: [
+        ["深海回声", "剧情 / 悬疑", 9.1, "#2b4a6b"],
+        ["长安三万里", "动画 / 历史", 8.9, "#4a6b8a"],
+        ["山海之间", "纪录片", 8.7, "#4a6b52"],
+        ["第七号仓库", "犯罪 / 剧情", 8.5, "#5a4a6b"],
+        ["春天不回来", "爱情 / 文艺", 8.3, "#8a5a4a"],
+        ["逆风而行", "运动", 8.2, "#3a5a6b"],
+        ["小镇来信", "家庭", 8.0, "#6b6a4a"],
+        ["最后一班地铁", "剧情", 7.9, "#3d4a5a"],
+        ["南方以南", "文艺", 7.7, "#5a5a6b"],
+        ["午夜诊所", "惊悚", 7.4, "#5a3a3a"]
+      ]
+    },
+    month: {
+      range: "2026 年 11 月",
+      list: [
+        ["山海之间", "纪录片", 9.3, "#4a6b52"],
+        ["深海回声", "剧情 / 悬疑", 9.0, "#2b4a6b"],
+        ["小镇来信", "家庭", 8.8, "#6b6a4a"],
+        ["长安三万里", "动画 / 历史", 8.6, "#4a6b8a"],
+        ["春天不回来", "爱情 / 文艺", 8.4, "#8a5a4a"],
+        ["第七号仓库", "犯罪 / 剧情", 8.1, "#5a4a6b"],
+        ["最后一班地铁", "剧情", 7.9, "#3d4a5a"],
+        ["逆风而行", "运动", 7.8, "#3a5a6b"],
+        ["南方以南", "文艺", 7.5, "#5a5a6b"],
+        ["午夜诊所", "惊悚", 7.2, "#5a3a3a"]
+      ]
+    }
+  };
+
+  var cols = document.getElementById("cols");
+  var range = document.getElementById("range");
+
+  function render(key) {
+    var d = DATA[key];
+    range.textContent = d.range;
+    cols.innerHTML = "";
+
+    var left = d.list.slice(0, 5);
+    var right = d.list.slice(5);
+
+    [left, right].forEach(function (group, gi) {
+      var col = document.createElement("div");
+      group.forEach(function (item, i) {
+        var idx = gi * 5 + i;
+
+        var row = document.createElement("div");
+        row.className = "row" + (idx < 3 ? " hot" : "");
+
+        var no = document.createElement("span");
+        no.className = "no";
+        no.textContent = idx + 1;
+
+        var poster = document.createElement("div");
+        poster.className = "poster";
+        poster.textContent = item[0];
+        poster.style.background = "linear-gradient(150deg," + item[3] + ",rgba(0,0,0,.55))";
+
+        var info = document.createElement("div");
+        var b = document.createElement("b");
+        b.textContent = item[0];
+        b.title = item[0];
+        var small = document.createElement("small");
+        small.textContent = item[1];
+        info.appendChild(b);
+        info.appendChild(small);
+
+        var score = document.createElement("span");
+        score.className = "score";
+        score.textContent = item[2].toFixed(1);
+        var em = document.createElement("em");
+        em.textContent = "分";
+        score.appendChild(em);
+
+        row.appendChild(no);
+        row.appendChild(poster);
+        row.appendChild(info);
+        row.appendChild(score);
+        col.appendChild(row);
+      });
+      cols.appendChild(col);
+    });
+  }
+
+  document.getElementById("seg").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    Array.prototype.forEach.call(this.children, function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+    render(btn.dataset.k);
+  });
+
+  render("day");
+})();
+</script>
+
+</body>
+</html>

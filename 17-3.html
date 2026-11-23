@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>商品列表与详情 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .shop-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .shop-head h4 { margin: 0; font-size: 14px; }
+  .shop-head span { color: #8b929d; font-size: 12px; font-family: var(--mono); }
+
+  .grid-shop {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 12px;
+  }
+
+  .prod {
+    padding: 0;
+    border: 1px solid #eef0f3;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .prod:hover { border-color: #b9cef7; transform: translateY(-2px); box-shadow: 0 12px 24px -18px rgba(20,22,26,.5); }
+
+  .prod .cover {
+    height: 96px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
+
+  .prod .info { padding: 10px 12px 12px; }
+  .prod b { display: block; font-size: 13px; color: #2c333d; margin-bottom: 3px; }
+  .prod small { color: #8b929d; font-size: 11.5px; }
+  .prod .price { display: block; margin-top: 6px; color: #b23b3b; font-size: 13px; font-weight: 600; }
+  .prod .price i { font-style: normal; font-size: 11px; font-weight: 400; color: #8b929d; margin-left: 4px; }
+
+  /* 详情 */
+  .detail { display: none; }
+  .detail.on { display: block; }
+  .list.on ~ .detail { display: none; }
+  .list.hide { display: none; }
+
+  .detail-inner {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 20px;
+    padding: 18px;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    background: #fff;
+  }
+  @media (max-width: 620px) { .detail-inner { grid-template-columns: 1fr; } }
+
+  .detail-inner .cover {
+    height: 180px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .detail h4 { margin: 0 0 6px; font-size: 19px; }
+  .detail .sub { margin: 0 0 14px; color: #8b929d; font-size: 12.5px; }
+  .detail .rows { display: grid; gap: 6px; font-size: 13px; color: #4b525c; }
+  .detail .rows div { display: flex; gap: 10px; }
+  .detail .rows span:first-child { color: #8b929d; width: 64px; flex: 0 0 64px; }
+  .detail .rows strong { color: #b23b3b; font-size: 17px; }
+
+  .back-btn {
+    margin-top: 14px;
+    padding: 7px 16px;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #fff;
+    color: #2c333d;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .back-btn:hover { border-color: #2f6fed; color: #1c4fc0; }
+
+  .log {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #1b1f24;
+    color: #dfe4ec;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.75;
+    white-space: pre-wrap;
+  }
+  .log .k { color: #8fb3f9; }
+  .log .s { color: #a5d6a7; }
+  .log .c { color: #7d8794; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>列表与详情</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>商品列表与详情</h1>
+    <div class="meta">
+      <span>第 17 讲</span>
+      <span class="mono">17-3.html</span>
+      <span>数据渲染 / 状态切换</span>
+    </div>
+    <p class="lead">
+      这是电商页最基础的一套交互：<b>列表用数据渲染出来，点某一项进入详情，详情只显示被点的那一条</b>。
+      全程没有图片，封面是用书名和配色临时生成的色块——数据驱动，不是手写八张卡。
+    </p>
+
+    <section class="demo">
+      <div class="shop-head">
+        <h4>在售商品</h4>
+        <span id="count"></span>
+      </div>
+
+      <div class="list" id="list">
+        <div class="grid-shop" id="grid"></div>
+      </div>
+
+      <div class="detail" id="detail">
+        <div class="detail-inner">
+          <div class="cover" id="d-cover"></div>
+          <div>
+            <h4 id="d-name"></h4>
+            <p class="sub" id="d-sub"></p>
+            <div class="rows">
+              <div><span>售价</span><strong id="d-price"></strong></div>
+              <div><span>库存</span><span id="d-stock"></span></div>
+              <div><span>编号</span><span id="d-id"></span></div>
+              <div><span>简介</span><span id="d-desc"></span></div>
+            </div>
+            <button class="back-btn" id="btn-back">← 返回列表</button>
+          </div>
+        </div>
+      </div>
+
+      <pre class="log" id="log"></pre>
+    </section>
+
+    <div class="note">
+      <b>为什么不用手写八个卡片：</b>商品信息一变（改价、下架、加新品），手写结构就要改 HTML；
+      数据渲染只改数组。<code>document.createElement</code> + <code>textContent</code>
+      把内容塞进节点，还能顺带避免 XSS——从接口拿到的字符串直接拼进 <code>innerHTML</code>
+      是有风险的，商品名里带个 <code>&lt;script&gt;</code> 就麻烦了。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var PRODUCTS = [
+    { id: "B01", name: "活着",       cat: "文学 · 余华",       price: 28, stock: 42, desc: "一个人和他命运之间的友情。", c1: "#2b2b33", c2: "#4a4a55" },
+    { id: "B02", name: "三体",       cat: "科幻 · 刘慈欣",     price: 46, stock: 18, desc: "地球文明与三体文明的信息交流。", c1: "#16264a", c2: "#2c4a7c" },
+    { id: "B03", name: "人类简史",   cat: "历史 · 尤瓦尔",     price: 68, stock: 7,  desc: "从动物到上帝，认知革命到科学革命。", c1: "#8d7a5a", c2: "#b5a084" },
+    { id: "B04", name: "被讨厌的勇气", cat: "心理 · 岸见一郎", price: 39, stock: 25, desc: "阿德勒心理学的对话式入门。", c1: "#e8eef8", c2: "#f6f9ff" },
+    { id: "B05", name: "长安的荔枝", cat: "历史 · 马伯庸",     price: 45, stock: 33, desc: "一颗荔枝背后的大唐物流。", c1: "#b8442c", c2: "#d96a4a" },
+    { id: "B06", name: "置身事内",   cat: "经济 · 兰小欢",     price: 59, stock: 11, desc: "中国政府与经济发展的内在逻辑。", c1: "#2b4a6b", c2: "#4a7499" },
+    { id: "B07", name: "万历十五年", cat: "历史 · 黄仁宇",     price: 36, stock: 0,  desc: "从一个平常年份看帝国的深层结构。", c1: "#3d3a35", c2: "#5e5a52" },
+    { id: "B08", name: "代码整洁之道", cat: "技术 · Robert C. Martin", price: 79, stock: 5, desc: "让代码可读、可维护的实践清单。", c1: "#1f3a2e", c2: "#35604c" }
+  ];
+
+  var grid = document.getElementById("grid");
+  var list = document.getElementById("list");
+  var detail = document.getElementById("detail");
+  var log = document.getElementById("log");
+
+  document.getElementById("count").textContent = PRODUCTS.length + " 件";
+
+  function money(n) { return "¥" + n; }
+
+  function paint(el, p) {
+    el.style.background = "linear-gradient(135deg," + p.c1 + "," + p.c2 + ")";
+    el.style.color = (p.id === "B04") ? "#1c4fc0" : "#fff";
+  }
+
+  PRODUCTS.forEach(function (p) {
+    var card = document.createElement("button");
+    card.className = "prod";
+    card.type = "button";
+    card.dataset.id = p.id;
+
+    var cover = document.createElement("div");
+    cover.className = "cover";
+    cover.textContent = p.name;
+    paint(cover, p);
+
+    var info = document.createElement("div");
+    info.className = "info";
+
+    var b = document.createElement("b");
+    b.textContent = p.name;
+
+    var small = document.createElement("small");
+    small.textContent = p.cat;
+
+    var price = document.createElement("span");
+    price.className = "price";
+    price.textContent = money(p.price);
+    var i = document.createElement("i");
+    i.textContent = p.stock === 0 ? "缺货" : "库存 " + p.stock;
+    price.appendChild(i);
+
+    info.appendChild(b);
+    info.appendChild(small);
+    info.appendChild(price);
+    card.appendChild(cover);
+    card.appendChild(info);
+    grid.appendChild(card);
+  });
+
+  function showDetail(p) {
+    document.getElementById("d-name").textContent = p.name;
+    document.getElementById("d-sub").textContent = p.cat + " · 编号 " + p.id;
+    document.getElementById("d-price").textContent = money(p.price);
+    document.getElementById("d-stock").textContent = p.stock === 0 ? "已售完" : p.stock + " 件";
+    document.getElementById("d-id").textContent = p.id;
+    document.getElementById("d-desc").textContent = p.desc;
+
+    var cov = document.getElementById("d-cover");
+    cov.textContent = p.name;
+    paint(cov, p);
+
+    list.classList.add("hide");
+    detail.classList.add("on");
+
+    log.innerHTML =
+      '<span class="c">// 点击后做的事</span>\n' +
+      'const p = PRODUCTS.find(x =&gt; x.id === <span class="s">"' + p.id + '"</span>)\n' +
+      'render(p)\n\n' +
+      '<span class="c">// 找到的这条：</span>\n' +
+      JSON.stringify(p, null, 2).replace(/"(\w+)":/g, '"$1":');
+  }
+
+  grid.addEventListener("click", function (e) {
+    var card = e.target.closest(".prod");
+    if (!card) return;
+    var p = PRODUCTS.find(function (x) { return x.id === card.dataset.id; });
+    if (p) showDetail(p);
+  });
+
+  document.getElementById("btn-back").addEventListener("click", function () {
+    detail.classList.remove("on");
+    list.classList.remove("hide");
+  });
+})();
+</script>
+
+</body>
+</html>

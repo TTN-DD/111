@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文学社科书城 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .store {
+    display: grid;
+    grid-template-columns: 1fr 1fr 268px;
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .store { grid-template-columns: 1fr 1fr; } .store .third { grid-column: span 2; } }
+  @media (max-width: 620px) { .store { grid-template-columns: 1fr; } .store .third { grid-column: span 1; } }
+
+  .col-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .col-head b { font-size: 14.5px; color: #14161a; }
+  .col-head span { margin-left: auto; color: #8b929d; font-size: 12px; }
+
+  .pick {
+    display: grid;
+    gap: 10px;
+  }
+
+  .pick-item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .pick-item:hover { border-color: #dbe4f5; box-shadow: 0 10px 20px -18px rgba(20,22,26,.5); }
+
+  .cover {
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 6px;
+    font-size: 10.5px;
+    line-height: 1.3;
+    color: #fff;
+    letter-spacing: .02em;
+  }
+
+  .pick-item .cover { height: 88px; }
+
+  .pick-item b { display: block; font-size: 13.5px; color: #2c333d; margin-bottom: 4px; }
+  .pick-item p { margin: 0 0 6px; color: #6b7280; font-size: 12px; line-height: 1.6; }
+  .pick-item small { color: #b23b3b; font-family: var(--mono); font-size: 11.5px; }
+
+  .wall { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .wall .item { cursor: pointer; }
+  .wall .cover { height: 86px; }
+  .wall .item p {
+    margin: 6px 0 0;
+    font-size: 11.5px;
+    color: #4b525c;
+    line-height: 1.45;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .rank {
+    margin: 0;
+    padding: 14px;
+    list-style: none;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    background: #fff;
+    display: grid;
+    gap: 9px;
+  }
+
+  .rank li {
+    display: grid;
+    grid-template-columns: 20px 1fr auto;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 12.5px;
+  }
+
+  .rank .no {
+    color: #b9c2d0;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    text-align: right;
+  }
+  .rank li:nth-child(-n+3) .no { color: #b23b3b; font-weight: 600; }
+  .rank .t { color: #2c333d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank .c { color: #b9c2d0; font-family: var(--mono); font-size: 11px; }
+  .rank li:nth-child(-n+3) .c { color: #b23b3b; }
+
+  .rank .note { color: #b9c2d0; font-size: 11.5px; padding-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>书城三栏</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>文学社科书城</h1>
+    <div class="meta">
+      <span>课堂测试 3</span>
+      <span class="mono">test-4.html</span>
+      <span>三栏布局</span>
+    </div>
+    <p class="lead">
+      三栏各司其职：左边"主编推荐"给理由，中间"书墙"给视觉密度，右边"订购榜"给数字依据。
+      难点在于<b>三栏内容量不同但顶部要对齐、底部不能长短不齐</b>——这里用 <code>align-items: start</code> 解决。
+    </p>
+
+    <section class="demo">
+      <div class="store">
+
+        <div>
+          <div class="col-head"><b>主编推荐</b><span>每日 3 本</span></div>
+          <div class="pick" id="pick"></div>
+        </div>
+
+        <div>
+          <div class="col-head"><b>文学 · 社科</b><span>本月上新</span></div>
+          <div class="wall" id="wall"></div>
+        </div>
+
+        <div class="third">
+          <div class="col-head"><b>订购榜</b><span>近 7 天</span></div>
+          <ol class="rank" id="rank"></ol>
+        </div>
+
+      </div>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>问题</th><th>解法</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>三栏高度不一致，下方留白难看</td><td>容器 <code>align-items: start</code>，让每栏按自己的内容高度走，不强行拉平</td></tr>
+        <tr><td>右侧窄栏被中间挤扁</td><td>右侧给固定宽度 <code>268px</code>，左边两栏用 <code>1fr</code></td></tr>
+        <tr><td>书名两行以上把格子撑高</td><td><code>-webkit-line-clamp: 2</code> 截断，保证每格等高</td></tr>
+        <tr><td>窄屏三栏变一栏</td><td>两个断点：900px 变两栏、620px 变单栏</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>封面为什么不用图片：</b>用书名 + 配色生成的色块，既避免了几十张图片的请求，
+      又让"封面缺失"这件事看起来像设计而不是 bug。真实项目里封面图应该加
+      <code>width/height</code> 属性占位，防止加载完成后页面跳动。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var PICKS = [
+    { t: "活着", a: "余华", p: "一个人和他命运之间的友情，写尽了普通人的韧性。", c1: "#2b2b33", c2: "#4a4a55" },
+    { t: "置身事内", a: "兰小欢", p: "把政府与市场的关系讲清楚，读完能看懂很多新闻。", c1: "#2b4a6b", c2: "#4a7499" },
+    { t: "长安的荔枝", a: "马伯庸", p: "一颗荔枝背后的物流、人情与制度，读起来像悬疑。", c1: "#b8442c", c2: "#d96a4a" }
+  ];
+
+  var WALL = [
+    { t: "三体",       c1: "#16264a" }, { t: "人类简史",   c1: "#8d7a5a" },
+    { t: "万历十五年", c1: "#3d3a35" }, { t: "被讨厌的勇气", c1: "#7a8aa8" },
+    { t: "乡土中国",   c1: "#5b6b52" }, { t: "枪炮病菌与钢铁", c1: "#6b5545" },
+    { t: "百年孤独",   c1: "#7a5c3e" }, { t: "围城",       c1: "#4a5a6b" },
+    { t: "局外人",     c1: "#4f4f57" }, { t: "月亮与六便士", c1: "#8a6a3a" },
+    { t: "中国历代政治得失", c1: "#5a4a6b" }, { t: "平凡的世界", c1: "#7a4a3a" }
+  ];
+
+  var RANK = [
+    ["活着", "1.8 万"], ["三体", "1.6 万"], ["人类简史", "1.3 万"],
+    ["长安的荔枝", "1.1 万"], ["置身事内", "9800"], ["被讨厌的勇气", "8600"],
+    ["万历十五年", "7200"], ["乡土中国", "6400"]
+  ];
+
+  function paint(el, c1, c2) {
+    el.style.background = "linear-gradient(150deg," + c1 + " 0%," + (c2 || c1) + " 160%)";
+  }
+
+  var pick = document.getElementById("pick");
+  PICKS.forEach(function (b) {
+    var d = document.createElement("div");
+    d.className = "pick-item";
+    var cover = document.createElement("div");
+    cover.className = "cover";
+    cover.textContent = b.t;
+    paint(cover, b.c1, b.c2);
+    var box = document.createElement("div");
+    var t = document.createElement("b"); t.textContent = b.t;
+    var p = document.createElement("p"); p.textContent = b.p;
+    var a = document.createElement("small"); a.textContent = b.a + " · 推荐";
+    box.appendChild(t); box.appendChild(p); box.appendChild(a);
+    d.appendChild(cover);
+    d.appendChild(box);
+    pick.appendChild(d);
+  });
+
+  var wall = document.getElementById("wall");
+  WALL.forEach(function (b) {
+    var d = document.createElement("div");
+    d.className = "item";
+    var cover = document.createElement("div");
+    cover.className = "cover";
+    cover.textContent = b.t;
+    paint(cover, b.c1, b.c1);
+    var p = document.createElement("p");
+    p.textContent = b.t;
+    d.appendChild(cover);
+    d.appendChild(p);
+    wall.appendChild(d);
+  });
+
+  var rank = document.getElementById("rank");
+  RANK.forEach(function (r, i) {
+    var li = document.createElement("li");
+    li.innerHTML = "<span class='no'></span><span class='t'></span><span class='c'></span>";
+    li.querySelector(".no").textContent = i + 1;
+    li.querySelector(".t").textContent = r[0];
+    li.querySelector(".c").textContent = r[1];
+    rank.appendChild(li);
+  });
+
+  var note = document.createElement("li");
+  note.className = "note";
+  note.textContent = "统计口径：近 7 天实体书 + 电子书合计销量";
+  rank.appendChild(note);
+})();
+</script>
+
+</body>
+</html>

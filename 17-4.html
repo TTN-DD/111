@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Promise 与 async — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .bar button {
+    padding: 7px 16px;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #fff;
+    color: #2c333d;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .bar button:hover { border-color: #2f6fed; color: #1c4fc0; }
+  .bar button.primary { background: #2f6fed; border-color: #2f6fed; color: #fff; }
+  .bar button.primary:hover { background: #2459c9; }
+  .bar button:disabled { opacity: .45; cursor: not-allowed; }
+
+  .tasks { display: grid; gap: 8px; margin-bottom: 14px; }
+
+  .task {
+    display: grid;
+    grid-template-columns: 120px 1fr 56px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 12.5px;
+    color: #4b525c;
+  }
+
+  .task .name { font-size: 13px; color: #2c333d; }
+
+  .task .track { height: 6px; border-radius: 3px; background: #eef1f7; overflow: hidden; }
+  .task .fill {
+    height: 100%;
+    width: 0;
+    border-radius: 3px;
+    background: #2f6fed;
+    transition: width .15s linear;
+  }
+  .task.done .fill { background: #639922; }
+  .task .state { text-align: right; color: #8b929d; font-family: var(--mono); font-size: 11.5px; }
+  .task.done .state { color: #3b6d11; }
+
+  .log {
+    padding: 14px;
+    border-radius: 10px;
+    background: #1b1f24;
+    color: #dfe4ec;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.85;
+    min-height: 190px;
+    max-height: 340px;
+    overflow: auto;
+    white-space: pre-wrap;
+  }
+  .log .k { color: #8fb3f9; }
+  .log .s { color: #a5d6a7; }
+  .log .n { color: #ffcc80; }
+  .log .c { color: #7d8794; }
+
+  .result {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid #e6e8ec;
+    background: #f7f9fc;
+    font-size: 13.5px;
+    color: #4b525c;
+  }
+  .result b { color: #14161a; }
+  .result .big { font-family: var(--mono); font-size: 17px; color: #b23b3b; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>Promise 与 async</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>Promise 与 async / await</h1>
+    <div class="meta">
+      <span>第 17 讲</span>
+      <span class="mono">17-4.html</span>
+      <span>串行 vs 并行</span>
+    </div>
+    <p class="lead">
+      三个"接口"分别要 900ms、600ms、1200ms。同样的三个任务，
+      <b>串行 await 要等 2.7 秒，并行 Promise.all 只要 1.2 秒</b>。
+      这一页就是让你亲眼看到这个差别——它是真实项目里最容易优化的性能点。
+    </p>
+
+    <section class="demo">
+      <h2>三个任务</h2>
+      <p class="demo-hint">任务本身互不依赖，理论上不需要排队。</p>
+
+      <div class="tasks" id="tasks"></div>
+
+      <div class="bar">
+        <button class="primary" id="btn-serial">串行执行（await 逐个等）</button>
+        <button id="btn-parallel">并行执行（Promise.all）</button>
+        <button id="btn-reset">重置</button>
+      </div>
+
+      <pre class="log" id="log">等待执行…</pre>
+
+      <div class="result" id="result" style="display:none"></div>
+    </section>
+
+    <section class="demo">
+      <h2>两种写法对照</h2>
+      <p class="demo-hint">同一份任务，差别只在"等不等前一个完成"。</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div>
+          <h4 style="margin:0 0 6px;font-size:13px;color:#b23b3b;">串行：总耗时 = 累加</h4>
+<pre style="margin:0;"><code>const a = await checkStock();   // 900ms
+const b = await calcFreight();  // 600ms
+const c = await createOrder();  // 1200ms
+// 合计 ≈ 2700ms</code></pre>
+        </div>
+        <div>
+          <h4 style="margin:0 0 6px;font-size:13px;color:#3b6d11;">并行：总耗时 = 最慢的那个</h4>
+<pre style="margin:0;"><code>const [a, b, c] = await Promise.all([
+  checkStock(), calcFreight(), createOrder()
+]);
+// 合计 ≈ 1200ms</code></pre>
+        </div>
+      </div>
+      <p style="margin:14px 0 0;color:#4b525c;font-size:13.5px;">
+        并行的前提是<b>任务之间没有依赖</b>。如果"下单"必须先拿到"库存结果"，那就只能串行——
+        把没有依赖的请求排成队，是最常见的性能浪费。
+      </p>
+    </section>
+
+    <div class="note">
+      <b>错误处理也要知道差别：</b><code>Promise.all</code> 只要有一个失败就整体失败（快速失败），
+      适合"全都必须成功"的场景；<code>Promise.allSettled</code> 会等全部结束并返回每一项的状态，
+      适合"部分失败也能接受"的场景（比如页面里同时挂三个互不相关的模块）。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var TASKS = [
+    { key: "stock",   name: "查询库存", ms: 900 },
+    { key: "freight", name: "计算运费", ms: 600 },
+    { key: "order",   name: "生成订单", ms: 1200 }
+  ];
+
+  var tasksBox = document.getElementById("tasks");
+  var logBox = document.getElementById("log");
+  var resultBox = document.getElementById("result");
+  var btnSerial = document.getElementById("btn-serial");
+  var btnParallel = document.getElementById("btn-parallel");
+  var btnReset = document.getElementById("btn-reset");
+
+  function K(t) { return '<span class="k">' + t + "</span>"; }
+  function S(t) { return '<span class="s">' + t + "</span>"; }
+  function N(t) { return '<span class="n">' + t + "</span>"; }
+  function C(t) { return '<span class="c">' + t + "</span>"; }
+
+  function build() {
+    tasksBox.innerHTML = "";
+    TASKS.forEach(function (t) {
+      var row = document.createElement("div");
+      row.className = "task";
+      row.id = "task-" + t.key;
+      row.innerHTML =
+        "<span class='name'></span>" +
+        "<span class='track'><span class='fill'></span></span>" +
+        "<span class='state'>待执行</span>";
+      row.querySelector(".name").textContent = t.name + " · " + t.ms + "ms";
+      tasksBox.appendChild(row);
+    });
+  }
+
+  var t0 = 0;
+  function stamp() { return String(Math.round(performance.now() - t0)).padStart(4, " ") + "ms"; }
+
+  function reset() {
+    build();
+    logBox.innerHTML = "等待执行…";
+    resultBox.style.display = "none";
+    btnSerial.disabled = btnParallel.disabled = false;
+  }
+
+  /* 用 setTimeout 包一个 Promise，模拟一次网络请求 */
+  function run(name, ms, key) {
+    return new Promise(function (resolve) {
+      var row = document.getElementById("task-" + key);
+      var fill = row.querySelector(".fill");
+      var state = row.querySelector(".state");
+      state.textContent = "进行中";
+      fill.style.width = "6%";
+
+      var start = performance.now();
+      var timer = setInterval(function () {
+        var pct = Math.min(96, ((performance.now() - start) / ms) * 100);
+        fill.style.width = pct.toFixed(0) + "%";
+      }, 40);
+
+      setTimeout(function () {
+        clearInterval(timer);
+        fill.style.width = "100%";
+        row.classList.add("done");
+        state.textContent = "完成";
+        resolve(ms);
+      }, ms);
+    });
+  }
+
+  function write(html) { logBox.innerHTML = html; }
+
+  btnSerial.addEventListener("click", async function () {
+    btnSerial.disabled = btnParallel.disabled = true;
+    build();
+    t0 = performance.now();
+    logBox.innerHTML = "";
+
+    var lines = [C("// 串行：await 逐个等，后一个要等前一个结束")];
+    write(lines.join("\n"));
+
+    var sum = 0;
+    for (var i = 0; i < TASKS.length; i++) {
+      var t = TASKS[i];
+      lines.push("[" + stamp() + "] " + K("开始") + " " + t.name);
+      write(lines.join("\n"));
+      var ms = await run(t.name, t.ms, t.key);
+      sum += ms;
+      lines.push("[" + stamp() + "] " + S("完成") + " " + t.name + C("（每个任务耗时 " + ms + "ms，累计 " + sum + "ms）"));
+      write(lines.join("\n"));
+    }
+
+    var total = Math.round(performance.now() - t0);
+    lines.push("");
+    lines.push(C("总耗时：") + N(total + " ms"));
+    write(lines.join("\n"));
+
+    resultBox.style.display = "block";
+    resultBox.innerHTML = "串行结果：总耗时 <span class='big'>" + total + " ms</span>" +
+      "（三个任务耗时相加 " + sum + " ms）";
+    btnSerial.disabled = btnParallel.disabled = false;
+  });
+
+  btnParallel.addEventListener("click", async function () {
+    btnSerial.disabled = btnParallel.disabled = true;
+    build();
+    t0 = performance.now();
+
+    var lines = [C("// 并行：Promise.all，三个任务同时发出"), "[" + stamp() + "] " + K("一次性发出") + " 3 个请求"];
+    write(lines.join("\n"));
+
+    await Promise.all(TASKS.map(function (t) { return run(t.name, t.ms, t.key); }));
+
+    var total = Math.round(performance.now() - t0);
+    lines.push("[" + stamp() + "] " + S("全部完成") + " " + C("（等的是最慢的那个：1200ms）"));
+    lines.push("");
+    lines.push(C("总耗时：") + N(total + " ms"));
+    write(lines.join("\n"));
+
+    resultBox.style.display = "block";
+    resultBox.innerHTML = "并行结果：总耗时 <span class='big'>" + total + " ms</span>" +
+      "（约等于最慢任务的 1200ms，省下约 " + (2700 - total) + "ms）";
+    btnSerial.disabled = btnParallel.disabled = false;
+  });
+
+  btnReset.addEventListener("click", reset);
+
+  reset();
+})();
+</script>
+
+</body>
+</html>

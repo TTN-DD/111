@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>纯 CSS 图标 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .ic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+
+  .ic-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 8px 12px;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .ic-cell span {
+    color: #8b929d;
+    font-family: var(--mono);
+    font-size: 10.5px;
+  }
+
+  .ic-cell b {
+    color: #4b525c;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* 统一基准：24×24 的容器 */
+  .ic { position: relative; width: 24px; height: 24px; }
+  .ic::before, .ic::after, .ic i, .ic u {
+    position: absolute;
+    content: "";
+    border-radius: 2px;
+  }
+
+  /* 汉堡菜单：三条横线 */
+  .ic-menu::before, .ic-menu::after, .ic-menu i {
+    left: 2px; width: 20px; height: 2px; background: #2c333d;
+  }
+  .ic-menu::before { top: 5px; }
+  .ic-menu i { top: 11px; }
+  .ic-menu::after { top: 17px; }
+
+  /* 关闭：两条对角线 */
+  .ic-close::before, .ic-close::after {
+    left: 11px; top: 3px; width: 2px; height: 18px; background: #2c333d;
+  }
+  .ic-close::before { transform: rotate(45deg); }
+  .ic-close::after  { transform: rotate(-45deg); }
+
+  /* 加号 */
+  .ic-plus::before, .ic-plus::after { background: #2c333d; }
+  .ic-plus::before { left: 11px; top: 3px; width: 2px; height: 18px; }
+  .ic-plus::after  { top: 11px; left: 3px; height: 2px; width: 18px; }
+
+  /* 减号 */
+  .ic-minus::before { top: 11px; left: 3px; height: 2px; width: 18px; background: #2c333d; }
+
+  /* 右箭头：横杠 + 旋转的折角 */
+  .ic-arrow::before { left: 3px; top: 11px; width: 16px; height: 2px; background: #2c333d; }
+  .ic-arrow::after {
+    right: 2px; top: 6px; width: 9px; height: 9px;
+    border-top: 2px solid #2c333d; border-right: 2px solid #2c333d;
+    transform: rotate(45deg); background: none;
+  }
+
+  /* 勾：折角旋转 */
+  .ic-check::before {
+    left: 3px; top: 9px; width: 13px; height: 6px;
+    border-left: 2px solid #12603f; border-bottom: 2px solid #12603f;
+    transform: rotate(-45deg); transform-origin: left center; background: none;
+  }
+
+  /* 播放：三角形用边框拼 */
+  .ic-play::before {
+    left: 6px; top: 4px; width: 0; height: 0; background: none; border-radius: 0;
+    border-left: 14px solid #2c333d;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+  }
+
+  /* 下箭头（caret） */
+  .ic-caret::before {
+    left: 6px; top: 8px; width: 10px; height: 10px;
+    border-bottom: 2px solid #2c333d; border-right: 2px solid #2c333d;
+    transform: rotate(45deg); background: none;
+  }
+
+  /* 三点菜单：一个点 + 两个 box-shadow */
+  .ic-more::before {
+    left: 10px; top: 10px; width: 4px; height: 4px; border-radius: 50%;
+    background: #2c333d;
+    box-shadow: -7px 0 0 #2c333d, 7px 0 0 #2c333d;
+  }
+
+  /* 加载环：边框 + 单边透明 + 旋转 */
+  .ic-load::before {
+    inset: 3px; border: 2px solid #dbe4f5; border-top-color: #2f6fed;
+    border-radius: 50%; background: none;
+    animation: ic-spin .9s linear infinite;
+  }
+  @keyframes ic-spin { to { transform: rotate(360deg); } }
+
+  /* 悬停：整体转 90° 或放大，证明它是"活的图形"而非图片 */
+  .ic-cell:hover .ic-close { transform: rotate(90deg); transition: transform .3s ease; }
+  .ic-cell:hover .ic-plus  { transform: rotate(90deg); transition: transform .3s ease; }
+  .ic-cell:hover .ic-play  { transform: scale(1.15); transition: transform .2s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ic-load::before { animation: none; }
+    .ic-cell:hover .ic-close,
+    .ic-cell:hover .ic-plus,
+    .ic-cell:hover .ic-play { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>纯 CSS 图标</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>纯 CSS 图标</h1>
+    <div class="meta">
+      <span>第 13 讲</span>
+      <span class="mono">13-3.html</span>
+      <span>零资源 · 10 个图标</span>
+    </div>
+    <p class="lead">
+      不加载字体、不写 SVG、不引图片，只用 <code>::before</code>、<code>::after</code>、边框和
+      <code>transform</code> 画出几何图标。代价是每个图标都要手算位置，收益是<b>零请求、零依赖</b>，
+      而且改颜色就是在 CSS 里改一个值。
+    </p>
+
+    <section class="demo">
+      <h2>一、十个图标</h2>
+      <p class="demo-hint">移上去看动效——关闭和加号会转 90°，播放会放大。</p>
+
+      <div class="ic-grid">
+        <div class="ic-cell"><div class="ic ic-menu"><i></i></div><b>汉堡菜单</b><span>.ic-menu</span></div>
+        <div class="ic-cell"><div class="ic ic-close"></div><b>关闭</b><span>.ic-close</span></div>
+        <div class="ic-cell"><div class="ic ic-plus"></div><b>加号</b><span>.ic-plus</span></div>
+        <div class="ic-cell"><div class="ic ic-minus"></div><b>减号</b><span>.ic-minus</span></div>
+        <div class="ic-cell"><div class="ic ic-arrow"></div><b>右箭头</b><span>.ic-arrow</span></div>
+        <div class="ic-cell"><div class="ic ic-check"></div><b>勾选</b><span>.ic-check</span></div>
+        <div class="ic-cell"><div class="ic ic-play"></div><b>播放</b><span>.ic-play</span></div>
+        <div class="ic-cell"><div class="ic ic-caret"></div><b>下拉箭头</b><span>.ic-caret</span></div>
+        <div class="ic-cell"><div class="ic ic-more"></div><b>更多</b><span>.ic-more</span></div>
+        <div class="ic-cell"><div class="ic ic-load"></div><b>加载环</b><span>.ic-load</span></div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>二、三个关键技巧</h2>
+      <p class="demo-hint">会了这三个，大部分几何图标都能自己画。</p>
+
+      <h4 style="margin:0 0 6px;font-size:13.5px;">① 折角：用 border 拼出"L"，再旋转</h4>
+<pre><code>.ic-arrow::after {
+  width: 9px; height: 9px;
+  border-top: 2px solid #2c333d;
+  border-right: 2px solid #2c333d;
+  transform: rotate(45deg);   /* 边框拼的是 "⌐"，转 45° 就成了 ">" */
+}</code></pre>
+
+      <h4 style="margin:18px 0 6px;font-size:13.5px;">② 三角形：用透明边框</h4>
+<pre><code>.ic-play::before {
+  width: 0; height: 0;
+  border-left: 14px solid #2c333d;      /* 实边：三角形的底 */
+  border-top: 8px solid transparent;    /* 透明边：切出斜边 */
+  border-bottom: 8px solid transparent;
+}</code></pre>
+
+      <h4 style="margin:18px 0 6px;font-size:13.5px;">③ 圆环：单边换个颜色 + 旋转</h4>
+<pre><code>.ic-load::before {
+  inset: 3px;
+  border: 2px solid #dbe4f5;
+  border-top-color: #2f6fed;   /* 只让上边有颜色 */
+  border-radius: 50%;
+  animation: ic-spin .9s linear infinite;
+}</code></pre>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>图标</th><th>用了什么</th><th>代码量</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>汉堡 / 加号 / 减号</td><td>两条或三条背景色横竖条</td><td>3 行</td></tr>
+        <tr><td>关闭</td><td>同一根竖条旋转 ±45°</td><td>3 行</td></tr>
+        <tr><td>箭头 / 勾 / 下拉</td><td>两条边框 + <code>rotate</code></td><td>5 行</td></tr>
+        <tr><td>播放</td><td>透明边框拼三角形</td><td>4 行</td></tr>
+        <tr><td>更多</td><td>一个圆点 + <code>box-shadow</code> 复制两个</td><td>3 行</td></tr>
+        <tr><td>加载环</td><td>圆角边框 + 单边着色 + 动画</td><td>6 行</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>什么时候别用：</b>图形一旦超出"直线 + 折角 + 圆"的范围（比如一本书、一个购物车、一个相机），
+      CSS 的代码量会指数膨胀，而且不同浏览器 1px 的差异会让形状歪掉。
+      这条界限大概是<b>能用 3 个伪元素以内画出</b>的，才值得用 CSS。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

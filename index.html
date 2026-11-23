@@ -13,9 +13,9 @@
   <div class="wrap">
     <h1>高级网页设计 · 课堂练习</h1>
     <p>
-      把做过的网页作品都收在这一页：基础与表单、层叠与布局、过渡与动画三个练习专题，
-      加上课程大作业「微信读书」，共 11 个页面。每张卡片点开就是可直接运行的页面，
-      底部小字是对应的文件路径。
+      把做过的网页作品都收在这一页：基础与表单、层叠与布局、过渡与动画、图标专题、
+      JavaScript 练习、课堂测试六个练习专题，加上课程大作业「微信读书」，共 27 个页面。
+      每张卡片点开就是可直接运行的页面，底部小字是对应的文件路径。
     </p>
     <div class="chips">
       <a class="chip chip--gh" href="https://github.com/TTN-DD/111" target="_blank" rel="noopener">
@@ -25,8 +25,8 @@
         在 GitHub 上查看
       </a>
       <span class="chip"><strong>段栋</strong></span>
-      <span class="chip"><strong>11</strong> 个页面</span>
-      <span class="chip"><strong>4</strong> 个专题</span>
+      <span class="chip"><strong>27</strong> 个页面</span>
+      <span class="chip"><strong>7</strong> 个专题</span>
       <span class="chip">最后整理 2026-11-23</span>
     </div>
   </div>
@@ -126,7 +126,133 @@
 
   <section class="section">
     <div class="section-head">
-      <h2>四、综合项目</h2>
+      <h2>四、图标专题</h2>
+      <span class="lecture">第 13 讲</span>
+      <span class="count">3 个</span>
+    </div>
+    <div class="grid">
+      <a class="card" href="13-1.html">
+        <span class="no">13-1</span>
+        <h3>图标方案对比</h3>
+        <p>字体图标、内联 SVG、纯 CSS 三种实现的体积、着色、缩放与可访问性取舍</p>
+        <span class="file">13-1.html</span>
+      </a>
+      <a class="card" href="13-2.html">
+        <span class="no">13-2</span>
+        <h3>SVG 图标库</h3>
+        <p>16 个手写图标，统一 24×24 网格，currentColor 着色、任意尺寸缩放</p>
+        <span class="file">13-2.html</span>
+      </a>
+      <a class="card" href="13-3.html">
+        <span class="no">13-3</span>
+        <h3>纯 CSS 图标</h3>
+        <p>十个几何图标：伪元素 + 边框 + transform 绘制，零图片零字体</p>
+        <span class="file">13-3.html</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>五、JavaScript 练习</h2>
+      <span class="lecture">第 14–17 讲</span>
+      <span class="count">7 个</span>
+    </div>
+    <div class="grid">
+      <a class="card" href="14-1.html">
+        <span class="no">14-1</span>
+        <h3>六种基本数据类型</h3>
+        <p>13 个值逐个 typeof，附 null 与 NaN 两个必踩的坑</p>
+        <span class="file">14-1.html</span>
+      </a>
+      <a class="card" href="15-1.html">
+        <span class="no">15-1</span>
+        <h3>结构与循环</h3>
+        <p>if / else if 分支判定、for 生成 FizzBuzz 方块、while 折半计数</p>
+        <span class="file">15-1.html</span>
+      </a>
+      <a class="card" href="16-1.html">
+        <span class="no">16-1</span>
+        <h3>数组与对象方法</h3>
+        <p>map / filter / reduce / sort / find 实测，重点看原数组有没有被改</p>
+        <span class="file">16-1.html</span>
+      </a>
+      <a class="card" href="17-1.html">
+        <span class="no">17-1</span>
+        <h3>JSON 与对象互转</h3>
+        <p>可编辑的 JSON 编辑器、非法格式报错、stringify 会丢掉哪些字段</p>
+        <span class="file">17-1.html</span>
+      </a>
+      <a class="card" href="17-2.html">
+        <span class="no">17-2</span>
+        <h3>调用接口展示数据</h3>
+        <p>fetch + res.ok 判断 + 网络失败降级，成功 / 404 / 断网三种结局</p>
+        <span class="file">17-2.html</span>
+      </a>
+      <a class="card" href="17-3.html">
+        <span class="no">17-3</span>
+        <h3>商品列表与详情</h3>
+        <p>数据渲染八件商品、点击进入详情、返回列表的状态切换</p>
+        <span class="file">17-3.html</span>
+      </a>
+      <a class="card" href="17-4.html">
+        <span class="no">17-4</span>
+        <h3>Promise 与 async</h3>
+        <p>三个任务的串行与并行实测：2700ms 对 1200ms</p>
+        <span class="file">17-4.html</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>六、课堂测试</h2>
+      <span class="lecture">版面与数据排版</span>
+      <span class="count">6 个</span>
+    </div>
+    <div class="grid">
+      <a class="card" href="test-1.html">
+        <span class="no">测试 1</span>
+        <h3>四标签排行榜</h3>
+        <p>新闻 / 证券 / 理财 / 博客切换，十条榜单的序号、截断与数字对齐</p>
+        <span class="file">test-1.html</span>
+      </a>
+      <a class="card" href="test-2.html">
+        <span class="no">测试 2</span>
+        <h3>24 小时点击排行</h3>
+        <p>前三名放大带序号块，实时计数触发排名重排</p>
+        <span class="file">test-2.html</span>
+      </a>
+      <a class="card" href="test-3.html">
+        <span class="no">测试 3</span>
+        <h3>新车上市表</h3>
+        <p>八款车型表格，按动力类型筛选，窄屏横向滚动</p>
+        <span class="file">test-3.html</span>
+      </a>
+      <a class="card" href="test-4.html">
+        <span class="no">测试 4</span>
+        <h3>文学社科书城</h3>
+        <p>主编推荐 / 书墙 / 订购榜三栏，两段断点降为两栏与单栏</p>
+        <span class="file">test-4.html</span>
+      </a>
+      <a class="card" href="test-5.html">
+        <span class="no">测试 5</span>
+        <h3>影视排行</h3>
+        <p>每日 / 每周 / 每月切换，双列前十，海报位用色块占位</p>
+        <span class="file">test-5.html</span>
+      </a>
+      <a class="card" href="test-6.html">
+        <span class="no">测试 6</span>
+        <h3>股票涨跌榜</h3>
+        <p>红涨绿跌、四组行情表、涨跌箭头与等宽数字对齐</p>
+        <span class="file">test-6.html</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>七、综合项目</h2>
       <span class="lecture">课程大作业</span>
       <span class="count">1 个</span>
     </div>

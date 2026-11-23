@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SVG 图标库 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px;
+  }
+
+  .icon-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 8px 10px;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    background: #fff;
+    color: #2c333d;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, color .15s ease;
+  }
+
+  .icon-cell:hover {
+    border-color: #b9cef7;
+    background: #f7faff;
+    color: #1c4fc0;
+  }
+
+  .icon-cell svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .icon-cell span {
+    color: #8b929d;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: -.02em;
+  }
+
+  .sizes { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+  .sizes svg { stroke: #2f6fed; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .colors { display: flex; gap: 14px; flex-wrap: wrap; }
+  .colors span {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #f7f9fc;
+  }
+  .colors svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .fill-demo { display: flex; gap: 16px; align-items: center; }
+  .fill-demo svg { width: 30px; height: 30px; }
+
+  .split2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .split2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>SVG 图标库</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>内联 SVG 图标库</h1>
+    <div class="meta">
+      <span>第 13 讲</span>
+      <span class="mono">13-2.html</span>
+      <span>16 个图标 · 零外部资源</span>
+    </div>
+    <p class="lead">
+      这一页的 16 个图标全部手写在 HTML 里，统一 <code>viewBox="0 0 24 24"</code>、
+      统一 <code>stroke-width="1.8"</code>、统一圆角端点。只靠 <code>stroke: currentColor</code>
+      就能跟随父元素颜色，改主题色不用动任何一个 SVG 路径。
+    </p>
+
+    <section class="demo">
+      <h2>一、图标集</h2>
+      <p class="demo-hint">鼠标移上去会变色——变的是文字颜色，图标自动跟随。</p>
+
+      <div class="icon-grid">
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+          <span>home</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg>
+          <span>search</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          <span>menu</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          <span>close</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></svg>
+          <span>user</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 3z"/></svg>
+          <span>comment</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg>
+          <span>like</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8L3.5 9.6l5.9-.8z"/></svg>
+          <span>star</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+          <span>clock</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16M8.5 3.5v3M15.5 3.5v3"/></svg>
+          <span>calendar</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8"/></svg>
+          <span>chart</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+          <span>check-box</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          <span>plus</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+          <span>arrow</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><path d="M12 3.5v11"/><path d="M8 10.5l4 4 4-4"/><path d="M5 19.5h14"/></svg>
+          <span>download</span>
+        </div>
+        <div class="icon-cell">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 4v2.2M12 17.8V20M4 12h2.2M17.8 12H20M6.3 6.3l1.6 1.6M16.1 16.1l1.6 1.6M17.7 6.3l-1.6 1.6M7.9 16.1l-1.6 1.6"/></svg>
+          <span>settings</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>二、尺寸：改 width / height 就够</h2>
+      <p class="demo-hint">SVG 是矢量，同一份路径从 16px 放到 64px 都清晰，不需要导出多套图。</p>
+
+      <div class="sizes">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+        <svg width="36" height="36" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+        <svg width="52" height="52" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+        <span style="color:#8b929d;font-size:12px;font-family:var(--mono);">16 / 24 / 36 / 52 px</span>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>三、颜色：currentColor 是关键</h2>
+      <p class="demo-hint">写 <code>stroke="currentColor"</code>，图标的颜色就等于父元素的 <code>color</code>。</p>
+
+      <div class="colors">
+        <span style="color:#2f6fed"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg></span>
+        <span style="color:#12603f"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg></span>
+        <span style="color:#b23b3b"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg></span>
+        <span style="color:#b45309"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg></span>
+        <span style="color:#7c3aed"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg></span>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>四、描边图标 vs 填充图标</h2>
+      <p class="demo-hint">同样的路径，把 <code>fill</code> 和 <code>stroke</code> 换个值就是两种风格。</p>
+
+      <div class="split2">
+        <div class="fill-demo">
+          <svg viewBox="0 0 24 24" style="fill:none;stroke:#2f6fed;stroke-width:1.8;stroke-linejoin:round"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg>
+          <div>
+            <b style="font-size:13.5px;">描边（stroke）</b>
+            <p style="margin:2px 0 0;color:#8b929d;font-size:12.5px;">轻，适合导航、按钮、列表</p>
+          </div>
+        </div>
+        <div class="fill-demo">
+          <svg viewBox="0 0 24 24" style="fill:#d64545;stroke:none"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z"/></svg>
+          <div>
+            <b style="font-size:13.5px;">填充（fill）</b>
+            <p style="margin:2px 0 0;color:#8b929d;font-size:12.5px;">重，适合选中态、收藏、强调</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="note">
+      <b>写图标的三条纪律：</b>
+      ① 所有图标统一 <code>viewBox</code>（这里是 0 0 24 24），否则大小对不齐；
+      ② 用 <code>currentColor</code> 而不是硬编码颜色，主题改色的时候不用一个个改；
+      ③ 纯装饰性图标加 <code>aria-hidden="true"</code>，有语义的图标加 <code>role="img"</code> 和 <code>&lt;title&gt;</code>，否则读屏软件会念出一串乱码。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

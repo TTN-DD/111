@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>结构·条件·循环 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .jsx { border: 1px solid #eef0f3; border-radius: 10px; overflow: hidden; }
+
+  .ctrl {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 14px;
+    background: #fafbfd;
+    border-bottom: 1px solid #eef0f3;
+    font-size: 13px;
+    color: #4b525c;
+  }
+
+  .ctrl input[type="number"] {
+    width: 92px;
+    padding: 6px 10px;
+    border: 1px solid #d9dee7;
+    border-radius: 7px;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .ctrl input:focus { outline: none; border-color: #2f6fed; box-shadow: 0 0 0 3px rgba(47,111,237,.12); }
+
+  .ctrl button {
+    padding: 6px 14px;
+    border: 1px solid #2f6fed;
+    border-radius: 7px;
+    background: #2f6fed;
+    color: #fff;
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .ctrl button:hover { background: #2459c9; }
+
+  .out {
+    padding: 16px;
+    background: #1b1f24;
+    color: #dfe4ec;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.85;
+    min-height: 74px;
+    white-space: pre-wrap;
+  }
+  .out .k { color: #8fb3f9; }
+  .out .s { color: #a5d6a7; }
+  .out .n { color: #ffcc80; }
+  .out .c { color: #7d8794; }
+
+  .bars { display: flex; flex-wrap: wrap; gap: 5px; padding: 16px; background: #fff; min-height: 20px; }
+  .bars i {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: #eaf1fe;
+    color: #1c4fc0;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-style: normal;
+  }
+  .bars i.fz { background: #fdf1f1; color: #b23b3b; }
+  .bars i.fb { background: #eef8f3; color: #12603f; }
+
+  .legend { display: flex; gap: 14px; padding: 0 16px 14px; background: #fff; font-size: 12px; color: #8b929d; }
+  .legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  .legend .l1::before { background: #eaf1fe; border: 1px solid #c9dcfb; }
+  .legend .l2::before { background: #fdf1f1; }
+  .legend .l3::before { background: #eef8f3; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>结构·条件·循环</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>程序结构：条件与循环</h1>
+    <div class="meta">
+      <span>第 15 讲</span>
+      <span class="mono">15-1.html</span>
+      <span>if / for / while</span>
+    </div>
+    <p class="lead">
+      三块内容各配一个可运行的例子：<b>条件</b>决定走哪条路，<b>for</b> 适合已知次数的重复，
+      <b>while</b> 适合不知道要循环多少次、只知道什么时候该停。
+    </p>
+
+    <section class="demo">
+      <h2>一、条件分支：分数 → 等级</h2>
+      <p class="demo-hint">改数字点"判定"，看 if / else if 依次怎么比。</p>
+
+      <div class="jsx">
+        <div class="ctrl">
+          <label for="score">分数</label>
+          <input type="number" id="score" value="86" min="0" max="100">
+          <button id="btn-if">判定</button>
+        </div>
+        <pre class="out" id="out-if">等待判定…</pre>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>二、for 循环：生成 n 个方块</h2>
+      <p class="demo-hint">经典题：3 的倍数显示 Fizz，5 的倍数显示 Buzz，同时是就 FizzBuzz。</p>
+
+      <div class="jsx">
+        <div class="ctrl">
+          <label for="n">循环到</label>
+          <input type="number" id="n" value="15" min="1" max="40">
+          <button id="btn-for">生成</button>
+        </div>
+        <div class="bars" id="bars"></div>
+        <div class="legend">
+          <span class="l1">普通数字</span>
+          <span class="l2">3 的倍数（Fizz）</span>
+          <span class="l3">5 的倍数（Buzz）</span>
+        </div>
+        <pre class="out" id="out-for" style="border-top:1px solid #eef0f3;">点"生成"看输出。</pre>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>三、while 循环：折半几次到 1</h2>
+      <p class="demo-hint">不知道要循环几次，只知道"直到 n 变成 1 为止"——这种就该用 while。</p>
+
+      <div class="jsx">
+        <div class="ctrl">
+          <label for="m">初始值</label>
+          <input type="number" id="m" value="1000" min="2" max="100000000">
+          <button id="btn-while">开始折半</button>
+        </div>
+        <pre class="out" id="out-while">等待运行…</pre>
+      </div>
+    </section>
+
+    <div class="note">
+      <b>选择原则：</b>次数已知（遍历数组、循环 n 次）用 <code>for</code>；
+      条件已知但次数未知（读流、等到某个状态）用 <code>while</code>；
+      只关心"集合里每个元素"用 <code>for...of</code>；只关心"对象每个键"用 <code>for...in</code>。
+      另外 <code>while</code> 一定要确保循环体里有让条件终止的语句，否则就是死循环，页面会直接卡死。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function K(t) { return '<span class="k">' + t + "</span>"; }
+  function S(t) { return '<span class="s">' + t + "</span>"; }
+  function N(t) { return '<span class="n">' + t + "</span>"; }
+  function C(t) { return '<span class="c">' + t + "</span>"; }
+
+  /* ---------- 条件 ---------- */
+  document.getElementById("btn-if").addEventListener("click", function () {
+    var raw = document.getElementById("score").value;
+    var s = Number(raw);
+    var lines = [C("输入：") + raw];
+
+    if (raw === "" || Number.isNaN(s)) {
+      lines.push(N("不是有效数字，先补一个分数。"));
+    } else if (s < 0 || s > 100) {
+      lines.push(N("超出 0–100 范围，if 的第一个条件就被拦下了。"));
+    } else {
+      var grade;
+      if (s >= 90)      grade = "优秀";
+      else if (s >= 80) grade = "良好";
+      else if (s >= 70) grade = "中等";
+      else if (s >= 60) grade = "及格";
+      else              grade = "不及格";
+
+      var passed = s >= 60 ? "通过" : "未通过";
+      lines.push("");
+      lines.push(C("判定路径："));
+      lines.push("  " + (s >= 90 ? "✔" : "✘") + " s >= 90　→ " + (s >= 90));
+      if (s < 90)  lines.push("  " + (s >= 80 ? "✔" : "✘") + " s >= 80　→ " + (s >= 80));
+      if (s < 80)  lines.push("  " + (s >= 70 ? "✔" : "✘") + " s >= 70　→ " + (s >= 70));
+      if (s < 70)  lines.push("  " + (s >= 60 ? "✔" : "✘") + " s >= 60　→ " + (s >= 60));
+      lines.push("");
+      lines.push(C("结果：") + S(grade) + "　" + C("三目运算：") + S(passed));
+      lines.push(C("说明：") + "else if 只会执行第一个为 true 的分支，后面的不再判断。");
+    }
+    document.getElementById("out-if").innerHTML = lines.join("\n");
+  });
+
+  /* ---------- for ---------- */
+  document.getElementById("btn-for").addEventListener("click", function () {
+    var n = Math.max(1, Math.min(40, Number(document.getElementById("n").value) || 1));
+    var bars = document.getElementById("bars");
+    var lines = [];
+    var fizz = 0, buzz = 0, both = 0;
+
+    bars.innerHTML = "";
+    for (var i = 1; i <= n; i++) {
+      var cell = document.createElement("i");
+      var text = String(i);
+      var isF = i % 3 === 0;
+      var isB = i % 5 === 0;
+
+      if (isF && isB) { text = "FB"; cell.className = "fz fb"; both++; }
+      else if (isF)   { text = "F";  cell.className = "fz"; fizz++; }
+      else if (isB)   { text = "B";  cell.className = "fb"; buzz++; }
+
+      cell.textContent = text;
+      cell.title = i + (isF ? " · Fizz" : "") + (isB ? " · Buzz" : "");
+      bars.appendChild(cell);
+    }
+
+    lines.push(C("循环：") + "for (let i = 1; i <= " + n + "; i++)");
+    lines.push("");
+    lines.push(C("Fizz（3 的倍数）　") + N(fizz) + C(" 个"));
+    lines.push(C("Buzz（5 的倍数）　") + N(buzz) + C(" 个"));
+    lines.push(C("FizzBuzz（两者）　") + N(both) + C(" 个"));
+    lines.push(C("合计 " + n + " 次循环，全部结果已同步渲染到上方方块。"));
+    document.getElementById("out-for").innerHTML = lines.join("\n");
+  });
+
+  /* ---------- while ---------- */
+  document.getElementById("btn-while").addEventListener("click", function () {
+    var n = Number(document.getElementById("m").value) || 2;
+    n = Math.max(2, Math.min(100000000, Math.floor(n)));
+    var cur = n;
+    var steps = 0;
+    var trace = [];
+
+    while (cur > 1) {
+      cur = cur / 2;
+      steps++;
+      if (trace.length < 6) trace.push("  " + steps + " 次后 → " + (Number.isInteger(cur) ? cur : cur.toFixed(3)));
+      if (steps > 200) break;
+    }
+
+    var lines = [C("初始值：") + N(n)];
+    lines.push("");
+    lines.push(C("前几步："));
+    lines = lines.concat(trace);
+    if (steps > 6) lines.push("  …");
+    lines.push("");
+    lines.push(C("总共折半 ") + N(steps) + C(" 次后小于等于 1"));
+    lines.push(C("验证：") + "log2(" + n + ") ≈ " + (Math.log2(n)).toFixed(2));
+    document.getElementById("out-while").innerHTML = lines.join("\n");
+  });
+
+  /* 初始状态各跑一次 */
+  document.getElementById("btn-if").click();
+  document.getElementById("btn-for").click();
+  document.getElementById("btn-while").click();
+})();
+</script>
+
+</body>
+</html>
