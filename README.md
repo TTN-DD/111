@@ -4,7 +4,11 @@
 
 ## 在线预览
 
-开启 GitHub Pages 后访问：`https://<用户名>.github.io/<仓库名>/`
+仓库：<https://github.com/TTN-DD/111>
+
+开启 GitHub Pages 后访问：<https://ttn-dd.github.io/111/>
+
+开启方式：仓库 Settings → Pages → Source 选 `Deploy from a branch` → 分支 `main`、目录 `/ (root)` → Save。
 
 ## 页面目录
 
