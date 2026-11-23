@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>选择器练习 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ---------- 1. 后代选择器：.tree 里面所有 li 都算 ---------- */
+  .tree li { padding: 4px 0; color: #2c333d; font-size: 14px; }
+
+  /* ---------- 2. 子代选择器：只选直接子元素 ---------- */
+  .tree > ul > li { border-left: 2px solid #2f6fed; padding-left: 10px; }
+
+  /* ---------- 3. 相邻兄弟：紧挨着的下一个 ---------- */
+  .sibling h4 { margin: 0 0 6px; font-size: 14px; }
+  .sibling h4 + p { margin-top: 0; color: #1c7c54; font-weight: 500; }
+  .sibling p { color: #8b929d; font-size: 13.5px; margin: 0 0 10px; }
+
+  /* ---------- 4. 属性选择器 ---------- */
+  .links a { display: inline-block; margin-right: 14px; font-size: 13.5px; }
+  .links a[href^="https://"]::after { content: " ↗"; color: #8b929d; }
+  .links a[href$=".pdf"] { color: #b45309; }
+  .links a[href$=".pdf"]::before { content: "PDF "; font-size: 10px; font-weight: 600; letter-spacing: .04em; }
+
+  /* ---------- 5. 结构伪类 ---------- */
+  .zebra { margin: 0; padding: 0; list-style: none; border: 1px solid #e6e8ec; border-radius: 10px; overflow: hidden; }
+  .zebra li { padding: 9px 14px; font-size: 13.5px; color: #2c333d; border-bottom: 1px solid #f1f3f7; }
+  .zebra li:nth-child(odd) { background: #fafbfc; }
+  .zebra li:first-child { font-weight: 600; color: #14161a; }
+  .zebra li:last-child { border-bottom: 0; }
+
+  /* ---------- 6. :not() 排除 ---------- */
+  .not-demo button {
+    padding: 7px 16px;
+    margin-right: 8px;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #fff;
+    color: #4b525c;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .not-demo button:not(.danger) { background: #f5f8ff; border-color: #cdddf8; color: #1c4fc0; }
+  .not-demo button.danger { border-color: #f0c4c4; color: #b23b3b; }
+
+  /* ---------- 7. 伪元素 ---------- */
+  .quote { position: relative; padding-left: 22px; margin: 0; color: #4b525c; font-size: 14px; }
+  .quote::before {
+    content: "“";
+    position: absolute;
+    left: 0;
+    top: -6px;
+    color: #cdddf8;
+    font-size: 34px;
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .legend span {
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: #f1f4f8;
+    color: #4b525c;
+    font-family: var(--mono);
+    font-size: 11.5px;
+  }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 700px) { .split { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>选择器练习</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>选择器综合练习</h1>
+    <div class="meta">
+      <span>第 4 讲</span>
+      <span class="mono">4.html</span>
+      <span>CSS 选择器</span>
+    </div>
+    <p class="lead">
+      七组选择器，每组都能看到代码和它命中的元素。练到后面你会发现：
+      能用结构选择器解决的问题，就不该回到 HTML 里加一堆类名。
+    </p>
+
+    <section class="demo">
+      <h2>一、后代 vs 子代</h2>
+      <p class="demo-hint">左边是 <code>.tree li</code>（所有后代），右边是 <code>.tree &gt; ul &gt; li</code>（只有直接子元素）。</p>
+      <div class="split">
+        <div class="tree">
+          <ul>
+            <li>第一层：被两条规则都选中</li>
+            <li>第一层：同上
+              <ul>
+                <li>第二层：只被后代选择器选中</li>
+                <li>第二层：同上</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <pre><code>.tree li          /* 后代，全部命中 */
+.tree &gt; ul &gt; li   /* 子代，只管第一层 */</code></pre>
+      </div>
+      <div class="legend">
+        <span>左竖线 = 子代选择器加的边框</span>
+        <span>第二层没有竖线</span>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>二、相邻兄弟选择器</h2>
+      <p class="demo-hint"><code>h4 + p</code> 只命中紧跟在 h4 后面的第一个 p。</p>
+      <div class="sibling">
+        <h4>小标题</h4>
+        <p>紧跟在小标题后面的段落，被 <code>+</code> 命中，显示为绿色。</p>
+        <p>第二个段落，不在 h4 的相邻位置，保持灰色。</p>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>三、属性选择器</h2>
+      <p class="demo-hint">按 href 的开头、结尾匹配，自动加后缀和前缀标记。</p>
+      <div class="links">
+        <a href="https://github.com/">https 外链</a>
+        <a href="index.html">站内链接</a>
+        <a href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf">课程讲义</a>
+      </div>
+      <pre><code>a[href^="https://"]  /* 以 https:// 开头 */
+a[href$=".pdf"]      /* 以 .pdf 结尾 */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>四、结构伪类</h2>
+      <p class="demo-hint">不用加任何类名，靠位置就能做斑马纹和首尾样式。</p>
+      <ul class="zebra">
+        <li>第一行（:first-child 加粗）</li>
+        <li>第二行</li>
+        <li>第三行（:nth-child(odd) 底色）</li>
+        <li>第四行</li>
+        <li>第五行（:nth-child(odd) 底色）</li>
+        <li>最后一行（:last-child 去掉下边框）</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>五、:not() 排除</h2>
+      <p class="demo-hint">给所有按钮一个样式，唯独排除带 danger 类的那个。</p>
+      <div class="not-demo">
+        <button type="button">普通按钮</button>
+        <button type="button">普通按钮</button>
+        <button type="button" class="danger">危险按钮</button>
+      </div>
+      <pre><code>button:not(.danger) { /* 除了 .danger 都命中 */ }</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>六、伪元素</h2>
+      <p class="demo-hint">::before / ::after 创造的是"假元素"，不占 DOM，常用来做装饰和图标。</p>
+      <p class="quote">
+        能用 CSS 画出来的装饰，就不要多写一个标签。伪元素是最省结构成本的做法。
+      </p>
+    </section>
+
+    <table class="data">
+      <thead>
+        <tr><th>写法</th><th>名称</th><th>权重</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>div p</code></td><td>后代</td><td>0,0,2</td></tr>
+        <tr><td><code>div &gt; p</code></td><td>子代</td><td>0,0,2</td></tr>
+        <tr><td><code>h4 + p</code></td><td>相邻兄弟</td><td>0,0,2</td></tr>
+        <tr><td><code>h4 ~ p</code></td><td>通用兄弟</td><td>0,0,2</td></tr>
+        <tr><td><code>a[href$=".pdf"]</code></td><td>属性</td><td>0,1,1</td></tr>
+        <tr><td><code>li:nth-child(odd)</code></td><td>伪类</td><td>0,1,1</td></tr>
+        <tr><td><code>::before</code></td><td>伪元素</td><td>同标签</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <b>练习体会：</b>选择器越短越好。像 <code>div.wrap &gt; ul &gt; li &gt; a.link</code> 这种层层写死的选择器，
+      结构一变就全废；换成单个类名反而更稳，也不影响优先级判断。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

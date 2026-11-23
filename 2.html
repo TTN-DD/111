@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>基础页面 · HTML 元素 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ---- 本页演示样式 ---- */
+  .h-list h1 { font-size: 26px; margin: 0 0 8px; }
+  .h-list h2 { font-size: 20px; margin: 0 0 8px; }
+  .h-list h3 { font-size: 17px; margin: 0 0 6px; color: #4b525c; }
+  .h-list h4 { font-size: 15px; margin: 0; color: #8b929d; font-weight: 500; }
+
+  .poem {
+    padding: 22px;
+    border-radius: 10px;
+    background: #fbfaf7;
+    border: 1px solid #ece7dd;
+    text-align: center;
+    font-family: "Songti SC", "SimSun", serif;
+    color: #3a3226;
+  }
+  .poem h3 { margin: 0 0 14px; font-size: 18px; letter-spacing: .3em; }
+  .poem p { margin: 0; font-size: 16px; line-height: 2.1; }
+
+  .lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .lists > div { padding: 16px; border: 1px solid #eef0f3; border-radius: 10px; }
+  .lists h4 { margin: 0 0 8px; font-size: 13px; color: #8b929d; font-weight: 500; letter-spacing: .02em; }
+  .lists ul, .lists ol, .lists dl { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.9; }
+  .lists dl { padding-left: 0; }
+  .lists dt { font-weight: 600; }
+  .lists dd { margin: 0 0 8px 0; color: #4b525c; font-size: 13.5px; }
+
+  .semantic {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 18px;
+    border: 1px dashed #d7dce4;
+    border-radius: 10px;
+    background: #fcfdfe;
+  }
+  .semantic figure { margin: 0; flex: 0 0 92px; }
+  .semantic svg { display: block; width: 92px; height: 92px; border-radius: 12px; }
+  .semantic figcaption { margin-top: 6px; font-size: 11.5px; color: #8b929d; text-align: center; }
+  .semantic h4 { margin: 0 0 4px; font-size: 15px; }
+  .semantic time { color: #8b929d; font-size: 12.5px; }
+  .semantic p { margin: 8px 0 0; font-size: 13.5px; color: #4b525c; }
+
+  .nameplate {
+    display: inline-block;
+    padding: 14px 34px;
+    background: #2f4bb8;
+    color: #fff;
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    line-height: 1.3;
+  }
+
+  .logotype {
+    font-size: 62px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .logotype .a { color: #e01f26; }
+  .logotype .b { color: #22b8cf; }
+
+  .two-col { display: grid; grid-template-columns: auto 1fr; gap: 8px 22px; align-items: center; }
+  .two-col span:first-child { font-size: 12.5px; color: #8b929d; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>基础页面</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>第一个网页：HTML 元素</h1>
+    <div class="meta">
+      <span>第 2 讲</span>
+      <span class="mono">2.html</span>
+      <span>纯 HTML</span>
+    </div>
+    <p class="lead">
+      这一页只做一件事：把 HTML 里最常用的元素都用一遍。重点不是"它能变粗"，
+      而是每个标签各自表达什么含义——同样的视觉效果，用对标签，读屏软件和搜索引擎才读得懂。
+    </p>
+
+    <section class="demo">
+      <h2>一、标题与段落</h2>
+      <p class="demo-hint">h1 全页只出现一次，往下按层级递减，不要为了字号大小跳级。</p>
+      <div class="h-list">
+        <h1>这是一级标题</h1>
+        <h2>这是二级标题</h2>
+        <h3>这是三级标题</h3>
+        <h4>这是四级标题</h4>
+      </div>
+      <p style="margin:18px 0 0;color:#4b525c;">
+        这是一个普通段落。<strong>strong 表示重要</strong>，<em>em 表示语气强调</em>，
+        <mark>mark 表示高亮</mark>，<code>code 表示代码片段</code>，
+        键盘操作写 <kbd>Ctrl</kbd> + <kbd>S</kbd>。
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>二、换行与居中：《静夜思》</h2>
+      <p class="demo-hint">诗里每一句是同一段内的断行，所以用 &lt;br&gt;，而不是四个 &lt;p&gt;。</p>
+      <div class="poem">
+        <h3>静夜思</h3>
+        <p>
+          床前明月光，<br>
+          疑是地上霜。<br>
+          举头望明月，<br>
+          低头思故乡。
+        </p>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>三、三种列表</h2>
+      <p class="demo-hint">无序用 ul，有序用 ol，名词解释用 dl——不要拿 ul 硬凑。</p>
+      <div class="lists">
+        <div>
+          <h4>UL · 无序</h4>
+          <ul>
+            <li>HTML 结构</li>
+            <li>CSS 表现</li>
+            <li>JavaScript 行为</li>
+          </ul>
+        </div>
+        <div>
+          <h4>OL · 有序</h4>
+          <ol>
+            <li>先写结构</li>
+            <li>再写样式</li>
+            <li>最后交互</li>
+          </ol>
+        </div>
+        <div>
+          <h4>DL · 定义</h4>
+          <dl>
+            <dt>层叠</dt>
+            <dd>同一个元素被多条规则命中时，按优先级决定谁生效。</dd>
+            <dt>继承</dt>
+            <dd>子元素自动获得父元素可继承的属性值。</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>四、语义化结构</h2>
+      <p class="demo-hint">article 是一篇能独立拿走的内容，figure 是配图与图注，time 带机器可读的日期。</p>
+      <article class="semantic">
+        <figure>
+          <svg viewBox="0 0 92 92" role="img" aria-label="段栋的头像占位图">
+            <rect width="92" height="92" rx="12" fill="#eaf1fe"/>
+            <circle cx="46" cy="37" r="14" fill="#2f6fed"/>
+            <path d="M20 82c0-14 12-22 26-22s26 8 26 22z" fill="#2f6fed"/>
+          </svg>
+          <figcaption>头像占位图</figcaption>
+        </figure>
+        <div>
+          <h4>段栋</h4>
+          <time datetime="2026-11-23">2026 年 11 月 23 日</time>
+          <p>
+            高级网页设计课程练习记录。这一页练的是"用对标签"，
+            页面里所有字号、间距都还是浏览器默认值，没有写一行 CSS 布局。
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section class="demo">
+      <h2>五、文字与配色</h2>
+      <p class="demo-hint">同一个名字，用背景块和纯文字两种方式呈现。</p>
+      <div class="two-col">
+        <span>背景块</span>
+        <div><span class="nameplate">段栋</span></div>
+        <span>文字配色</span>
+        <div class="logotype"><span class="a">duan</span><span class="b">dong</span></div>
+      </div>
+    </section>
+
+    <div class="note">
+      <b>这一页的收获：</b>
+      <code>&lt;div&gt;</code> 不是万能的。凡是能用
+      <code>header / nav / main / article / section / aside / footer</code>
+      表达清楚的结构，就不要一路 div 到底——语义标签本身不带来样式，
+      但它决定了这一页对机器来说是否可读。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

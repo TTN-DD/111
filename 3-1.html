@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>层叠样式表 · 三种引入方式 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/demo-link.css">
+
+<style>
+  /* 2. 内嵌样式表：写在 head 的 style 标签里，只对本文档生效 */
+  .from-embed {
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-left: 3px solid #c2410c;
+    border-radius: 0 6px 6px 0;
+    background: #fdf2e9;
+    color: #8a3a0b;
+    font-size: 14px;
+  }
+  .from-embed::before {
+    content: "内嵌（style 标签）";
+    display: block;
+    margin-bottom: 2px;
+    color: #c67f52;
+    font-size: 11.5px;
+    letter-spacing: .04em;
+  }
+
+  .ways { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-bottom: 4px; }
+  .way { padding: 16px; border: 1px solid #e6e8ec; border-radius: 10px; background: #fbfcfd; }
+  .way h4 { margin: 0 0 4px; font-size: 14px; }
+  .way p { margin: 0 0 10px; font-size: 12.5px; color: #8b929d; }
+  .way pre { margin: 0; font-size: 11.5px; padding: 12px; }
+
+  /* 优先级实验的三个同名目标 */
+  #target {
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 14.5px;
+  }
+  .target-class {
+    /* 权重 0,1,0 */
+    background: #eaf1fe;
+    color: #1c4fc0;
+    border: 1px solid #b9cef7;
+  }
+  #target {
+    /* 权重 1,0,0 —— id 选择器更高，覆盖上面的类 */
+    color: #12603f;
+  }
+
+  .weight-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+  .weight-bar span {
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #f1f4f8;
+    color: #4b525c;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>层叠样式表</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>层叠样式表：三种引入方式</h1>
+    <div class="meta">
+      <span>第 3 讲</span>
+      <span class="mono">3-1.html</span>
+      <span>CSS 引入</span>
+    </div>
+    <p class="lead">
+      同一个页面里可以同时存在三种写 CSS 的地方。它们不是"随便挑一种"，而是各有适用范围：
+      外链管全站，内嵌管单页，行内管特例。这一页把三种都写出来，看它们的实际效果和优先级。
+    </p>
+
+    <section class="demo">
+      <h2>一、写法对比</h2>
+      <p class="demo-hint">三段的样式分别来自三个不同位置，肉眼看起来差不多，来源完全不同。</p>
+
+      <div class="ways">
+        <div class="way">
+          <h4>外链</h4>
+          <p>最推荐。一个 CSS 管所有页面，改一次全站生效，浏览器还能缓存。</p>
+<pre><code>&lt;link rel="stylesheet"
+      href="assets/demo-link.css"&gt;</code></pre>
+        </div>
+        <div class="way">
+          <h4>内嵌</h4>
+          <p>写在 head 里，只影响当前文档。适合页面独有的那几条规则。</p>
+<pre><code>&lt;style&gt;
+  .from-embed { color: #8a3a0b; }
+&lt;/style&gt;</code></pre>
+        </div>
+        <div class="way">
+          <h4>行内</h4>
+          <p>直接写在标签上，优先级极高但无法复用，只用于调试或邮件模板。</p>
+<pre><code>&lt;p style="color: #6b21a8"&gt;
+  文字
+&lt;/p&gt;</code></pre>
+        </div>
+      </div>
+
+      <p class="from-link" style="margin-top:16px;">这段文字的样式来自外部 CSS 文件。</p>
+      <p class="from-embed">这段文字的样式来自当前文档 head 里的 style 标签。</p>
+      <p style="padding:10px 14px;margin:0;border-left:3px solid #6b21a8;border-radius:0 6px 6px 0;background:#f6eefc;color:#5b1a8a;font-size:14px;">
+        这段文字的样式直接写在 p 标签的 style 属性里。
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>二、三者同时命中同一个元素</h2>
+      <p class="demo-hint">下面这个方块同时被行内、id、类三条规则命中，看谁说了算。</p>
+
+      <div id="target" class="target-class"
+           style="background:#fff7e6;border:1px solid #f0c98a;">
+        我的颜色来自哪里？
+      </div>
+
+      <div class="weight-bar">
+        <span>行内 style → 1000</span>
+        <span>id → 100</span>
+        <span>class → 10</span>
+        <span>标签 → 1</span>
+      </div>
+
+      <table class="data" style="margin-top:16px;">
+        <thead>
+          <tr><th>规则</th><th>选择器</th><th>权重</th><th>是否生效</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>行内</td><td><code>style="background:#fff7e6"</code></td><td>1000</td><td>背景生效</td></tr>
+          <tr><td>id</td><td><code>#target</code></td><td>100</td><td>颜色生效</td></tr>
+          <tr><td>类</td><td><code>.target-class</code></td><td>10</td><td>被上面两条盖掉</td></tr>
+        </tbody>
+      </table>
+
+      <p style="margin:0;color:#4b525c;font-size:13.5px;">
+        所以最终结果：背景来自行内，文字颜色来自 id，类里的
+        <code>background / color</code> 都被覆盖了——但类里没被覆盖的
+        <code>border-radius</code> 依然生效。<b>层叠是按属性逐个比较的，不是整条规则整体胜出。</b>
+      </p>
+    </section>
+
+    <div class="note">
+      <b>三条结论：</b>
+      ① 优先级是四位数字比较（行内 / id / class / 标签），不是数字越大越"高级"；
+      ② 同权重时，后写的覆盖先写的；
+      ③ <code>!important</code> 能强行提权，但它会让后面的维护者失去判断依据，
+      只在覆盖第三方库时才用，自己的代码里不要写。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>盒子模型 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ---------------- 四层结构剖视图 ---------------- */
+  .bm {
+    position: relative;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 22px;
+    border: 1px dashed #d9a5a5;
+    border-radius: 8px;
+    background: #fdf1f1;
+  }
+
+  .bm-border {
+    padding: 6px;
+    border-radius: 6px;
+    background: #d99b4a;
+  }
+
+  .bm-pad {
+    padding: 26px;
+    border-radius: 4px;
+    background: #eaf1fe;
+  }
+
+  .bm-content {
+    padding: 20px 16px;
+    border: 1px dashed #9fbcf0;
+    border-radius: 4px;
+    background: #fff;
+    text-align: center;
+    font-size: 13px;
+    color: #1c4fc0;
+    line-height: 1.6;
+  }
+
+  .tag {
+    position: absolute;
+    padding: 1px 7px;
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+  .tag-m { top: 4px; left: 8px; background: #f6dddd; color: #a34a4a; }
+  .tag-b { top: 26px; right: 10px; background: #d99b4a; color: #fff; }
+  .tag-p { position: static; display: inline-block; margin-bottom: 8px; background: #cfe0fb; color: #1c4fc0; }
+  .tag-c { position: static; display: inline-block; margin-bottom: 8px; background: #eef1f5; color: #4b525c; }
+
+  /* ---------------- box-sizing 对比 ---------------- */
+  .sizing { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  .sizing > div > h4 {
+    margin: 0 0 4px;
+    font-size: 13.5px;
+  }
+
+  .sizing > div > p {
+    margin: 0 0 12px;
+    color: #8b929d;
+    font-size: 12.5px;
+    font-family: var(--mono);
+  }
+
+  .demo-box {
+    width: 200px;
+    padding: 20px;
+    border: 4px solid #2f6fed;
+    background: #eaf1fe;
+    color: #1c4fc0;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .demo-box--content { box-sizing: content-box; }
+  .demo-box--border  { box-sizing: border-box; }
+
+  .measure {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: #8b929d;
+  }
+
+  .measure b { color: #b23b3b; }
+
+  table.data { margin-top: 4px; }
+
+  @media (max-width: 640px) {
+    .sizing { grid-template-columns: 1fr; }
+    .bm { padding: 16px; }
+    .bm-pad { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>盒子模型</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>盒子模型：四层结构与 box-sizing</h1>
+    <div class="meta">
+      <span>第 4 讲</span>
+      <span class="mono">盒子.html</span>
+      <span>CSS 盒模型</span>
+    </div>
+    <p class="lead">
+      页面上每一个元素都是一个矩形盒子，从里到外四层：
+      content（内容）→ padding（内边距）→ border（边框）→ margin（外边距）。
+      搞不清这四层，就会出现"我明明设了 width:200px，为什么占了 248px"这种问题。
+    </p>
+
+    <section class="demo">
+      <h2>一、剖视图</h2>
+      <p class="demo-hint">从内往外看：白色是最里面的内容区，蓝色是内边距，橙色是边框，最外层粉色是外边距。</p>
+
+      <div class="bm">
+        <span class="tag tag-m">margin 22</span>
+        <div class="bm-border">
+          <span class="tag tag-b">border 6</span>
+          <div class="bm-pad">
+            <span class="tag tag-p">padding 26</span>
+            <div class="bm-content">
+              <span class="tag tag-c">content</span><br>
+              这里放文字和图片。<br>
+              内容区的大小由 width / height 决定。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr><th>层</th><th>属性</th><th>会不会顶开相邻元素</th><th>背景色是否延伸到这里</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>content</td><td><code>width / height</code></td><td>—</td><td>是</td></tr>
+          <tr><td>padding</td><td><code>padding</code></td><td>会，把边框推远</td><td>是</td></tr>
+          <tr><td>border</td><td><code>border</code></td><td>会</td><td>否，边框自己上色</td></tr>
+          <tr><td>margin</td><td><code>margin</code></td><td>会</td><td>否，永远透明</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="demo">
+      <h2>二、box-sizing：那个 48px 是怎么多出来的</h2>
+      <p class="demo-hint">两个盒子都写了 width:200px、padding:20px、border:4px，实际占据的宽度不一样。</p>
+
+      <div class="sizing">
+        <div>
+          <h4>content-box（默认）</h4>
+          <p>box-sizing: content-box</p>
+          <div class="demo-box demo-box--content">200px 只是内容区</div>
+          <div class="measure">实际占据：200 + 20×2 + 4×2 = <b>248px</b></div>
+        </div>
+        <div>
+          <h4>border-box（推荐）</h4>
+          <p>box-sizing: border-box</p>
+          <div class="demo-box demo-box--border">200px 含内边距和边框</div>
+          <div class="measure">实际占据：<b>200px</b></div>
+        </div>
+      </div>
+
+      <p style="margin:18px 0 0;color:#4b525c;font-size:13.5px;">
+        左边那个盒子明显更宽，因为默认的 <code>content-box</code> 把 padding 和 border
+        加在了 200px 之外。所以实际项目里几乎都会在开头统一写上：
+      </p>
+<pre><code>*, *::before, *::after {
+  box-sizing: border-box;   /* 让 width 就是最终宽 */
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>三、margin 的两种特殊情况</h2>
+      <p class="demo-hint">这两个坑几乎每个初学者都会踩一次。</p>
+      <table class="data">
+        <thead>
+          <tr><th>现象</th><th>说明</th><th>处理</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>外边距折叠</td>
+            <td>上下相邻两个块级元素的 margin 不会相加，而是取较大值。两个 20px 之间只有 20px，不是 40px。</td>
+            <td>改用单方向 margin（统一用 margin-bottom）</td>
+          </tr>
+          <tr>
+            <td>父元素高度塌陷</td>
+            <td>子元素全用 float 时脱离文档流，父元素高度变成 0。</td>
+            <td>父元素加 <code>overflow: hidden</code> 或用 Flex</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="note">
+      <b>记住一条就够了：</b>
+      <code>margin</code> 是盒子<b>外面</b>的空白，属于"我和别人之间的距离"；
+      <code>padding</code> 是盒子<b>里面</b>的空白，属于"我的内容和我的边框之间的距离"。
+      点背景色能不能盖住它，一眼就能分清：能盖住的是 padding，盖不住的是 margin。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

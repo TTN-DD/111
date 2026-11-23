@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>过渡与动画 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .hint-btn {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 5px;
+    background: #eaf1fe;
+    color: #1c4fc0;
+    font-size: 11.5px;
+    font-family: var(--mono);
+  }
+
+  /* ---------- 1. transition 基础 ---------- */
+  .trans-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .trans-card {
+    flex: 1 1 150px;
+    padding: 16px;
+    border: 1px solid #e6e8ec;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    color: #4b525c;
+    transition: background .25s ease, border-color .25s ease, color .25s ease;
+  }
+
+  .trans-card:hover {
+    background: #2f6fed;
+    border-color: #2f6fed;
+    color: #fff;
+  }
+
+  .trans-card b { display: block; margin-bottom: 4px; font-size: 13.5px; }
+
+  /* ---------- 2. transform ---------- */
+  .tf-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .tf {
+    flex: 1 1 130px;
+    height: 84px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: #f4f7fd;
+    border: 1px solid #dbe4f5;
+    color: #1c4fc0;
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .tf-1 { transition: transform .28s ease; }
+  .tf-1:hover { transform: translateY(-8px); }
+
+  .tf-2 { transition: transform .28s cubic-bezier(.34, 1.56, .64, 1); }
+  .tf-2:hover { transform: scale(1.12); }
+
+  .tf-3 { transition: transform .4s ease; }
+  .tf-3:hover { transform: rotate(6deg); }
+
+  .tf-4 { transition: transform .3s ease, box-shadow .3s ease; }
+  .tf-4:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 16px 32px -18px rgba(47, 111, 237, .85); }
+
+  /* ---------- 3. 缓动曲线对比 ---------- */
+  .timing { display: grid; gap: 8px; }
+
+  .timing .lane {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #fafbfd;
+  }
+
+  .timing .lane span {
+    flex: 0 0 118px;
+    color: #55617a;
+    font-family: var(--mono);
+    font-size: 11.5px;
+  }
+
+  .timing .track {
+    position: relative;
+    flex: 1;
+    height: 22px;
+    border-radius: 6px;
+    background: #eef1f7;
+    overflow: hidden;
+  }
+
+  .timing .dot {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #2f6fed;
+    transition-property: left;
+    transition-duration: 1s;
+  }
+
+  .timing .lane:hover .dot { left: calc(100% - 19px); }
+
+  .e-linear     { transition-timing-function: linear; }
+  .e-ease       { transition-timing-function: ease; }
+  .e-in         { transition-timing-function: ease-in; }
+  .e-out        { transition-timing-function: ease-out; }
+  .e-back       { transition-timing-function: cubic-bezier(.68, -.55, .27, 1.55); }
+
+  /* ---------- 4. keyframes ---------- */
+  .anim-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+
+  .anim-cell {
+    padding: 18px 12px;
+    border: 1px solid #e6e8ec;
+    border-radius: 10px;
+    background: #fff;
+    text-align: center;
+    font-size: 12px;
+    color: #55617a;
+  }
+
+  .anim-cell .stage {
+    height: 60px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 10px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #e2e9f7;
+    border-top-color: #2f6fed;
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(.82); opacity: .55; }
+  }
+  .pulse {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #2f6fed;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+  }
+  .float {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: #7aa2f7;
+    animation: float 2s ease-in-out infinite;
+  }
+
+  @keyframes grow-bar {
+    0%   { width: 8%; }
+    60%  { width: 86%; }
+    100% { width: 100%; }
+  }
+  .bar-track { width: 100%; height: 8px; border-radius: 4px; background: #eef1f7; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; background: #2f6fed; animation: grow-bar 2.6s ease-in-out infinite; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-5px); }
+    75%      { transform: translateX(5px); }
+  }
+  .shake {
+    padding: 5px 14px;
+    border-radius: 7px;
+    border: 1px solid #f0c4c4;
+    background: #fdf1f1;
+    color: #b23b3b;
+    font-size: 12px;
+    animation: shake .6s ease-in-out infinite;
+  }
+
+  /* 尊重系统的「减少动态效果」设置 */
+  @media (prefers-reduced-motion: reduce) {
+    .loader, .pulse, .float, .bar-fill, .shake { animation: none; }
+    .trans-card, .tf, .timing .dot { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>过渡与动画</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>过渡与动画</h1>
+    <div class="meta">
+      <span>第 10 讲</span>
+      <span class="mono">10.html</span>
+      <span>transition / transform / @keyframes</span>
+    </div>
+    <p class="lead">
+      <b>过渡（transition）</b>需要触发条件，比如鼠标悬停，两个状态之间自动补帧；
+      <b>动画（animation）</b>自己就能跑，用 <code>@keyframes</code> 定义多个关键帧。
+      两者都只改 <code>transform</code> 和 <code>opacity</code> 时最流畅，因为它们走 GPU 合成，不触发重排。
+    </p>
+
+    <section class="demo">
+      <h2>一、transition：四个属性</h2>
+      <p class="demo-hint">把鼠标移到卡片上 <span class="hint-btn">hover</span> 看过渡效果。</p>
+
+      <div class="trans-row">
+        <div class="trans-card"><b>背景与文字</b>transition: background .25s ease</div>
+        <div class="trans-card"><b>边框颜色</b>三个属性同时过渡，用逗号分隔</div>
+        <div class="trans-card"><b>只影响自己</b>不给 transition 就是瞬间跳变</div>
+      </div>
+
+      <pre><code>transition: 属性 时长 缓动 延迟;
+/* 例：background .25s ease 0s */
+transition: background .25s ease, color .25s ease;</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>二、transform：位移、缩放、旋转</h2>
+      <p class="demo-hint">四个方块都只有 hover 时才变，过渡负责把它变得顺滑。</p>
+
+      <div class="tf-row">
+        <div class="tf tf-1">translateY(-8px)</div>
+        <div class="tf tf-2">scale(1.12)</div>
+        <div class="tf tf-3">rotate(6deg)</div>
+        <div class="tf tf-4">组合 + 阴影</div>
+      </div>
+
+      <p style="margin:14px 0 0;color:#55617a;font-size:13px;">
+        第二个用了 <code>cubic-bezier(.34, 1.56, .64, 1)</code>，第三个参数超过 1，
+        会产生轻微"弹一下"的效果——比默认的 ease 更有手感，但别用在需要精确对齐的地方。
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>三、缓动曲线对比</h2>
+      <p class="demo-hint">鼠标移进任意一行，五个圆点同时出发、同一时长，只有曲线不同。</p>
+
+      <div class="timing">
+        <div class="lane"><span>linear</span><div class="track"><i class="dot e-linear"></i></div></div>
+        <div class="lane"><span>ease（默认）</span><div class="track"><i class="dot e-ease"></i></div></div>
+        <div class="lane"><span>ease-in</span><div class="track"><i class="dot e-in"></i></div></div>
+        <div class="lane"><span>ease-out</span><div class="track"><i class="dot e-out"></i></div></div>
+        <div class="lane"><span>cubic-bezier 回弹</span><div class="track"><i class="dot e-back"></i></div></div>
+      </div>
+
+      <p style="margin:14px 0 0;color:#55617a;font-size:13px;">
+        进场动画常用 <code>ease-out</code>（快进慢停），退场用 <code>ease-in</code>；
+        匀速的 <code>linear</code> 只适合旋转、进度这类需要等速的东西。
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>四、@keyframes：不用触发的动画</h2>
+      <p class="demo-hint">这些动画页面一打开就在跑，靠 <code>animation: 名称 时长 缓动 循环次数</code> 启动。</p>
+
+      <div class="anim-grid">
+        <div class="anim-cell">
+          <div class="stage"><div class="loader"></div></div>
+          加载环<br><code>spin .9s infinite</code>
+        </div>
+        <div class="anim-cell">
+          <div class="stage"><div class="pulse"></div></div>
+          呼吸灯<br><code>pulse 1.4s infinite</code>
+        </div>
+        <div class="anim-cell">
+          <div class="stage"><div class="float"></div></div>
+          浮动<br><code>float 2s infinite</code>
+        </div>
+        <div class="anim-cell">
+          <div class="stage" style="width:100%;"><div class="bar-track"><div class="bar-fill"></div></div></div>
+          进度条<br><code>grow-bar 2.6s infinite</code>
+        </div>
+        <div class="anim-cell">
+          <div class="stage"><span class="shake">格式错误</span></div>
+          错误抖动<br><code>shake .6s infinite</code>
+        </div>
+      </div>
+
+<pre><code>@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loader {
+  animation: spin .9s linear infinite;
+}</code></pre>
+    </section>
+
+    <div class="note">
+      <b>两条实践建议：</b>
+      ① 动画只改 <code>transform</code> 和 <code>opacity</code>。改 <code>width / top / margin</code>
+      会让浏览器每一帧重新计算布局，机器差一点就掉帧；
+      ② 加上 <code>@media (prefers-reduced-motion: reduce)</code> 关掉动画——
+      有些用户会因为前庭功能问题对运动敏感，这个媒体查询在系统设置里能关掉全部动画。
+      本页已经加上了，你可以在系统设置里打开"减少动态效果"验证。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

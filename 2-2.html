@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>页面练习 · 个人简介 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ---- 练习：按效果图还原一个静态个人简介页 ---- */
+  .profile {
+    max-width: 720px;
+    margin: 0 auto;
+    border: 1px solid #e6e8ec;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 20px 40px -28px rgba(20, 22, 26, .25);
+  }
+
+  .profile__head {
+    padding: 34px 36px 28px;
+    background: #f4f7fd;
+    border-bottom: 1px solid #e6e8ec;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+
+  .avatar {
+    width: 78px;
+    height: 78px;
+    flex: 0 0 78px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #2f6fed;
+    color: #fff;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    box-shadow: 0 6px 16px -8px rgba(47, 111, 237, .8);
+  }
+
+  .profile__id h2 {
+    margin: 0 0 4px;
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+
+  .profile__id .role {
+    margin: 0;
+    color: #4b525c;
+    font-size: 13.5px;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+
+  .tags span {
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #dbe4f5;
+    color: #3a5170;
+    font-size: 12px;
+  }
+
+  .profile__body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .block { padding: 24px 26px; border-right: 1px solid #eef0f3; }
+  .block:last-child { border-right: 0; }
+
+  .block h3 {
+    margin: 0 0 12px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    color: #8b929d;
+    text-transform: uppercase;
+  }
+
+  .block ul { margin: 0; padding-left: 16px; font-size: 13.5px; line-height: 1.95; color: #2c333d; }
+  .block li::marker { color: #b9c2d0; }
+
+  .bar { margin-bottom: 11px; }
+  .bar span { display: block; font-size: 12.5px; color: #4b525c; margin-bottom: 5px; }
+  .bar i {
+    display: block;
+    height: 5px;
+    border-radius: 3px;
+    background: #eef1f5;
+    overflow: hidden;
+  }
+  .bar i b { display: block; height: 100%; border-radius: 3px; background: #2f6fed; }
+  .bar i b.w80 { width: 80%; }
+  .bar i b.w65 { width: 65%; }
+  .bar i b.w50 { width: 50%; }
+
+  .block p { margin: 0 0 10px; font-size: 13.5px; color: #4b525c; }
+  .block p b { color: #2c333d; font-weight: 600; }
+
+  .profile__foot {
+    padding: 14px 26px;
+    border-top: 1px solid #eef0f3;
+    background: #fcfdfe;
+    font-size: 12.5px;
+    color: #8b929d;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 620px) {
+    .profile__body { grid-template-columns: 1fr; }
+    .block { border-right: 0; border-bottom: 1px solid #eef0f3; }
+    .block:last-child { border-bottom: 0; }
+    .profile__head { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>页面练习</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>页面练习：个人简介</h1>
+    <div class="meta">
+      <span>第 2 讲</span>
+      <span class="mono">2-2.html</span>
+      <span>HTML + CSS</span>
+    </div>
+    <p class="lead">
+      按效果图还原一个静态个人简介页。练的是"看着图能拆出结构"：先分区块，再定栅格，
+      最后才调间距和字号。这一页只用到 Flex 和三列 Grid，没有绝对定位，也没有图片资源。
+    </p>
+
+    <section class="demo">
+      <h2>还原结果</h2>
+      <p class="demo-hint">窗口变窄时三列会自动堆成单列，头部信息也跟着换行。</p>
+
+      <div class="profile">
+        <div class="profile__head">
+          <div class="avatar">段</div>
+          <div class="profile__id">
+            <h2>段栋</h2>
+            <p class="role">计算机应用 · 高级网页设计 · 2026 秋</p>
+            <div class="tags">
+              <span>HTML5</span>
+              <span>CSS3</span>
+              <span>Flex</span>
+              <span>Grid</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile__body">
+          <div class="block">
+            <h3>基本信息</h3>
+            <p><b>姓名</b>　段栋</p>
+            <p><b>课程</b>　高级网页设计</p>
+            <p><b>时间</b>　2026 年秋季学期</p>
+            <p><b>方向</b>　前端页面制作</p>
+          </div>
+
+          <div class="block">
+            <h3>掌握程度</h3>
+            <div class="bar">
+              <span>HTML 结构</span>
+              <i><b class="w80"></b></i>
+            </div>
+            <div class="bar">
+              <span>CSS 布局</span>
+              <i><b class="w65"></b></i>
+            </div>
+            <div class="bar">
+              <span>动画与过渡</span>
+              <i><b class="w50"></b></i>
+            </div>
+          </div>
+
+          <div class="block">
+            <h3>本页练习点</h3>
+            <ul>
+              <li>Flex 做头部横向排列</li>
+              <li>Grid 三列等宽布局</li>
+              <li>进度条用宽度百分比</li>
+              <li>媒体查询改单列</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="profile__foot">
+          <span>段栋 · 高级网页设计课堂练习</span>
+          <span>2-2.html</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="note">
+      <b>还原顺序：</b>量出效果图的分栏（这里是头部 + 三列正文）→ 写出不带样式的 HTML 骨架 →
+      再用 Flex/Grid 把骨架摆到位 → 最后调字号、行高、间距。跳过骨架直接调样式，
+      后面每加一个区块都要重排一遍。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

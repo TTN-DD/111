@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>层叠与继承 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ---------- 同权重：后写的赢 ---------- */
+  .order-demo {
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .first  { background: #eaf1fe; color: #1c4fc0; }
+  .second { background: #eef8f3; color: #12603f; }   /* 写在后面，所以它赢 */
+
+  /* ---------- 继承演示 ---------- */
+  .inherit-parent {
+    padding: 20px;
+    border: 1px solid #e6e8ec;
+    border-radius: 10px;
+    background: #fff;
+    color: #7c3aed;
+    font-family: Georgia, "Songti SC", serif;
+    font-size: 15px;
+    line-height: 1.9;
+    letter-spacing: .02em;
+    /* 下面这些不会被子元素继承 */
+    border-color: #d8c7f5;
+    background-color: #fbf8ff;
+  }
+
+  .inherit-parent .child {
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #e6e8ec;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+    font-family: var(--sans);
+  }
+
+  .inherit-parent .child b { color: #2c333d; }
+
+  /* ---------- inherit 关键字 ---------- */
+  .force-parent { padding: 16px; border: 2px solid #2f6fed; border-radius: 10px; background: #f7faff; }
+  .force-parent .no-inherit { padding: 10px; border: 2px dashed #c2410c; border-radius: 8px; }
+  .force-parent .do-inherit  { padding: 10px; border: 2px dashed #12603f; border-radius: 8px; border-color: inherit; }
+
+  /* ---------- !important ---------- */
+  .imp { padding: 12px 14px; border-radius: 8px; background: #fdf1f1; color: #b23b3b; font-size: 13.5px; }
+  .imp strong { color: #8a2b2b !important; }
+  .imp strong { color: #1c4fc0; }
+
+  .demo-stack > * + * { margin-top: 10px; }
+
+  .inline-note { margin: 12px 0 0; color: #8b929d; font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>层叠与继承</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>层叠与继承</h1>
+    <div class="meta">
+      <span>第 5 讲</span>
+      <span class="mono">5.html</span>
+      <span>CSS 核心机制</span>
+    </div>
+    <p class="lead">
+      「层叠」解决的是多条规则同时命中一个元素时谁生效；「继承」解决的是子元素没写样式时要不要听父元素的。
+      这两条是 CSS 的地基，调不出效果的九成原因都在这。
+    </p>
+
+    <section class="demo">
+      <h2>一、优先级怎么算</h2>
+      <p class="demo-hint">把选择器拆成四位数字比较，从左往右逐位比，不是加总。</p>
+
+      <table class="data">
+        <thead>
+          <tr><th>选择器</th><th>行内</th><th>id</th><th>class / 属性 / 伪类</th><th>标签 / 伪元素</th><th>合计</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>p</code></td><td>0</td><td>0</td><td>0</td><td>1</td><td>0,0,0,1</td></tr>
+          <tr><td><code>.card p</code></td><td>0</td><td>0</td><td>1</td><td>1</td><td>0,0,1,1</td></tr>
+          <tr><td><code>#main .card p</code></td><td>0</td><td>1</td><td>1</td><td>1</td><td>0,1,1,1</td></tr>
+          <tr><td><code>style="color:red"</code></td><td>1</td><td>0</td><td>0</td><td>0</td><td>1,0,0,0</td></tr>
+        </tbody>
+      </table>
+
+      <p class="inline-note">
+        注意 <code>0,0,1,1</code> 和 <code>0,0,2,0</code>：后者更大。
+        不要误以为"class 数量乘以 10 加起来"——虽然多数情况下结果巧合一致，但十一位的 class 也压不过一个 id。
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>二、同权重：后写的覆盖先写的</h2>
+      <p class="demo-hint">两个类权重都是 0,0,1,0，谁在后面谁生效。</p>
+      <div class="demo-stack">
+        <div class="order-demo first second">我同时有 first 和 second 两个类，最终是 second 的颜色</div>
+      </div>
+<pre><code>.first  { background: #eaf1fe; color: #1c4fc0; }
+.second { background: #eef8f3; color: #12603f; }  /* 在后面，赢 */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>三、哪些属性会继承</h2>
+      <p class="demo-hint">父元素设了字体、颜色、行高，子元素不写也自动获得。</p>
+
+      <div class="inherit-parent">
+        父元素：紫色文字、衬线字体、字间距 0.02em。
+        <div class="child">
+          子元素<b>没有</b>写 color 和 font-family，但文字变成了紫色衬线体——这就是继承。<br>
+          反过来，子元素有自己的灰色边框和白色背景，说明 <code>border</code> 和
+          <code>background</code> <b>不会</b>继承。
+        </div>
+      </div>
+
+      <table class="data" style="margin-top:16px;">
+        <thead>
+          <tr><th>会继承（文字相关）</th><th>不会继承（盒子和背景）</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>color</code> <code>font-*</code> <code>line-height</code></td><td><code>margin</code> <code>padding</code> <code>border</code></td></tr>
+          <tr><td><code>letter-spacing</code> <code>text-align</code></td><td><code>background</code> <code>width</code> <code>height</code></td></tr>
+          <tr><td><code>visibility</code> <code>cursor</code></td><td><code>display</code> <code>position</code> <code>overflow</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="demo">
+      <h2>四、想让不继承的属性也继承：用 inherit</h2>
+      <p class="demo-hint">中间那个子盒子写了 border-color: inherit，于是拿到了父元素的蓝色边框。</p>
+      <div class="force-parent">
+        父元素边框：蓝色
+        <div class="no-inherit">没写 inherit：保留自己的橙色边框</div>
+        <div class="do-inherit" style="margin-top:8px;">写了 border-color: inherit：边框变成父元素的蓝色</div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>五、!important 的代价</h2>
+      <p class="demo-hint">下面这段文字有两条同名规则，后面那条加了 !important，于是先写的反而赢了。</p>
+      <div class="imp">
+        <strong>我是红色，因为 .imp strong 那条后面加了 !important，把后面写的蓝色盖掉了。</strong>
+      </div>
+<pre><code>.imp strong { color: #8a2b2b !important; }
+.imp strong { color: #1c4fc0; }             /* 明明在后面，却输了 */</code></pre>
+      <p class="inline-note">
+        这就是 !important 最危险的地方：它破坏了"后写覆盖先写"这个直觉，
+        后来接手的人看到颜色不对，改哪一条都没用，得全局搜 !important。
+        只在覆盖第三方库、或者真的没法改源码时才用。
+      </p>
+    </section>
+
+    <div class="note">
+      <b>排查顺序（实测有效）：</b>
+      ① 打开开发者工具看这条属性有没有被划掉，划掉说明被更高优先级覆盖；
+      ② 看继承来的值（Computed 面板会标「inherited from」）；
+      ③ 还是没有？检查有没有 <code>!important</code>、有没有内联 style；
+      ④ 顺序错了？看两个规则谁在后面。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

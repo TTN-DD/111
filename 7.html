@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flex 布局 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .fx-panel {
+    padding: 14px;
+    border: 1px solid #e6e8ec;
+    border-radius: 10px;
+    background: #fff;
+    margin-bottom: 12px;
+  }
+
+  .fx-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .fx-label h4 { margin: 0; font-size: 13.5px; font-weight: 600; }
+  .fx-label code { font-size: 11.5px; }
+
+  .fx {
+    display: flex;
+    height: 62px;
+    padding: 6px;
+    border: 1px dashed #cfd7e6;
+    border-radius: 8px;
+    background: #fafbfd;
+  }
+
+  .fx i {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    border-radius: 6px;
+    background: #2f6fed;
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-style: normal;
+    flex: 0 0 auto;
+  }
+
+  .fx i:nth-child(2) { background: #5b8ef5; }
+  .fx i:nth-child(3) { background: #8fb3f9; }
+
+  /* 方向 */
+  .d-row         { flex-direction: row; gap: 8px; }
+  .d-row-reverse { flex-direction: row-reverse; gap: 8px; }
+  .d-column      { flex-direction: column; gap: 6px; height: 150px; }
+  .d-column i    { width: auto; }
+
+  /* 主轴对齐 */
+  .j-start   { justify-content: flex-start; gap: 8px; }
+  .j-center  { justify-content: center; gap: 8px; }
+  .j-end     { justify-content: flex-end; gap: 8px; }
+  .j-between { justify-content: space-between; }
+  .j-around  { justify-content: space-around; }
+  .j-evenly  { justify-content: space-evenly; }
+
+  /* 交叉轴 */
+  .a-start    { align-items: flex-start; gap: 8px; }
+  .a-center   { align-items: center; gap: 8px; }
+  .a-end      { align-items: flex-end; gap: 8px; }
+  .a-stretch  { align-items: stretch; gap: 8px; }
+  .a-stretch i { height: auto; }
+
+  .tall  { height: 44px; }
+  .taller{ height: 50px; }
+
+  /* 增长 */
+  .grow { gap: 8px; }
+  .grow i { width: auto; }
+  .g1 { flex: 1; }
+  .g2 { flex: 2; }
+  .g3 { flex: 3; }
+
+  /* 换行 */
+  .wrap-demo { flex-wrap: wrap; gap: 8px; height: auto; }
+  .wrap-demo i { width: 30%; }
+  .nowrap-demo { gap: 8px; }
+  .nowrap-demo i { width: 30%; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .split { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>Flex 布局</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>Flex 布局：六组对齐方式</h1>
+    <div class="meta">
+      <span>第 7 讲</span>
+      <span class="mono">7.html</span>
+      <span>Flexbox</span>
+    </div>
+    <p class="lead">
+      用 Flex 只需要记住两件事：谁是容器（<code>display:flex</code>），谁是「主轴」（<code>flex-direction</code>）。
+      主轴方向定了，<code>justify-content</code> 就是主轴上的分布，<code>align-items</code> 就是垂直于主轴的对齐。
+    </p>
+
+    <section class="demo">
+      <h2>一、主轴方向</h2>
+      <p class="demo-hint">改 flex-direction，justify-content 的方向也跟着转 90°。</p>
+
+      <div class="split">
+        <div class="fx-panel">
+          <div class="fx-label"><h4>row（默认，横向）</h4><code>flex-direction: row</code></div>
+          <div class="fx d-row"><i>1</i><i>2</i><i>3</i></div>
+        </div>
+        <div class="fx-panel">
+          <div class="fx-label"><h4>row-reverse（反向）</h4><code>flex-direction: row-reverse</code></div>
+          <div class="fx d-row-reverse"><i>1</i><i>2</i><i>3</i></div>
+        </div>
+      </div>
+
+      <div class="fx-panel">
+        <div class="fx-label"><h4>column（纵向）</h4><code>flex-direction: column</code></div>
+        <div class="fx d-column"><i>1</i><i>2</i><i>3</i></div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>二、justify-content：主轴上的分布</h2>
+      <p class="demo-hint">六个取值一次看完，注意剩余空间是怎么被分配的。</p>
+
+      <div class="fx-panel">
+        <div class="fx-label"><h4>flex-start</h4><code>靠主轴起点，剩余空间全留末尾</code></div>
+        <div class="fx j-start"><i>1</i><i>2</i><i>3</i></div>
+      </div>
+      <div class="fx-panel">
+        <div class="fx-label"><h4>center</h4><code>整体居中，两侧空间相等</code></div>
+        <div class="fx j-center"><i>1</i><i>2</i><i>3</i></div>
+      </div>
+      <div class="fx-panel">
+        <div class="fx-label"><h4>flex-end</h4><code>靠主轴末端</code></div>
+        <div class="fx j-end"><i>1</i><i>2</i><i>3</i></div>
+      </div>
+      <div class="fx-panel">
+        <div class="fx-label"><h4>space-between</h4><code>两端贴边，中间均分 —— 做导航栏最常用</code></div>
+        <div class="fx j-between"><i>1</i><i>2</i><i>3</i></div>
+      </div>
+      <div class="fx-panel">
+        <div class="fx-label"><h4>space-around</h4><code>每个元素两侧空间相等，所以两端是中间的一半</code></div>
+        <div class="fx j-around"><i>1</i><i>2</i><i>3</i></div>
+      </div>
+      <div class="fx-panel">
+        <div class="fx-label"><h4>space-evenly</h4><code>所有间隙完全相等，包括两端</code></div>
+        <div class="fx j-evenly"><i>1</i><i>2</i><i>3</i></div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>三、align-items：交叉轴上的对齐</h2>
+      <p class="demo-hint">盒子高度不同才能看出差别，所以第 3 个盒子加了高度。</p>
+
+      <div class="split">
+        <div class="fx-panel">
+          <div class="fx-label"><h4>flex-start</h4><code>贴顶</code></div>
+          <div class="fx a-start"><i class="tall">1</i><i>2</i><i class="taller">3</i></div>
+        </div>
+        <div class="fx-panel">
+          <div class="fx-label"><h4>center</h4><code>垂直居中，最常用</code></div>
+          <div class="fx a-center"><i class="tall">1</i><i>2</i><i class="taller">3</i></div>
+        </div>
+        <div class="fx-panel">
+          <div class="fx-label"><h4>flex-end</h4><code>贴底</code></div>
+          <div class="fx a-end"><i class="tall">1</i><i>2</i><i class="taller">3</i></div>
+        </div>
+        <div class="fx-panel">
+          <div class="fx-label"><h4>stretch</h4><code>没设高度时自动拉满</code></div>
+          <div class="fx a-stretch"><i>1</i><i>2</i><i>3</i></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>四、flex-grow：按比例分剩余空间</h2>
+      <p class="demo-hint">三个盒子的 flex 分别写 1 / 2 / 3，宽度比就是 1 : 2 : 3。</p>
+      <div class="fx-panel">
+        <div class="fx-label"><h4>flex: 1 / 2 / 3</h4><code>剩余空间按比例分配</code></div>
+        <div class="fx grow"><i class="g1">1</i><i class="g2">2</i><i class="g3">3</i></div>
+      </div>
+<pre><code>.item-1 { flex: 1; }   /* flex-grow: 1 */
+.item-2 { flex: 2; }
+.item-3 { flex: 3; }</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>五、flex-wrap：装不下怎么办</h2>
+      <p class="demo-hint">三个盒子各占 30%，加上间距装不下 100%，换不换行是两种结果。</p>
+
+      <div class="split">
+        <div class="fx-panel">
+          <div class="fx-label"><h4>nowrap（默认）</h4><code>挤在一行，盒子被压缩</code></div>
+          <div class="fx nowrap-demo"><i>1</i><i>2</i><i>3</i></div>
+        </div>
+        <div class="fx-panel">
+          <div class="fx-label"><h4>wrap</h4><code>装不下就换行</code></div>
+          <div class="fx wrap-demo"><i>1</i><i>2</i><i>3</i></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="note">
+      <b>一句话判断该用哪组：</b>一行排列、需要垂直居中、需要两端对齐 → Flex；
+      两维网格、行列都要对齐 → Grid。别拿 Flex 硬做网格，
+      也别为了一个垂直居中引入 Grid。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

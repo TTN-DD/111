@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flex 布局进阶 — 段栋</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ---------- 1. 三个等宽长方框带文字 ---------- */
+  .three {
+    display: flex;
+    gap: 12px;
+  }
+
+  .rect {
+    flex: 1;
+    min-width: 0;
+    padding: 16px 18px 18px;
+    border: 1px solid #dbe4f5;
+    border-radius: 10px;
+    background: #f7faff;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .rect .k {
+    color: #7f97c4;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .06em;
+  }
+
+  .rect h4 { margin: 0; font-size: 15px; font-weight: 600; color: #1b2b45; }
+
+  .rect p { margin: 0; font-size: 12.5px; line-height: 1.7; color: #55617a; }
+
+  /* ---------- 2. 侧栏固定 + 内容自适应 ---------- */
+  .sidebar-layout {
+    display: flex;
+    gap: 12px;
+    min-height: 132px;
+  }
+
+  .sidebar-layout .aside {
+    flex: 0 0 168px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #eef2f9;
+    color: #55617a;
+    font-size: 12.5px;
+    line-height: 1.9;
+  }
+
+  .sidebar-layout .aside b { display: block; margin-bottom: 6px; color: #2c333d; font-size: 13px; }
+
+  .sidebar-layout .main {
+    flex: 1;
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid #e6e8ec;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 12.5px;
+    color: #4b525c;
+    line-height: 1.8;
+  }
+
+  /* ---------- 3. 圣杯布局 ---------- */
+  .grail {
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+    border: 1px solid #e6e8ec;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    font-size: 12.5px;
+  }
+
+  .grail header,
+  .grail footer {
+    padding: 10px 14px;
+    background: #1b2b45;
+    color: #fff;
+    font-size: 12.5px;
+  }
+
+  .grail footer { background: #2d3d59; }
+
+  .grail .middle {
+    display: flex;
+    flex: 1;
+  }
+
+  .grail .nav,
+  .grail .side {
+    flex: 0 0 118px;
+    padding: 12px;
+    background: #f2f5fa;
+    color: #55617a;
+  }
+
+  .grail .nav { border-right: 1px solid #e6e8ec; }
+  .grail .side { border-left: 1px solid #e6e8ec; }
+
+  .grail .content {
+    flex: 1;
+    min-width: 0;
+    padding: 14px;
+    color: #2c333d;
+    line-height: 1.85;
+  }
+
+  .grail .content h4 { margin: 0 0 6px; font-size: 14px; }
+
+  /* ---------- 4. 等高列 ---------- */
+  .equal-height { display: flex; gap: 12px; align-items: stretch; }
+
+  .equal-height > div {
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    background: #fbfcfd;
+    border: 1px solid #e6e8ec;
+    font-size: 12.5px;
+    color: #4b525c;
+    line-height: 1.75;
+  }
+
+  .equal-height h4 { margin: 0 0 6px; font-size: 13.5px; color: #2c333d; }
+
+  /* ---------- 5. 完美居中 ---------- */
+  .center-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 150px;
+    border: 1px dashed #cfd7e6;
+    border-radius: 10px;
+    background: #fafbfd;
+  }
+
+  .center-stage span {
+    padding: 14px 28px;
+    border-radius: 10px;
+    background: #2f6fed;
+    color: #fff;
+    font-size: 13.5px;
+    box-shadow: 0 10px 24px -14px rgba(47, 111, 237, .9);
+  }
+
+  /* ---------- 响应式 ---------- */
+  @media (max-width: 700px) {
+    .three { flex-direction: column; }
+    .sidebar-layout { flex-direction: column; }
+    .sidebar-layout .aside { flex: 0 0 auto; }
+    .grail .middle { flex-direction: column; }
+    .grail .nav, .grail .side { flex: 0 0 auto; border: 0; }
+    .grail .nav { border-bottom: 1px solid #e6e8ec; }
+    .grail .side { border-top: 1px solid #e6e8ec; }
+    .equal-height { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="back" href="index.html">← 返回索引</a>
+    <span class="crumb">高级网页设计 / <b>Flex 布局进阶</b></span>
+  </div>
+</div>
+
+<main class="doc">
+  <div class="wrap">
+    <h1>Flex 布局进阶：四组实战结构</h1>
+    <div class="meta">
+      <span>第 8 讲</span>
+      <span class="mono">8.html</span>
+      <span>Flexbox 应用</span>
+    </div>
+    <p class="lead">
+      上一页练的是单个属性，这一页练组合：等宽分栏、侧栏固定、圣杯布局、等高列、垂直居中。
+      这些都是页面里真正会反复出现的结构，写熟了就不需要到处用固定宽度。
+    </p>
+
+    <section class="demo">
+      <h2>一、三个等宽长方框带文字</h2>
+      <p class="demo-hint">每个框都是 <code>flex: 1</code>，宽度自动均分；文字长短不同也不影响对齐。</p>
+
+      <div class="three">
+        <div class="rect">
+          <span class="k">STEP 01</span>
+          <h4>拆结构</h4>
+          <p>先把效果图拆成区块，写出不带样式的 HTML 骨架。</p>
+        </div>
+        <div class="rect">
+          <span class="k">STEP 02</span>
+          <h4>定栅格</h4>
+          <p>用 Flex 或 Grid 把区块摆到位置，这一阶段不加任何装饰。</p>
+        </div>
+        <div class="rect">
+          <span class="k">STEP 03</span>
+          <h4>调细节</h4>
+          <p>最后才调字号、行高、圆角和间距，改一处不影响其他区块。</p>
+        </div>
+      </div>
+
+      <pre style="margin-top:14px;"><code>.three { display: flex; gap: 12px; }
+.rect  { flex: 1; min-width: 0; }</code></pre>
+      <p style="margin:0;color:#8b929d;font-size:12.5px;">
+        <code>min-width: 0</code> 别省：Flex 子项默认最小宽度不小于内容宽度，里面文字一长就会把分栏挤变形。
+      </p>
+    </section>
+
+    <section class="demo">
+      <h2>二、侧栏固定宽度 + 内容自适应</h2>
+      <p class="demo-hint"><code>flex: 0 0 168px</code> 表示不放大、不缩小、固定 168px。</p>
+
+      <div class="sidebar-layout">
+        <div class="aside">
+          <b>侧栏</b>
+          固定 168px<br>
+          导航 / 目录 / 筛选条件<br>
+          放在这里
+        </div>
+        <div class="main">
+          <b style="color:#2c333d;">内容区 flex: 1</b><br>
+          宽度随窗口变化自动伸展。窗口变窄到 700px 以下时，整块会变成上下结构——
+          这是媒体查询在起作用，不是 Flex 自己会换行。
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>三、圣杯布局</h2>
+      <p class="demo-hint">外层是纵向 Flex（头 / 中间 / 尾），中间那层再横向 Flex 分成三栏。</p>
+
+      <div class="grail">
+        <header>header — 顶部通栏</header>
+        <div class="middle">
+          <nav class="nav">nav<br>固定 118px</nav>
+          <div class="content">
+            <h4>主内容区</h4>
+            三层 Flex 嵌套：最外层 <code>flex-direction: column</code>，
+            保证页脚始终贴底；中间层横向排列，主内容 <code>flex: 1</code> 吃掉剩余宽度。
+            这样无论内容多少，页脚都不会浮在页面中间。
+          </div>
+          <aside class="side">aside<br>固定 118px</aside>
+        </div>
+        <footer>footer — 贴底</footer>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>四、等高列与垂直居中</h2>
+      <p class="demo-hint">左边三列文字长短不同，高度自动拉齐；右边是 Flex 做居中的标准写法。</p>
+
+      <div class="equal-height">
+        <div>
+          <h4>短</h4>
+          只有一行。
+        </div>
+        <div>
+          <h4>中</h4>
+          内容长一些，占三行左右。注意三列的高度是完全一致的，因为 <code>align-items</code> 默认就是 stretch。
+        </div>
+        <div>
+          <h4>长</h4>
+          这一列写得最长，用来验证另外两列会不会跟着一起变高。答案是会——这就是 Flex 相比浮动布局最省心的地方，浮动还得自己补 min-height。
+        </div>
+      </div>
+
+      <div class="center-stage" style="margin-top:14px;">
+        <span>align-items + justify-content = 完美居中</span>
+      </div>
+<pre style="margin-top:14px;"><code>.center-stage {
+  display: flex;
+  align-items: center;      /* 交叉轴居中 */
+  justify-content: center;  /* 主轴居中 */
+}</code></pre>
+    </section>
+
+    <div class="note">
+      <b>组合规律：</b>横向排列用 <code>display:flex</code>，纵向排列就加
+      <code>flex-direction: column</code>，需要某一项吃掉剩余空间就给它
+      <code>flex: 1; min-width: 0;</code>。
+      这三句话能解决课上遇到的大部分布局题，剩下的才需要 Grid。
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span>段栋 · 高级网页设计课堂练习</span>
+    <span><a href="index.html">返回索引</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
